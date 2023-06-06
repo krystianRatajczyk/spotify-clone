@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import axios from "axios";
@@ -7,13 +7,17 @@ import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 
 import Input from "@/components/Input";
+import serverAuth from "@/lib/serverAuth";
+import { requireAuthentication } from "@/lib/isAuthenticated";
+import { GetServerSideProps } from "next";
 
-const Auth = () => {
+const Auth = ({}) => {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
 
   const [type, setType] = useState("login");
 
@@ -26,10 +30,10 @@ const Auth = () => {
       await signIn("credentials", {
         email,
         password,
-        callbackUrl: "/profiles",
+        callbackUrl: "/",
       });
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      setError(error);
     }
   }, [email, password, router]);
 
@@ -63,7 +67,12 @@ const Auth = () => {
             {type !== "login" && (
               <div className="w-full flex items-center mt-5 bg-black rounded-xl">
                 <AiOutlineUser size={30} className="ml-3" />
-                <Input type="text" placeholder="Username" setState={setName} />
+                <Input
+                  type="text"
+                  placeholder="Username"
+                  setState={setName}
+                  state={name}
+                />
               </div>
             )}
             <div className="w-full flex items-center mt-5 bg-black rounded-xl">
@@ -72,13 +81,19 @@ const Auth = () => {
               ) : (
                 <AiOutlineMail size={30} className="ml-3" />
               )}
-              <Input type="text" placeholder="Email" setState={setEmail} />
+              <Input
+                type="text"
+                placeholder="Email"
+                setState={setEmail}
+                state={email}
+              />
             </div>
             <div className="w-full flex items-center mt-5 bg-black rounded-xl">
               <AiFillLock size={30} className="ml-3" />
               <Input
                 type="password"
                 placeholder="Password"
+                state={password}
                 setState={setPassword}
               />
             </div>
@@ -143,7 +158,12 @@ const Auth = () => {
             )}
             <p
               className="text-right mt-4  text-gray-500 cursor-pointer"
-              onClick={toggleType}
+              onClick={() => {
+                setName("");
+                setEmail("");
+                setPassword("");
+                toggleType();
+              }}
             >
               {type == "login"
                 ? "Don't have account ?"
@@ -157,3 +177,11 @@ const Auth = () => {
 };
 
 export default Auth;
+
+export const getServerSideProps: GetServerSideProps = requireAuthentication(
+  async (_ctx) => {
+    return {
+      props: {},
+    };
+  }
+);
