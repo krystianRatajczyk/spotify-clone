@@ -6,10 +6,13 @@ import { AiOutlineUser, AiFillLock, AiOutlineMail } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 
+import { SyncLoader } from "react-spinners";
+
 import Input from "@/components/Input";
-import serverAuth from "@/lib/serverAuth";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { GetServerSideProps } from "next";
+import { isEmailValid, isPasswordValid, isUsernameValid } from "@/lib/isValid";
+import { errorState } from "@/constants/initialStates";
 
 const Auth = ({}) => {
   const router = useRouter();
@@ -17,38 +20,106 @@ const Auth = ({}) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+
+  const [error, setError] = useState({
+    email: { message: null },
+    password: { message: null },
+    username: { message: null },
+  });
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const [type, setType] = useState("login");
 
   const toggleType = useCallback(() => {
     setType((currentType) => (currentType == "login" ? "register" : "login"));
+    setError(errorState);
   }, []);
 
   const login = useCallback(async () => {
+    setError(errorState);
     try {
-      await signIn("credentials", {
-        email,
-        password,
-        callbackUrl: "/",
-      });
+      if (isEmailValid(email) && isPasswordValid(password)) {
+        setIsLoggingIn(true);
+        signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        }).then(({ ok, error }: any) => {
+          if (ok) {
+            router.push("/");
+          } else {
+            let cause = "";
+            switch (error) {
+              case "Incorrect password": {
+                cause = "password";
+                break;
+              }
+              case "Email does not exist": {
+                cause = "email";
+                break;
+              }
+              default: {
+                break;
+              }
+            }
+            if (cause !== "") {
+              setError((prevState) => {
+                return {
+                  ...prevState,
+                  [cause]: {
+                    message: error,
+                  },
+                };
+              });
+            }
+            setIsLoggingIn(false);
+          }
+        });
+      }
     } catch (error: any) {
-      setError(error);
+      setIsLoggingIn(false);
+      setError((prevState) => {
+        return {
+          ...prevState,
+          [error.cause]: {
+            message: error.message,
+          },
+        };
+      });
     }
   }, [email, password, router]);
 
   const register = useCallback(async () => {
+    setError(errorState);
     try {
-      await axios.post("/api/register", {
-        email,
-        name,
-        password,
+      if (
+        isUsernameValid(name) &&
+        isEmailValid(email) &&
+        isPasswordValid(password)
+      ) {
+        setIsLoggingIn(true);
+        await axios
+          .post("/api/register", {
+            email,
+            name,
+            password,
+          })
+        login();
+      }
+    } catch (error: any) {
+      setIsLoggingIn(false);
+      setError((prevState) => {
+        return {
+          ...prevState,
+          [error.code ? error.response.data.cause : error.cause]: {
+            message: error.code ? error.response.data.error : error.message,
+          },
+        };
       });
-      login();
-    } catch (error) {
-      console.log(error);
     }
   }, [email, name, password, login]);
+
+  const errorClasses = "border-1 border-red-400";
 
   return (
     <div className="relative h-screen w-screen bg-black bg-no-repeat bg-center bg-fixed bg-hover">
@@ -65,7 +136,11 @@ const Auth = ({}) => {
               Please enter your credentials
             </p>
             {type !== "login" && (
-              <div className="w-full flex items-center mt-5 bg-black rounded-xl">
+              <div
+                className={`w-full flex items-center mt-2 bg-black rounded-xl border ${
+                  error.username.message ? errorClasses : "border-none"
+                }`}
+              >
                 <AiOutlineUser size={30} className="ml-3" />
                 <Input
                   type="text"
@@ -75,7 +150,16 @@ const Auth = ({}) => {
                 />
               </div>
             )}
-            <div className="w-full flex items-center mt-5 bg-black rounded-xl">
+            {error.username.message && (
+              <h3 className="font-semibold text-red-400">
+                {error.username.message}
+              </h3>
+            )}
+            <div
+              className={`w-full flex items-center mt-2 bg-black rounded-xl border ${
+                error.email.message ? errorClasses : "border-none"
+              }`}
+            >
               {type == "login" ? (
                 <AiOutlineUser size={30} className="ml-3" />
               ) : (
@@ -88,7 +172,16 @@ const Auth = ({}) => {
                 state={email}
               />
             </div>
-            <div className="w-full flex items-center mt-5 bg-black rounded-xl">
+            {error.email.message && (
+              <h3 className="font-semibold text-red-400">
+                {error.email.message}
+              </h3>
+            )}
+            <div
+              className={`w-full flex items-center mt-2 bg-black rounded-xl border ${
+                error.password.message ? errorClasses : "border-none"
+              }`}
+            >
               <AiFillLock size={30} className="ml-3" />
               <Input
                 type="password"
@@ -97,7 +190,13 @@ const Auth = ({}) => {
                 setState={setPassword}
               />
             </div>
+            {error.password.message && (
+              <h3 className="font-semibold text-red-400">
+                {error.password.message}
+              </h3>
+            )}
             <button
+              disabled={isLoggingIn}
               onClick={() => {
                 type == "login" ? login() : register();
               }}
@@ -111,7 +210,13 @@ const Auth = ({}) => {
                     duration-300 
                     hover:bg-darkPrimary"
             >
-              {type == "login" ? "Login" : "Register"}
+              {isLoggingIn ? (
+                <SyncLoader size={8} />
+              ) : type == "login" && !isLoggingIn ? (
+                "Login"
+              ) : (
+                "Register"
+              )}
             </button>
             {type == "login" && (
               <div>
