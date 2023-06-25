@@ -98,12 +98,11 @@ const Auth = ({}) => {
         isPasswordValid(password)
       ) {
         setIsLoggingIn(true);
-        await axios
-          .post("/api/register", {
-            email,
-            name,
-            password,
-          })
+        await axios.post("/api/register", {
+          email,
+          name,
+          password,
+        });
         login();
       }
     } catch (error: any) {
@@ -211,7 +210,7 @@ const Auth = ({}) => {
                     hover:bg-darkPrimary"
             >
               {isLoggingIn ? (
-                <SyncLoader size={8} />
+                <SyncLoader size={8} color="white" />
               ) : type == "login" && !isLoggingIn ? (
                 "Login"
               ) : (
@@ -262,7 +261,7 @@ const Auth = ({}) => {
               </div>
             )}
             <p
-              className="text-right mt-4  text-gray-500 cursor-pointer"
+              className="text-right mt-10  text-gray-500 cursor-pointer"
               onClick={() => {
                 setName("");
                 setEmail("");

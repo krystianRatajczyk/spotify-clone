@@ -12,8 +12,8 @@ const Profile = () => {
   const router = useRouter();
 
   return (
-    <div className="h-screen w-screen bg-black flex justify-center items-center">
-      <div className="px-20 py-16 bg-lightGray rounded-lg flex justify-center items-center flex-col">
+    <div className="h-full w-full bg-black flex justify-center items-center">
+      <div className="px-20 py-5 bg-lightGray rounded-lg flex justify-center items-center flex-col">
         <nav className="flex w-full items-center">
           <p
             className="self-start"

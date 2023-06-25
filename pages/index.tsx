@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="bg-black h-screen w-screen">
+    <div className="">
       <Link href="/profile">Profile</Link>
       <button onClick={() => signOut()}>Logout</button>
     </div>
