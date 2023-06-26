@@ -127,7 +127,17 @@ const Auth = ({}) => {
           <img src="/images/logo.png" alt="logo" className="h-12" />
         </nav>
         <div className="flex justify-center items-center">
-          <div className="bg-lightGray bg-opacity-70 px-16 py-16 self-centerlg:w-2/5 lg:max-w-md rounded-md w-full transition">
+          <div className="
+                bg-mediumGray 
+                bg-opacity-70 
+                px-16 py-16 
+                self-center 
+                lg:w-2/5 
+                lg:max-w-md 
+                rounded-md 
+                w-full 
+                transition
+                drop-shadow-2xl">
             <h2 className="text-white text-4xl mb-8 font-semibold text-center">
               {type == "login" ? "Login" : "Register"}
             </h2>

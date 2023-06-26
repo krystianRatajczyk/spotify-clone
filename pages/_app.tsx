@@ -4,8 +4,15 @@ import { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import type { AppProps } from "next/app";
 import { authOptions } from "./api/auth/[...nextauth]";
+import { usePathname } from "next/navigation";
 
 export default function App({ Component, pageProps }: AppProps) {
+  const pathname = usePathname();
+
+  if (pathname == "/auth") {
+    return <Component {...pageProps} />;
+  }
+
   return (
     <Layout>
       <Component {...pageProps} />
