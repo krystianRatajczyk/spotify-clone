@@ -17,18 +17,18 @@ import { errorState } from "@/constants/initialStates";
 const Auth = ({}) => {
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
   const [error, setError] = useState({
     email: { message: null },
     password: { message: null },
     username: { message: null },
   });
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
 
-  const [type, setType] = useState("login");
+  const [type, setType] = useState<string>("login");
 
   const toggleType = useCallback(() => {
     setType((currentType) => (currentType == "login" ? "register" : "login"));
@@ -127,7 +127,8 @@ const Auth = ({}) => {
           <img src="/images/logo.png" alt="logo" className="h-12" />
         </nav>
         <div className="flex justify-center items-center">
-          <div className="
+          <div
+            className="
                 bg-mediumGray 
                 bg-opacity-70 
                 px-16 py-16 
@@ -137,7 +138,8 @@ const Auth = ({}) => {
                 rounded-md 
                 w-full 
                 transition
-                drop-shadow-2xl">
+                drop-shadow-2xl"
+          >
             <h2 className="text-white text-4xl mb-8 font-semibold text-center">
               {type == "login" ? "Login" : "Register"}
             </h2>
@@ -154,7 +156,7 @@ const Auth = ({}) => {
                 <Input
                   type="text"
                   placeholder="Username"
-                  setState={setName}
+                  setstate={setName}
                   state={name}
                 />
               </div>
@@ -177,7 +179,7 @@ const Auth = ({}) => {
               <Input
                 type="text"
                 placeholder="Email"
-                setState={setEmail}
+                setstate={setEmail}
                 state={email}
               />
             </div>
@@ -196,7 +198,7 @@ const Auth = ({}) => {
                 type="password"
                 placeholder="Password"
                 state={password}
-                setState={setPassword}
+                setstate={setPassword}
               />
             </div>
             {error.password.message && (

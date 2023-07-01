@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="">
+    <div className="px-5 py-4 flex-1 bg-darkGray">
       <Link href="/profile">Profile</Link>
       <button onClick={() => signOut()}>Logout</button>
     </div>

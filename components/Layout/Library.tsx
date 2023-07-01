@@ -7,8 +7,7 @@ const Library: React.FC = () => {
       <h2 className="font-bold text-lg">Create your first playlist</h2>
       <p className="mt-2">It's simple, we will help you</p>
       <Button
-        className="bg-white text-black mt-5 text-[16px] w-[fit-content]"
-        hoverClassName="scale-[1.04]"
+        className="bg-white text-black mt-5 text-[16px] w-[fit-content] hover:scale-[1.04]"
       >
         Create playlist
       </Button>

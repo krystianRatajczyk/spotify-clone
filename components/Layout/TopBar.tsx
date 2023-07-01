@@ -38,13 +38,18 @@ const TopBar = () => {
     setIsClicked(true);
     if (pathname == "/search") {
       inputRef.current && inputRef.current.focus();
-      setBorder("border border-1");
+      setBorder("border border-2");
     }
-    console.log(inputRef)
   }, [pathname]);
 
   return (
-    <div className="rounded-xl px-6 py-4 flex justify-between w-full ">
+    <div
+      className={`px-6 py-4 flex justify-between w-full ${
+        pathname == "/profile"
+          ? "bg-transparent absolute top-0 left-0"
+          : "bg-darkGray"
+      }`}
+    >
       <div className="flex gap-3 items-center justify-center relative">
         <CircularButton
           className={`
@@ -57,7 +62,7 @@ const TopBar = () => {
                 ${historyIndex != 0 && "cursor-pointer"}`}
         >
           <IoIosArrowBack
-            size={30}
+            size={26}
             color={historyIndex == 0 ? "#8D8D8D" : "#fff"}
             onClick={() => {
               setIsClicked(false);
@@ -83,7 +88,7 @@ const TopBar = () => {
             ${historyIndex != history.length - 1 && "cursor-pointer"}`}
         >
           <IoIosArrowForward
-            size={30}
+            size={26}
             color={historyIndex == history.length - 1 ? "#8D8D8D" : "#fff"}
             onClick={() => {
               setIsClicked(false);
@@ -120,12 +125,15 @@ const TopBar = () => {
               type="text"
               placeholder="What would you like to listen?"
               state={search}
-              setState={setSearch}
+              setstate={setSearch}
               icon={RiSearchLine}
               isHover={isHover}
               ref={inputRef}
               onBlur={() => {
                 setBorder("");
+              }}
+              onFocus={() => {
+                setBorder("border border-2");
               }}
               iconObject={{ size: 22, color: "#B3B3B3", hoverColor: "#fff" }}
               className="bg-transparent px-0 py-0 w-full text-sm rounded-none"
@@ -135,8 +143,7 @@ const TopBar = () => {
       </div>
       <div className="flex gap-3 items-center justify-center">
         <Button
-          className="bg-white text-black text-lg"
-          hoverClassName="scale-[1.05]"
+          className="bg-white text-black  hover:scale-[1.05]"
           onClick={signOut}
         >
           Logout

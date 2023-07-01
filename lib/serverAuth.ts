@@ -5,8 +5,8 @@ import prismadb from "@/lib/prismadb";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
 const serverAuth = async (
-  req: NextApiRequest,
-  res: NextApiResponse
+  req: NextApiRequest | any,
+  res: NextApiRequest | any
 ) => {
   const session = await getServerSession(req, res, authOptions);
 

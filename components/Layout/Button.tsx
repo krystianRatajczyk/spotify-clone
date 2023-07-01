@@ -12,23 +12,13 @@ const Button: React.FC<ButtonProps> = ({
   children,
   className,
   onClick,
-  hoverClassName,
 }) => {
-  const [isHover, setIsHover] = useState(false);
-
   return (
     <button
-      className={
-        !isHover
-          ? twMerge(`px-4 py-1 rounded-full text-xl font-bold`, className)
-          : twMerge(
-              `px-4 py-1 rounded-full text-xl font-bold transition duration-300`,
-              className,
-              hoverClassName
-            )
-      }
-      onMouseEnter={() => setIsHover(true)}
-      onMouseLeave={() => setIsHover(false)}
+      className={twMerge(
+        `px-4 py-1 rounded-full  font-bold bg-white text-black text-lg`,
+        className
+      )}
       onClick={onClick}
     >
       {children}

@@ -20,6 +20,7 @@ module.exports = {
         darkGray: "#121212",
         lightGray: "#B3B3B3",
         mediumGray: "#333333",
+        opacityGray: "rgba(0, 0, 0, 0.64)",
       },
     },
   },

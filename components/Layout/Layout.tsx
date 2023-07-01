@@ -10,9 +10,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="p-2 flex h-screen">
       <Sidebar />
-      <div className="w-full h-full flex flex-col bg-darkGray rounded-xl ml-2 overflow-hidden">
+      <div className="w-full h-full flex flex-col rounded-xl ml-2 overflow-hidden relative">
         <TopBar />
-        <div className="px-5 py-4 flex-1 rounded-xl">{children}</div>
+        {children}
       </div>
     </div>
   );

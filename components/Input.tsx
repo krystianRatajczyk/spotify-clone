@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge";
 interface InputProps {
   type: string;
   placeholder: string;
-  setState: React.Dispatch<React.SetStateAction<string>>;
+  setstate: React.Dispatch<React.SetStateAction<string>>;
   state: string;
   icon?: IconType;
   iconObject?: { size: number; color: string; hoverColor: string };
@@ -13,7 +13,9 @@ interface InputProps {
   isHover?: boolean;
   hoverClassName?: string;
   ref?: React.RefObject<HTMLInputElement>;
-  onBlur: () => void;
+  onBlur?: () => void;
+  onFocus?: () => void;
+  value?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
@@ -34,6 +36,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
       <input
         {...props}
         ref={ref}
+        onChange={(e) => {
+          props.setstate(e.target.value);
+        }}
         value={props.state}
         className={twMerge(
           "color-black bg-black rounded-xl px-5 py-3 text-lg outline-none",
