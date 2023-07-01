@@ -13,6 +13,7 @@ import serverAuth from "@/lib/serverAuth";
 import { format } from "date-fns";
 import { User } from "@/constants/formattedTypesPrisma";
 import { checkImageExists } from "@/lib/checkImageExists";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
 interface ProfileProps {
   user: User;
@@ -72,6 +73,22 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
   const onSave = () => {
     if (!error.name && !error.url) {
       //api call
+      axios
+        .post("/api/changeProfile", {
+          newName,
+          url,
+          user,
+        })
+        .then((res: AxiosResponse) => {
+          if (res.statusText && res.statusText == "OK") {
+            // give feedback
+          }
+        })
+        .catch((err: AxiosError) => {
+          // give feedback
+        });
+
+      closeModal();
     }
   };
 
@@ -172,7 +189,8 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
             bg-mediumGray 
             flex 
             justify-center 
-            items-center"
+            items-center
+            overflow-hidden"
           onClick={openModal}
         >
           {isHover ? (
@@ -180,8 +198,10 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
               <HiOutlinePencil size={60} />
               <h3>Choose picture</h3>
             </div>
-          ) : (
+          ) : !user.image ? (
             <GoPerson size={60} color="B3B3B3" />
+          ) : (
+            <img src={user.image} className="object-cover w-full h-full" />
           )}
         </div>
         <div className="flex  flex-col">
