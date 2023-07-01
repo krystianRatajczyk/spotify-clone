@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   emailVerified: string;
-  image: string | null;
+  image: string | undefined;
   hashedPassword: string;
   createdAt: string;
   updatedAt: string;

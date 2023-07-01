@@ -1,4 +1,3 @@
-import useCurrentUser from "@/hooks/useCurrentUser";
 import React, { useEffect, useRef, useState } from "react";
 import { GetServerSideProps } from "next";
 import { requireAuthentication } from "@/lib/isAuthenticated";
@@ -13,14 +12,17 @@ import serverAuth from "@/lib/serverAuth";
 import { format } from "date-fns";
 import { User } from "@/constants/formattedTypesPrisma";
 import { checkImageExists } from "@/lib/checkImageExists";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios from "axios";
+import Notification from "@/components/Notification";
+import { notificationState } from "@/constants/initialStates";
+import Picture from "@/components/Picture";
 
 interface ProfileProps {
   user: User;
 }
 
 const Profile = ({ user: receivedUser }: ProfileProps) => {
-  const [user] = useState(receivedUser);
+  const [user, setUser] = useState<User>(receivedUser);
 
   const divRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(divRef);
@@ -36,6 +38,8 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
     url: false,
   });
 
+  const [notification, setNotification] =
+    useState<notificationState>(notificationState);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
   const openModal = () => {
@@ -44,7 +48,6 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setNewName(user.name);
     setUrl("");
     setError({ name: false, url: false });
   };
@@ -70,49 +73,60 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
     return () => clearTimeout(timeout);
   }, [url, imageInputRef.current?.value]);
 
-  const onSave = () => {
+  const onAction = (action: string) => {
+    if (url == "" && action == "save") {
+      setError((prevState) => {
+        return { ...prevState, url: true };
+      });
+      return;
+    }
     if (!error.name && !error.url) {
       //api call
       axios
         .post("/api/changeProfile", {
           newName,
-          url,
+          url: action == "save" ? url : "",
           user,
+          action,
         })
-        .then((res: AxiosResponse) => {
+        .then((res) => {
           if (res.statusText && res.statusText == "OK") {
-            // give feedback
+            setUser(res.data.update);
+            setNotification({ message: res.data.message, color: "bg-blue" });
+            setNewName(res.data.update.name);
+            closeModal();
           }
         })
-        .catch((err: AxiosError) => {
-          // give feedback
-        });
+        .catch((err) => {
+          setNotification(err.response.data.message);
+          setNotification({
+            message: err.response.data.message,
+            color: "bg-red-600",
+          });
 
-      closeModal();
+          closeModal();
+        });
     }
   };
 
   return (
     <div className="flex-1 bg-darkGray flex flex-col">
+      {notification.message && (
+        <Notification
+          message={notification.message}
+          setNotification={setNotification}
+          color={notification.color}
+        />
+      )}
       <Modal isOpen={isModalOpen} onClose={closeModal} title="Profile details">
         <div className="flex gap-5 items-center mt-3">
-          <div
-            className="
-            w-[170px] h-[170px] 
-            drop-shadow-2xl 
-            rounded-full 
-            bg-mediumGray 
-            flex 
-            justify-center 
-            items-center
-            overflow-hidden"
-          >
+          <Picture>
             {url != "" && !error.url ? (
               <img src={url} className="object-cover h-full w-full" />
             ) : (
               <GoPerson size={60} color="#B3B3B3" />
             )}
-          </div>
+          </Picture>
           <div>
             <div className="flex flex-col gap-3 w-[300px]">
               <div className="relative">
@@ -166,12 +180,15 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
               </div>
             </div>
             <div className="flex gap-3 mt-2 justify-end">
-              <Button className="font-bold bg-mediumGray text-white py-2 px-8 hover:drop-shadow-2xl hover:scale-[1.04]">
+              <Button
+                className="font-bold bg-mediumGray text-white py-2 px-8 hover:drop-shadow-2xl hover:scale-[1.04]"
+                onClick={onAction.bind(null, "delete")}
+              >
                 Delete
               </Button>
               <Button
                 className="font-bold py-2 px-8 hover:drop-shadow-2xl hover:scale-[1.04]"
-                onClick={onSave}
+                onClick={onAction.bind(null, "save")}
               >
                 Save
               </Button>
@@ -180,17 +197,11 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
         </div>
       </Modal>
       <div className="p-5 pt-[100px] flex gap-5 items-center bg-gradient-to-b from-[#5e5c5c] to-mediumGray ">
-        <div
-          ref={divRef}
+        <Picture
           className="
-            w-[230px] h-[230px] 
-            drop-shadow-2xl 
-            rounded-full 
-            bg-mediumGray 
-            flex 
-            justify-center 
-            items-center
-            overflow-hidden"
+            min-w-[230px] h-[230px]
+            max-w-[230px]"
+          ref={divRef}
           onClick={openModal}
         >
           {isHover ? (
@@ -203,8 +214,8 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
           ) : (
             <img src={user.image} className="object-cover w-full h-full" />
           )}
-        </div>
-        <div className="flex  flex-col">
+        </Picture>
+        <div className="flex  flex-col overflow-hidden">
           <h4 className="font-bold">Profile</h4>
           {user ? (
             <h2 className="text-bold text-white text-[100px] font-bold ">

@@ -12,9 +12,12 @@ export default async function handler(
     return res.status(405).end();
   }
   try {
-    const { newName, url, user } = req.body;
+    const { newName, url, user, action } = req.body;
 
-    if (newName != "" && (await checkImageExists(url))) {
+    if (
+      (newName != "" && (await checkImageExists(url)) && action == "save") ||
+      (action == "delete" && url == "" && newName != "")
+    ) {
       const update = await prisma.user.update({
         where: { email: user.email },
         data: { image: url, name: newName },

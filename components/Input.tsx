@@ -19,6 +19,7 @@ interface InputProps {
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+
   return (
     <React.Fragment>
       {props.icon && (

@@ -12,10 +12,20 @@ module.exports = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      animation: {
+        hide: "hide 0.4s ease-in-out",
+      },
+      keyframes: {
+        hide: {
+          from: { opacity: 1 },
+          to: { opacity: 0 },
+        },
+      },
       colors: {
         black: "#191624",
         primary: "#1ed860",
         darkPrimary: "#17b34e",
+        blue: "#3495eb",
         darkBlue: "#08082c",
         darkGray: "#121212",
         lightGray: "#B3B3B3",
