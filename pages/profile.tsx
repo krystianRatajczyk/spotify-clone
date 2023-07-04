@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { GetServerSideProps } from "next";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { GoPerson } from "react-icons/go";
@@ -16,13 +16,14 @@ import axios from "axios";
 import Notification from "@/components/Notification";
 import { notificationState } from "@/constants/initialStates";
 import Picture from "@/components/Picture";
+import { UserContext } from "@/context/UserContext";
 
 interface ProfileProps {
   user: User;
 }
 
 const Profile = ({ user: receivedUser }: ProfileProps) => {
-  const [user, setUser] = useState<User>(receivedUser);
+  const { user, setUser } = useContext(UserContext);
 
   const divRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(divRef);
@@ -46,10 +47,11 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
     setIsModalOpen(true);
   };
 
-  const closeModal = () => {
+  const closeModal = (changeNewName?: boolean) => {
     setIsModalOpen(false);
     setUrl("");
     setError({ name: false, url: false });
+    changeNewName && setNewName(user.name);
   };
 
   useEffect(() => {
@@ -94,7 +96,7 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
             setUser(res.data.update);
             setNotification({ message: res.data.message, color: "bg-blue" });
             setNewName(res.data.update.name);
-            closeModal();
+            closeModal(false);
           }
         })
         .catch((err) => {
@@ -104,7 +106,7 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
             color: "bg-red-600",
           });
 
-          closeModal();
+          closeModal(false);
         });
     }
   };
