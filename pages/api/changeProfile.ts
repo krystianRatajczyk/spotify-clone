@@ -30,6 +30,6 @@ export default async function handler(
     return res.status(410).json({ message: "Cannot update profile" });
   } catch (error) {
     console.log(error);
-    return res.status(400).end();
+    return res.status(400).json({ message: "Cannot update profile" });
   }
 }

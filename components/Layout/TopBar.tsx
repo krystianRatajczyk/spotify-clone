@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { use, useContext, useEffect, useRef, useState } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { GoPerson } from "react-icons/go";
 
@@ -10,13 +10,15 @@ import { usePathname } from "next/navigation";
 import CircularButton from "./CircularButton";
 import { RiSearchLine } from "react-icons/ri";
 import Input from "../Input";
+import { UserContext } from "@/context/UserContext";
 
 const TopBar = () => {
   const router = useRouter();
-
   const pathname = usePathname();
 
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const { state: user } = useContext(UserContext);
 
   const [history, setHistory] = useState<string[]>([pathname]);
   const [initialized, setInitialized] = useState<boolean>(false);
@@ -160,10 +162,15 @@ const TopBar = () => {
                       flex 
                       justify-center 
                       items-center
+                      overflow-hidden
                       "
             hoverClassName="scale-[1.1]"
           >
-            <GoPerson size={20} />
+            {user && user.image? (
+              <img src={user.image} className="w-full h-full object-cover" />
+            ) : (
+              <GoPerson size={20} />
+            )}
           </CircularButton>
         </Link>
       </div>

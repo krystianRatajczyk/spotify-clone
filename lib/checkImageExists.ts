@@ -2,10 +2,15 @@ export async function checkImageExists(url: string) {
   return fetch(url)
     .then((response) => {
       if (response.status === 200) {
+        if (url.length > 8500) {
+          throw new Error("Too long url");
+        }
         return true; // Image exists
       } else {
-        return false; // Image does not exist
+        throw new Error("Image doesn't exist"); // Image does not exist
       }
     })
-    .catch(() => false); // Network error or other issues
+    .catch((error) => {
+      throw new Error(error.message);
+    }); // Network error or other issues
 }

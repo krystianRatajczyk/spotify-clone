@@ -8,22 +8,19 @@ import useHover from "@/hooks/useHover";
 import Modal from "@/components/Modal";
 import Input from "@/components/Input";
 import Button from "@/components/Layout/Button";
-import serverAuth from "@/lib/serverAuth";
-import { format } from "date-fns";
-import { User } from "@/constants/formattedTypesPrisma";
 import { checkImageExists } from "@/lib/checkImageExists";
 import axios from "axios";
 import Notification from "@/components/Notification";
-import { notificationState } from "@/constants/initialStates";
+import {
+  errorType,
+  notificationState,
+  profileErrorState,
+} from "@/constants/initialStates";
 import Picture from "@/components/Picture";
 import { UserContext } from "@/context/UserContext";
 
-interface ProfileProps {
-  user: User;
-}
-
-const Profile = ({ user: receivedUser }: ProfileProps) => {
-  const { user, setUser } = useContext(UserContext);
+const Profile = () => {
+  const { state: user, dispatch } = useContext(UserContext);
 
   const divRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(divRef);
@@ -34,10 +31,7 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
 
   const [inputNameActive, setInputNameActive] = useState<boolean>(false);
   const [inputImageActive, setInputImageActive] = useState<boolean>(false);
-  const [error, setError] = useState<{ name: boolean; url: boolean }>({
-    name: false,
-    url: false,
-  });
+  const [error, setError] = useState<errorType>(profileErrorState);
 
   const [notification, setNotification] =
     useState<notificationState>(notificationState);
@@ -47,12 +41,17 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
     setIsModalOpen(true);
   };
 
-  const closeModal = (changeNewName?: boolean) => {
+  const closeModal = () => {
+    // when closing modal manually means no api call was made
     setIsModalOpen(false);
     setUrl("");
-    setError({ name: false, url: false });
-    changeNewName && setNewName(user.name);
+    setError(profileErrorState);
+    setNewName(user.name);
   };
+
+  useEffect(() => {
+    setNewName(user.name);
+  }, [user]);
 
   useEffect(() => {
     setError((prevState) => {
@@ -63,10 +62,19 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       const check = async () => {
-        const res = await checkImageExists(url);
-        setError((prevState) => {
-          return { ...prevState, url: !res };
-        });
+        try {
+          const res = await checkImageExists(url);
+          setError((prevState) => {
+            return { ...prevState, url: { value: !res, message: "" } };
+          });
+        } catch (error: any) {
+          setError((prevState) => {
+            return {
+              ...prevState,
+              url: { value: true, message: error.message },
+            };
+          });
+        }
       };
 
       if (url != "" && url == imageInputRef.current?.value) check();
@@ -78,11 +86,11 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
   const onAction = (action: string) => {
     if (url == "" && action == "save") {
       setError((prevState) => {
-        return { ...prevState, url: true };
+        return { ...prevState, url: { value: true, message: "" } };
       });
       return;
     }
-    if (!error.name && !error.url) {
+    if (!error.name && !error.url.value) {
       //api call
       axios
         .post("/api/changeProfile", {
@@ -93,20 +101,21 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
         })
         .then((res) => {
           if (res.statusText && res.statusText == "OK") {
-            setUser(res.data.update);
+            dispatch({ type: "CHANGE_PROFILE", payload: res.data.update });
             setNotification({ message: res.data.message, color: "bg-blue" });
             setNewName(res.data.update.name);
-            closeModal(false);
+            closeModal();
           }
         })
         .catch((err) => {
+          console.log(err)
           setNotification(err.response.data.message);
           setNotification({
             message: err.response.data.message,
             color: "bg-red-600",
           });
 
-          closeModal(false);
+          closeModal();
         });
     }
   };
@@ -123,7 +132,7 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
       <Modal isOpen={isModalOpen} onClose={closeModal} title="Profile details">
         <div className="flex gap-5 items-center mt-3">
           <Picture>
-            {url != "" && !error.url ? (
+            {url != "" && !error.url.value ? (
               <img src={url} className="object-cover h-full w-full" />
             ) : (
               <GoPerson size={60} color="#B3B3B3" />
@@ -164,7 +173,7 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
                 <Input
                   type="text"
                   className={`bg-mediumGray w-full ${
-                    error.url
+                    error.url.value
                       ? "outline-red-300 outline-[1px]"
                       : "focus:outline-lightGray focus:outline-[1px] "
                   }`}
@@ -179,9 +188,14 @@ const Profile = ({ user: receivedUser }: ProfileProps) => {
                   }}
                   ref={imageInputRef}
                 />
+                {
+                  <h2 className="mt-1 font-bold text-red-300">
+                    {error.url.message}
+                  </h2>
+                }
               </div>
             </div>
-            <div className="flex gap-3 mt-2 justify-end">
+            <div className="flex gap-3 mt-2 justify-end ">
               <Button
                 className="font-bold bg-mediumGray text-white py-2 px-8 hover:drop-shadow-2xl hover:scale-[1.04]"
                 onClick={onAction.bind(null, "delete")}
@@ -241,23 +255,6 @@ export default Profile;
 
 export const getServerSideProps: GetServerSideProps = requireAuthentication(
   async (_ctx) => {
-    try {
-      let { currentUser } = await serverAuth(_ctx.req, _ctx.res); //format Dates so I can pass user without using JSON.stringify()
-
-      const newUser = {
-        ...currentUser,
-        emailVerified: format(currentUser.emailVerified, "yyyy-MM-dd"),
-        createdAt: format(currentUser.createdAt, "yyyy-MM-dd"),
-        updatedAt: format(currentUser.updatedAt, "yyyy-MM-dd"),
-      };
-      return {
-        props: {
-          user: newUser,
-        },
-      };
-    } catch (error) {
-      console.log(error);
-    }
     return {
       props: {},
     };

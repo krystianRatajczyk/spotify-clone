@@ -12,7 +12,7 @@ import Input from "@/components/Input";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { GetServerSideProps } from "next";
 import { isEmailValid, isPasswordValid, isUsernameValid } from "@/lib/isValid";
-import { errorState } from "@/constants/initialStates";
+import { authErrorState } from "@/constants/initialStates";
 
 const Auth = ({}) => {
   const router = useRouter();
@@ -32,11 +32,11 @@ const Auth = ({}) => {
 
   const toggleType = useCallback(() => {
     setType((currentType) => (currentType == "login" ? "register" : "login"));
-    setError(errorState);
+    setError(authErrorState);
   }, []);
 
   const login = useCallback(async () => {
-    setError(errorState);
+    setError(authErrorState);
     try {
       if (isEmailValid(email) && isPasswordValid(password)) {
         setIsLoggingIn(true);
@@ -90,7 +90,7 @@ const Auth = ({}) => {
   }, [email, password, router]);
 
   const register = useCallback(async () => {
-    setError(errorState);
+    setError(authErrorState);
     try {
       if (
         isUsernameValid(name) &&

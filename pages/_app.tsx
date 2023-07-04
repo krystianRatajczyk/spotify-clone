@@ -1,10 +1,11 @@
 import Layout from "@/components/Layout/Layout";
 import "@/styles/globals.css";
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth";
 import type { AppProps } from "next/app";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { usePathname } from "next/navigation";
+import { UserContextProvider } from "@/context/UserContext";
 
 export default function App({ Component, pageProps }: AppProps) {
   const pathname = usePathname();
@@ -14,9 +15,11 @@ export default function App({ Component, pageProps }: AppProps) {
   }
 
   return (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
+    <UserContextProvider>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </UserContextProvider>
   );
 }
 
