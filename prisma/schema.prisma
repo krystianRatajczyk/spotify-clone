@@ -20,3 +20,26 @@ model User {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
+
+model Track {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String   @unique
+  image        String
+  releaseDate  String
+  currentRank  Int
+  previousRank Int
+  artistsIds   String[] @db.ObjectId
+  artists      Artist[] @relation(fields: [artistsIds], references: [id])
+  duration     Int
+  genre        String
+}
+
+model Artist {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String   @unique
+  tracksIds    String[] @db.ObjectId
+  tracks       Track[]  @relation(fields: [tracksIds], references: [id])
+  image        String
+  currentRank  Int
+  previousRank Int
+}

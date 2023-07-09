@@ -91,7 +91,7 @@ const Sidebar: React.FC = () => {
             </CircularButton>
           )}
         </div>
-        <Library />
+        <Library isLibraryOpened={isLibraryOpened} />
       </div>
     </div>
   );
