@@ -1,12 +1,13 @@
-import React from "react";
+import { UserContext } from "@/context/UserContext";
+import React, { useContext } from "react";
 import { IconType } from "react-icons";
 import { twMerge } from "tailwind-merge";
 
 interface InputProps {
   type: string;
   placeholder: string;
-  setstate: React.Dispatch<React.SetStateAction<string>>;
-  state: string;
+  setstate?: React.Dispatch<React.SetStateAction<string>>;
+  state?: string;
   icon?: IconType;
   iconObject?: { size: number; color: string; hoverColor: string };
   className?: string;
@@ -16,10 +17,11 @@ interface InputProps {
   onBlur?: () => void;
   onFocus?: () => void;
   value?: string;
+  context?: boolean;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
-
+  const { dispatch, state } = useContext(UserContext);
   return (
     <React.Fragment>
       {props.icon && (
@@ -38,9 +40,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
         {...props}
         ref={ref}
         onChange={(e) => {
-          props.setstate(e.target.value);
+          props.setstate && props.setstate(e.target.value);
+          props.context &&
+            dispatch({ type: "CHANGE_SEARCH", payload: e.target.value });
         }}
-        value={props.state}
+        value={props.context ? state.search : props.state}
         className={twMerge(
           "color-black bg-black rounded-xl px-5 py-3 text-lg outline-none",
           props.className

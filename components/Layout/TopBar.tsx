@@ -11,6 +11,8 @@ import CircularButton from "./CircularButton";
 import { RiSearchLine } from "react-icons/ri";
 import Input from "../Input";
 import { UserContext } from "@/context/UserContext";
+import { RxCross2 } from "react-icons/rx";
+import SortTabs from "./SortTabs";
 
 const TopBar = () => {
   const router = useRouter();
@@ -18,13 +20,14 @@ const TopBar = () => {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { state: user } = useContext(UserContext);
+  const { state, dispatch } = useContext(UserContext);
+
+  const { user: user } = state;
 
   const [history, setHistory] = useState<string[]>([pathname]);
   const [initialized, setInitialized] = useState<boolean>(false);
   const [historyIndex, setHistoryIndex] = useState<number>(0);
   const [isClicked, setIsClicked] = useState<boolean>(true);
-  const [search, setSearch] = useState<string>("");
   const [isHover, setIsHover] = useState<boolean>(false);
   const [border, setBorder] = useState<string>("");
 
@@ -46,15 +49,16 @@ const TopBar = () => {
 
   return (
     <div
-      className={`px-6 py-4 flex justify-between w-full ${
+      className={`px-6 pt-4 pb-1 flex-col gap-9 flex w-full ${
         pathname == "/profile"
           ? "bg-transparent absolute top-0 left-0"
           : "bg-darkGray"
       }`}
     >
-      <div className="flex gap-3 items-center justify-center relative">
-        <CircularButton
-          className={`
+      <div className="flex justify-between w-full ">
+        <div className="flex gap-3 items-center justify-center relative">
+          <CircularButton
+            className={`
                 w-[30px] 
                 h-[30px] 
                 bg-[#090909] 
@@ -62,24 +66,24 @@ const TopBar = () => {
                 justify-center 
                 items-center
                 ${historyIndex != 0 && "cursor-pointer"}`}
-        >
-          <IoIosArrowBack
-            size={26}
-            color={historyIndex == 0 ? "#8D8D8D" : "#fff"}
-            onClick={() => {
-              setIsClicked(false);
-              if (historyIndex > 0) {
-                setHistoryIndex((prevIndex) => {
-                  router.push(history[prevIndex - 1]);
-                  return prevIndex - 1;
-                });
-              }
-            }}
-          />
-        </CircularButton>
+          >
+            <IoIosArrowBack
+              size={26}
+              color={historyIndex == 0 ? "#8D8D8D" : "#fff"}
+              onClick={() => {
+                setIsClicked(false);
+                if (historyIndex > 0) {
+                  setHistoryIndex((prevIndex) => {
+                    router.push(history[prevIndex - 1]);
+                    return prevIndex - 1;
+                  });
+                }
+              }}
+            />
+          </CircularButton>
 
-        <CircularButton
-          className={`
+          <CircularButton
+            className={`
             w-[30px] 
             h-[30px] 
             rounded-full 
@@ -88,27 +92,27 @@ const TopBar = () => {
             justify-center 
             items-center
             ${historyIndex != history.length - 1 && "cursor-pointer"}`}
-        >
-          <IoIosArrowForward
-            size={26}
-            color={historyIndex == history.length - 1 ? "#8D8D8D" : "#fff"}
-            onClick={() => {
-              setIsClicked(false);
-              if (historyIndex < history.length - 1) {
-                setHistoryIndex((prevIndex) => {
-                  router.push(history[prevIndex + 1]);
-                  return prevIndex + 1;
-                });
-              }
-            }}
-          />
-        </CircularButton>
+          >
+            <IoIosArrowForward
+              size={26}
+              color={historyIndex == history.length - 1 ? "#8D8D8D" : "#fff"}
+              onClick={() => {
+                setIsClicked(false);
+                if (historyIndex < history.length - 1) {
+                  setHistoryIndex((prevIndex) => {
+                    router.push(history[prevIndex + 1]);
+                    return prevIndex + 1;
+                  });
+                }
+              }}
+            />
+          </CircularButton>
 
-        {pathname == "/search" && (
-          <div
-            onMouseEnter={() => setIsHover(true)}
-            onMouseLeave={() => setIsHover(false)}
-            className={`
+          {pathname == "/search" && (
+            <div
+              onMouseEnter={() => setIsHover(true)}
+              onMouseLeave={() => setIsHover(false)}
+              className={`
                   w-[360px] 
                   flex 
                   gap-1
@@ -122,40 +126,51 @@ const TopBar = () => {
                   hover:outline-gray-500
                   outline-1
                   rounded-full ${border}`}
+            >
+              <Input
+                type="text"
+                placeholder="What do you want to listen to?"
+                context={true}
+                icon={RiSearchLine}
+                isHover={isHover}
+                ref={inputRef}
+                onBlur={() => {
+                  setBorder("");
+                }}
+                onFocus={() => {
+                  setBorder("border border-2");
+                }}
+                iconObject={{ size: 22, color: "#B3B3B3", hoverColor: "#fff" }}
+                className="bg-transparent px-0 py-0 w-full text-sm rounded-none"
+              />
+              {state.search != "" && (
+                <CircularButton>
+                  <RxCross2
+                    size={20}
+                    onClick={() => {
+                      dispatch({ type: "CHANGE_SEARCH", payload: "" });
+
+                      inputRef.current?.focus();
+                    }}
+                  />
+                </CircularButton>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="flex gap-3 items-center justify-center">
+          <Button
+            className="bg-white text-black  hover:scale-[1.05]"
+            onClick={signOut}
           >
-            <Input
-              type="text"
-              placeholder="What would you like to listen?"
-              state={search}
-              setstate={setSearch}
-              icon={RiSearchLine}
-              isHover={isHover}
-              ref={inputRef}
-              onBlur={() => {
-                setBorder("");
-              }}
-              onFocus={() => {
-                setBorder("border border-2");
-              }}
-              iconObject={{ size: 22, color: "#B3B3B3", hoverColor: "#fff" }}
-              className="bg-transparent px-0 py-0 w-full text-sm rounded-none"
-            />
-          </div>
-        )}
-      </div>
-      <div className="flex gap-3 items-center justify-center">
-        <Button
-          className="bg-white text-black  hover:scale-[1.05]"
-          onClick={signOut}
-        >
-          Logout
-        </Button>
-        <Link
-          href="/profile"
-          className="h-full flex items-center justify-center"
-        >
-          <CircularButton
-            className="
+            Logout
+          </Button>
+          <Link
+            href="/profile"
+            className="h-full flex items-center justify-center"
+          >
+            <CircularButton
+              className="
                       w-[32px]
                       h-[32px]
                       bg-[#000000]
@@ -164,16 +179,19 @@ const TopBar = () => {
                       items-center
                       overflow-hidden
                       "
-            hoverClassName="scale-[1.1]"
-          >
-            {user && user.image? (
-              <img src={user.image} className="w-full h-full object-cover" />
-            ) : (
-              <GoPerson size={20} />
-            )}
-          </CircularButton>
-        </Link>
+              hoverClassName="scale-[1.1]"
+            >
+              {user && user.image ? (
+                <img src={user.image} className="w-full h-full object-cover" />
+              ) : (
+                <GoPerson size={20} />
+              )}
+            </CircularButton>
+          </Link>
+        </div>
       </div>
+
+      {state.search != "" && <SortTabs />}
     </div>
   );
 };

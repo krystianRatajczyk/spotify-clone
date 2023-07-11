@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-const useHover = (ref: any) => {
+const useHover = (ref: React.RefObject<any>) => {
   const [isHover, setIsHover] = useState(false);
-
+  
   useEffect(() => {
     const handleMouseEnter = () => {
       setIsHover(true);
@@ -26,7 +26,8 @@ const useHover = (ref: any) => {
       }
     };
   }, []);
-  return [isHover, ref];
+
+  return [isHover];
 };
 
 export default useHover;

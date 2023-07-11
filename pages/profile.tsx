@@ -20,7 +20,10 @@ import Picture from "@/components/Picture";
 import { UserContext } from "@/context/UserContext";
 
 const Profile = () => {
-  const { state: user, dispatch } = useContext(UserContext);
+  const {
+    state: { user: user }, //destructuring object : {state : {user: User}}
+    dispatch,
+  } = useContext(UserContext);
 
   const divRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(divRef);
@@ -108,7 +111,7 @@ const Profile = () => {
           }
         })
         .catch((err) => {
-          console.log(err)
+          console.log(err);
           setNotification(err.response.data.message);
           setNotification({
             message: err.response.data.message,

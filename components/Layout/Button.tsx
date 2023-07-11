@@ -19,7 +19,7 @@ const Button: React.FC<ButtonProps> = ({
     <button
       disabled={disabled}
       className={twMerge(
-        `px-4 py-1 rounded-full  font-bold bg-white text-black text-lg`,
+        `px-4 py-1 rounded-full font-bold bg-white text-black text-lg`,
         className
       )}
       onClick={onClick}
