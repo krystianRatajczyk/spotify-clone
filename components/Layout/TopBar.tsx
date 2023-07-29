@@ -22,7 +22,7 @@ const TopBar = () => {
 
   const { state, dispatch } = useContext(UserContext);
 
-  const { user: user } = state;
+  const { user: user, scrollTop, search } = state;
 
   const [history, setHistory] = useState<string[]>([pathname]);
   const [initialized, setInitialized] = useState<boolean>(false);
@@ -46,12 +46,15 @@ const TopBar = () => {
       setBorder("border border-2");
     }
   }, [pathname]);
-
+  
   return (
     <div
-      className={`px-6 pt-4 pb-1 flex-col gap-9 flex w-full ${
-        pathname == "/profile"
-          ? "bg-transparent absolute top-0 left-0"
+      className={`px-6 pt-4 absolute top-0 left-0 transition-all duration-300 ${
+        search != "" ? "pb-1" : "pb-4"
+      } flex-col gap-9 flex w-full z-[200] ${
+        (pathname == "/profile" || pathname.includes("/song/")) &&
+        scrollTop <= 200
+          ? "bg-transparent"
           : "bg-darkGray"
       }`}
     >

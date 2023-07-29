@@ -10,6 +10,7 @@ type UserState = {
   user: UserType;
   search: string;
   sortTab: string;
+  scrollTop: number;
 };
 
 //Action Type
@@ -17,7 +18,8 @@ type UserState = {
 type ActionType =
   | { type: "CHANGE_PROFILE"; payload: UserType }
   | { type: "CHANGE_SEARCH"; payload: string }
-  | { type: "CHANGE_SORT_TAB"; payload: string };
+  | { type: "CHANGE_SORT_TAB"; payload: string }
+  | { type: "CHANGE_SCROLL_TOP"; payload: number };
 
 //reducer func
 const reducer = (state: UserState, action: ActionType): UserState => {
@@ -28,6 +30,8 @@ const reducer = (state: UserState, action: ActionType): UserState => {
       return { ...state, search: action.payload };
     case "CHANGE_SORT_TAB":
       return { ...state, sortTab: action.payload };
+    case "CHANGE_SCROLL_TOP":
+      return { ...state, scrollTop: action.payload };
     default:
       //@ts-ignore
       throw new Error(`Unhandled action type: ${action.type}`);
@@ -45,6 +49,7 @@ export const UserContext = React.createContext<ContextType>({
     user: UserValue,
     search: "",
     sortTab: "All",
+    scrollTop: 0,
   },
   dispatch: () => {},
 });
@@ -58,6 +63,7 @@ export const UserContextProvider = ({
     user: UserValue,
     search: "",
     sortTab: "All",
+    scrollTop: 0,
   });
 
   useEffect(() => {

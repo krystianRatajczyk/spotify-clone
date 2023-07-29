@@ -1,32 +1,37 @@
 import useHover from "@/hooks/useHover";
 import { convertTime } from "@/lib/track";
 import { Artist } from "@prisma/client";
+import Link from "next/link";
 import React, { useRef } from "react";
 import { BsFillPlayFill } from "react-icons/bs";
 
 interface HorizontalSongCardProps {
+  id: string;
   image: string;
   name: string;
   duration: number;
   artists: Artist[];
   withNo?: boolean;
   index?: number;
+  redirect?: boolean;
 }
 
 const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
   image,
   name,
+  id,
   duration,
   artists,
   withNo,
   index,
+  redirect,
 }) => {
   const divRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(divRef);
 
-  return (
+  let contentInside = (
     <div
-      className="w-full p-2 pl-5 rounded-md hover:bg-[#2a2a2a] justify-between flex-row flex items-center"
+      className="w-full p-2 pl-5 rounded-md hover:bg-[rgba(0,0,0,0.4)] justify-between flex-row flex items-center"
       ref={divRef}
     >
       <div className="flex flex-row gap-4 items-center relative">
@@ -52,15 +57,26 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
         <div className="flex flex-col justify-between">
           <h3 className="font-semibold ">{name}</h3>
           <p className="text-lightGray">
-            {artists.map((artist: Artist) => {
-              return artist.name;
+            {artists.map((artist: Artist, index: number) => {
+              if (index == artists.length - 1) {
+                return artist.name;
+              }
+              return artist.name + " • ";
             })}
           </p>
         </div>
       </div>
-      <div className="text-sm text-[#757575]">{convertTime(duration)}</div>
+      <div className="text-sm text-[#757575]">
+        {convertTime(duration).formattedTime}
+      </div>
     </div>
   );
+
+  if (redirect) {
+    return <Link href={{ pathname: `/song/${id}` }}>{contentInside}</Link>;
+  } else {
+    return contentInside;
+  }
 };
 
 export default HorizontalSongCard;

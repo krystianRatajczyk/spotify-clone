@@ -35,3 +35,16 @@ export const UserEmptyState = {
   createdAt: "",
   updatedAt: "",
 };
+
+export const emptyTrackState = {
+  id: "",
+  name: "",
+  image: "",
+  releaseDate: "",
+  currentRank: 0,
+  previousRank: 0,
+  artistsIds: [],
+  artists: [],
+  duration: 0,
+  genre: "",
+};

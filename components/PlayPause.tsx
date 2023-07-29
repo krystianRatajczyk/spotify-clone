@@ -8,12 +8,16 @@ interface PlayPauseProps {
   className?: string;
   hoverClassName?: string;
   isVisible: boolean;
+  iconSize?: number;
+  animation?: boolean;
 }
 
 const PlayPause: React.FC<PlayPauseProps> = ({
   isPlaying,
   className,
   isVisible: visible,
+  iconSize,
+  animation = true,
 }) => {
   const [isVisible, setIsVisible] = useState<boolean>(visible);
 
@@ -32,14 +36,14 @@ const PlayPause: React.FC<PlayPauseProps> = ({
         hover:scale-[1.1]
         cursor-pointer
         `,
-        isVisible ? "animate-slide_bottom" : "",
+        isVisible && animation ? "animate-slide_bottom" : "",
         className
       )}
     >
       {isPlaying ? (
-        <BsFillPlayFill size={30} color="#000" />
+        <BsFillPlayFill size={iconSize || 30} color="#000" />
       ) : (
-        <BiPause size={30} color="#000" />
+        <BiPause size={iconSize || 30} color="#000" />
       )}
     </div>
   );

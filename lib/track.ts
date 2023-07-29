@@ -6,5 +6,5 @@ export const convertTime = (seconds: number) => {
   const formattedTime = `${minutes}:${remainingSeconds
     .toString()
     .padStart(2, "0")}`;
-  return formattedTime;
+  return { formattedTime, minutes, remainingSeconds };
 };

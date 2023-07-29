@@ -16,6 +16,7 @@ const SortTabs = () => {
             className={`${
               tab != state.sortTab ? "bg-[#2a2a2a] text-white" : ""
             } text-base font-normal`}
+            key={tab}
           >
             {tab}
           </Button>
