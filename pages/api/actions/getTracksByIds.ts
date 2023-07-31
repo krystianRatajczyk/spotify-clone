@@ -11,18 +11,17 @@ export default async function handler(
   }
   try {
     const { ids, options } = req.body;
-    const artists = await prisma.artist.findMany({
+    const tracks = await prisma.track.findMany({
       where: {
         id: {
           in: ids,
         },
       },
-      include: {
-        ...options,
-      },
+      include: {...options},
     });
-    if (artists) {
-      return res.status(200).json(artists);
+
+    if (tracks) {
+      return res.status(200).json(tracks);
     }
   } catch (error) {
     console.log(error);

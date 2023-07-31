@@ -46,16 +46,20 @@ const TopBar = () => {
       setBorder("border border-2");
     }
   }, [pathname]);
-  
+
   return (
     <div
-      className={`px-6 pt-4 absolute top-0 left-0 transition-all duration-300 ${
+      className={`px-6 pt-4 transition-all duration-300 ${
         search != "" ? "pb-1" : "pb-4"
       } flex-col gap-9 flex w-full z-[200] ${
-        (pathname == "/profile" || pathname.includes("/song/")) &&
+        (pathname == "/profile" ||
+          pathname.includes("/song/") ||
+          pathname.includes("/artist/")) &&
         scrollTop <= 200
-          ? "bg-transparent"
-          : "bg-darkGray"
+          ? "bg-transparent absolute top-0 left-0"
+          : pathname == "/search"
+          ? "bg-darkGray "
+          : "bg-darkGray absolute top-0 left-0"
       }`}
     >
       <div className="flex justify-between w-full ">

@@ -14,6 +14,7 @@ import Header from "@/components/Header";
 import HorizontalSongCard from "@/components/HorizontalSongCard";
 import VerticalCard from "@/components/VerticalCard";
 import { UserContext } from "@/context/UserContext";
+import Link from "next/link";
 
 interface SongDetailProps {
   trackData: Track;
@@ -40,14 +41,22 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
             "/api/actions/getArtistsByIds",
             {
               ids,
-              take: 6,
+              options: {
+                tracks: {
+                  take: 6,
+                },
+              },
             }
           );
           setArtists(artistsWithTracks.data);
         } else {
           const artists = await axios.post("/api/actions/getArtistsByIds", {
             ids: trackData.artistsIds,
-            take: 6,
+            options: {
+              tracks: {
+                take: 6,
+              },
+            },
           });
           //@ts-ignore
           setArtists(artists.data);
@@ -106,12 +115,18 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
                   <h2 className="font-bold text-[60px] leading-[60px]">
                     {track?.name}
                   </h2>
-                  <p className="mt-5">
+                  <p className="mt-5 flex gap-1">
                     {track?.artists?.map((artist: Artist) => {
                       return (
-                        <span className="font-bold" key={artist.id}>
-                          {artist.name + " • "}
-                        </span>
+                        <Link
+                          href={{
+                            pathname: `/artist/${artist.id}`,
+                            query: artist,
+                          }}
+                          key={artist.id}
+                        >
+                          <div className="font-bold">{artist.name + " • "}</div>
+                        </Link>
                       );
                     })}
                     <span className="font-semibold">
@@ -149,7 +164,6 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
                   key={track.id}
                   withNo
                   index={1}
-                  redirect={false}
                 />
               )}
               {artists &&

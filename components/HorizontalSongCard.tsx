@@ -2,6 +2,7 @@ import useHover from "@/hooks/useHover";
 import { convertTime } from "@/lib/track";
 import { Artist } from "@prisma/client";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { useRef } from "react";
 import { BsFillPlayFill } from "react-icons/bs";
 
@@ -13,23 +14,22 @@ interface HorizontalSongCardProps {
   artists: Artist[];
   withNo?: boolean;
   index?: number;
-  redirect?: boolean;
 }
 
 const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
   image,
   name,
-  id,
   duration,
   artists,
   withNo,
   index,
-  redirect,
 }) => {
   const divRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(divRef);
 
-  let contentInside = (
+  const router = useRouter();
+
+  return (
     <div
       className="w-full p-2 pl-5 rounded-md hover:bg-[rgba(0,0,0,0.4)] justify-between flex-row flex items-center"
       ref={divRef}
@@ -59,9 +59,21 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
           <p className="text-lightGray">
             {artists.map((artist: Artist, index: number) => {
               if (index == artists.length - 1) {
-                return artist.name;
+                return (
+                  <Link
+                    href={{ pathname: `/artist/${artist.id}`, query: artist }}
+                  >
+                    {artist.name}
+                  </Link>
+                );
               }
-              return artist.name + " • ";
+              return (
+                <Link
+                  href={{ pathname: `/artist/${artist.id}`, query: artist }}
+                >
+                  {artist.name + " • "}
+                </Link>
+              );
             })}
           </p>
         </div>
@@ -71,12 +83,6 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
       </div>
     </div>
   );
-
-  if (redirect) {
-    return <Link href={{ pathname: `/song/${id}` }}>{contentInside}</Link>;
-  } else {
-    return contentInside;
-  }
 };
 
 export default HorizontalSongCard;

@@ -184,16 +184,23 @@ const Search = () => {
                       if (index > 3 && sortTab != "Songs") {
                         return;
                       }
+
                       return (
-                        <HorizontalSongCard
-                          {...track}
-                          //@ts-ignore
-                          artists={track.artists}
-                          key={track.id}
-                          withNo={sortTab == "Songs"}
-                          index={index + 1}
-                          redirect
-                        />
+                        <Link
+                          href={{
+                            pathname: `/artist/${track.id}`,
+                            query: track,
+                          }}
+                        >
+                          <HorizontalSongCard
+                            {...track}
+                            //@ts-ignore
+                            artists={track.artists}
+                            key={track.id}
+                            withNo={sortTab == "Songs"}
+                            index={index + 1}
+                          />
+                        </Link>
                       );
                     })}
                   </div>
@@ -210,14 +217,22 @@ const Search = () => {
                       if (index > 5 && sortTab != "Artists") {
                         return;
                       }
+
                       return (
-                        <VerticalCard
-                          type="artist"
-                          {...artist}
-                          modal="playpause"
-                          key={index}
-                          imageClassName="w-[90%] aspect-[1/1]"
-                        />
+                        <Link
+                          href={{
+                            pathname: `/artist/${artist.id}`,
+                            query: artist,
+                          }}
+                        >
+                          <VerticalCard
+                            type="artist"
+                            {...artist}
+                            modal="playpause"
+                            key={index}
+                            imageClassName="w-[90%] aspect-[1/1]"
+                          />
+                        </Link>
                       );
                     })}
                   </div>

@@ -26,13 +26,12 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
   name,
   modal,
   imageClassName,
-  releaseDate,
+  releaseDate
 }) => {
   const divRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(divRef);
 
   return (
-    <Link href={{ pathname: `/song/${id}` }}>
       <div
         className={`bg-[#191919] p-4 rounded-md relative 
     hover:bg-[#282828] transition duration-300 ${
@@ -86,7 +85,7 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
           </p>
         </div>
       </div>
-    </Link>
+    
   );
 };
 
