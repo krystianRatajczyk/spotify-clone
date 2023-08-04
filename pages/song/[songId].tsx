@@ -7,13 +7,12 @@ import { format } from "date-fns";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import Color from "color-thief-react";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import PlayPause from "@/components/PlayPause";
 import { AiOutlineHeart } from "react-icons/ai";
 import Header from "@/components/Header";
 import HorizontalSongCard from "@/components/HorizontalSongCard";
 import VerticalCard from "@/components/VerticalCard";
-import { UserContext } from "@/context/UserContext";
 import Link from "next/link";
 
 interface SongDetailProps {
@@ -24,7 +23,6 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
   const [track, setTrack] = useState(emptyTrackState);
   const [artists, setArtists] = useState([]);
   const router = useRouter();
-  const { dispatch } = useContext(UserContext);
 
   useEffect(() => {
     const getTrack = async () => {
@@ -77,20 +75,11 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
 
   if (!track?.id) return null;
 
-  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
-    const element = event.currentTarget;
-    const scrolled = element.scrollTop;
-    dispatch({ type: "CHANGE_SCROLL_TOP", payload: scrolled });
-  };
-
   return (
     <Color src={track?.image} crossOrigin="anonymous" format="hex">
       {({ data: dominantColor }) => {
         return (
-          <div
-            className="w-full h-full overflow-x-scroll no-scrollbar bg-[#1b1b1b]"
-            onScroll={(e) => handleScroll(e)}
-          >
+          <div className="w-full bg-[#1b1b1b]">
             <div
               className={`p-5 pt-[70px] pb-[350px]`}
               style={{
@@ -177,10 +166,12 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
                         {artist.tracks?.map((track: Track) => {
                           return (
                             <VerticalCard
+                              typeId={track.id}
                               type="track"
                               {...track}
                               modal="playpause"
                               imageClassName="w-[180px] h-[180px]"
+                              isRecentSearch
                             />
                           );
                         })}

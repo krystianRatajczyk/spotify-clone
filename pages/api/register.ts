@@ -13,7 +13,9 @@ export default async function handler(
     const { email, name, password } = req.body;
     const existingUser = await prismadb.user.findUnique({ where: { email } });
     if (existingUser) {
-      return res.status(422).json({ error: "Email is already taken", cause: "email" });
+      return res
+        .status(422)
+        .json({ error: "Email is already taken", cause: "email" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -24,9 +26,9 @@ export default async function handler(
         hashedPassword,
         image: "",
         emailVerified: new Date(),
+        recentSearches: [],
       },
     });
-
     return res.status(200).json(user);
   } catch (error) {
     console.log(error);

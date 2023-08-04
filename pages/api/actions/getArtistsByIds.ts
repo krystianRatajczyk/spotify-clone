@@ -10,7 +10,12 @@ export default async function handler(
     return res.status(405).end();
   }
   try {
-    const { ids, options } = req.body;
+    let { ids, options } = req.body;
+
+    if (typeof ids === "string") {
+      ids = [ids];
+    }
+    
     const artists = await prisma.artist.findMany({
       where: {
         id: {

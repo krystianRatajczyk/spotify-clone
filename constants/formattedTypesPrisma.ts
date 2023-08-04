@@ -1,10 +1,18 @@
+export interface Search {
+  id: string;
+  name: string;
+  image: string;
+  type: string;
+  typeId: string;
+}
 export interface User {
   id: string;
   name: string;
   email: string;
-  emailVerified: string;
-  image: string | undefined;
+  emailVerified: Date;
+  image: string | null;
   hashedPassword: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
+  recentSearches: Search[];
 }

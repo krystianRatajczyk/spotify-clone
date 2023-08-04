@@ -1,4 +1,4 @@
-import { UserContext } from "@/context/UserContext";
+import { InfoContext } from "@/context/InfoContext";
 import React, { useContext } from "react";
 import { IconType } from "react-icons";
 import { twMerge } from "tailwind-merge";
@@ -21,7 +21,7 @@ interface InputProps {
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
-  const { dispatch, state } = useContext(UserContext);
+  const { dispatch, state } = useContext(InfoContext);
   return (
     <React.Fragment>
       {props.icon && (

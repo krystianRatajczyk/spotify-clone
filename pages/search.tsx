@@ -4,24 +4,25 @@ import PlayPause from "@/components/PlayPause";
 import RecentSearches from "@/components/RecentSearches";
 import VerticalCard from "@/components/VerticalCard";
 
-import { UserContext } from "@/context/UserContext";
 import prisma from "@/lib/prismadb";
 import { Artist, Track, User } from "@prisma/client";
 import axios from "axios";
 
 import { SyncLoader } from "react-spinners";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { AiOutlineClockCircle } from "react-icons/ai";
+import React, { useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
+import { InfoContext } from "@/context/InfoContext";
+import useAddRecentSearch from "@/hooks/useAddRecentSearch";
+import { requireAuthentication } from "@/lib/isAuthenticated";
+import { GetServerSideProps } from "next";
 
 const types = ["track", "artist", "user"];
 
 const Search = () => {
   const {
     state: { search, sortTab },
-    dispatch,
-  } = useContext(UserContext);
+  } = useContext(InfoContext);
 
   const [initialized, setInitialized] = useState<boolean>(false);
 
@@ -30,9 +31,6 @@ const Search = () => {
   const [artists, setArtists] = useState<Artist[]>([]);
 
   const [loading, setLoading] = useState<boolean>(true);
-
-  // const divRef = useRef<HTMLDivElement>(null);
-  // const [isHover] = useHover(divRef);
 
   const [isHover, setIsHover] = useState<boolean>(false);
 
@@ -86,11 +84,14 @@ const Search = () => {
     }
     setInitialized(true);
   }, [search, initialized]);
+
+  const [addRecentSearch] = useAddRecentSearch();
+
   return (
     <div
       className={`px-5  ${
         sortTab == "Songs" ? "px-8" : "px-5"
-      }py-4 flex-1 bg-darkGray overflow-y-scroll no-scrollbar`}
+      } flex-1 bg-darkGray overflow-y-scroll no-scrollbar w-full h-full`}
     >
       {search === "" ? (
         <React.Fragment>
@@ -115,7 +116,30 @@ const Search = () => {
                   }}
                   className="flex-[0.4]"
                 >
-                  <div>
+                  <div
+                    onClick={async () => {
+                      let arg;
+                      if (tracks[0]) {
+                        arg = {
+                          name: tracks[0].name,
+                          image: tracks[0].image,
+                          type: "track",
+                          typeId: tracks[0].id,
+                        };
+                      } else if (artists[0]) {
+                        arg = {
+                          name: artists[0].name,
+                          image: artists[0].image,
+                          type: "artist",
+                          typeId: artists[0].id,
+                        };
+                      }
+
+                      if (arg && addRecentSearch) {
+                        await addRecentSearch(arg);
+                      }
+                    }}
+                  >
                     <h2 className="font-bold text-2xl">Top result</h2>
                     <div
                       onMouseEnter={() => setIsHover(true)}
@@ -186,21 +210,15 @@ const Search = () => {
                       }
 
                       return (
-                        <Link
-                          href={{
-                            pathname: `/artist/${track.id}`,
-                            query: track,
-                          }}
-                        >
-                          <HorizontalSongCard
-                            {...track}
-                            //@ts-ignore
-                            artists={track.artists}
-                            key={track.id}
-                            withNo={sortTab == "Songs"}
-                            index={index + 1}
-                          />
-                        </Link>
+                        <HorizontalSongCard
+                          {...track}
+                          //@ts-ignore
+                          artists={track.artists}
+                          key={track.id}
+                          withNo={sortTab == "Songs"}
+                          index={index + 1}
+                          isSearchCard
+                        />
                       );
                     })}
                   </div>
@@ -219,20 +237,15 @@ const Search = () => {
                       }
 
                       return (
-                        <Link
-                          href={{
-                            pathname: `/artist/${artist.id}`,
-                            query: artist,
-                          }}
-                        >
-                          <VerticalCard
-                            type="artist"
-                            {...artist}
-                            modal="playpause"
-                            key={index}
-                            imageClassName="w-[90%] aspect-[1/1]"
-                          />
-                        </Link>
+                        <VerticalCard
+                          isRecentSearch={false}
+                          typeId={artist.id}
+                          type="artist"
+                          {...artist}
+                          modal="playpause"
+                          key={index}
+                          imageClassName="w-[90%] aspect-[1/1]"
+                        />
                       );
                     })}
                   </div>
@@ -252,6 +265,8 @@ const Search = () => {
                       }
                       return (
                         <VerticalCard
+                          isRecentSearch={false}
+                          typeId={user.id}
                           type="profile"
                           id={user.name}
                           name={user.name}
@@ -286,3 +301,11 @@ const Search = () => {
 };
 
 export default Search;
+
+export const getServerSideProps: GetServerSideProps = requireAuthentication(
+  async (_ctx) => {
+    return {
+      props: {},
+    };
+  }
+);

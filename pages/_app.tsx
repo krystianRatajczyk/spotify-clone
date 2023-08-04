@@ -6,6 +6,7 @@ import type { AppProps } from "next/app";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { usePathname } from "next/navigation";
 import { UserContextProvider } from "@/context/UserContext";
+import { InfoContextProvider } from "@/context/InfoContext";
 
 export default function App({ Component, pageProps }: AppProps) {
   const pathname = usePathname();
@@ -16,9 +17,11 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <UserContextProvider>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <InfoContextProvider>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </InfoContextProvider>
     </UserContextProvider>
   );
 }

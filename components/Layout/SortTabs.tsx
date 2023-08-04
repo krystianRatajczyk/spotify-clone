@@ -1,11 +1,11 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import Button from "./Button";
-import { UserContext } from "@/context/UserContext";
+import { InfoContext } from "@/context/InfoContext";
 
 const sortTabsArray = ["All", "Artists", "Songs", "Playlists", "Profiles"];
 
 const SortTabs = () => {
-  const { state, dispatch } = useContext(UserContext);
+  const { state, dispatch } = useContext(InfoContext);
 
   return (
     <div className="w-full flex gap-2 -mt-3 items-center mb-3">

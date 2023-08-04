@@ -6,6 +6,7 @@ interface CircularButtonProps {
   children: React.ReactNode;
   hoverClassName?: string;
   isHover?: (state: boolean) => void;
+  onClick?: (e:React.MouseEvent) => void;
 }
 
 const CircularButton: React.FC<CircularButtonProps> = ({
@@ -13,6 +14,7 @@ const CircularButton: React.FC<CircularButtonProps> = ({
   children,
   hoverClassName,
   isHover: getIsHover,
+  onClick,
 }) => {
   const [isHover, setIsHover] = useState(false);
 
@@ -22,10 +24,15 @@ const CircularButton: React.FC<CircularButtonProps> = ({
 
   return (
     <div
+      onClick={onClick}
       className={
         !isHover
           ? twMerge("rounded-full", className)
-          : twMerge("rounded-full transition duration-300", hoverClassName, className)
+          : twMerge(
+              "rounded-full transition duration-300",
+              hoverClassName,
+              className
+            )
       }
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}

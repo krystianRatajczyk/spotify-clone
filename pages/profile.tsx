@@ -21,7 +21,7 @@ import { UserContext } from "@/context/UserContext";
 
 const Profile = () => {
   const {
-    state: { user: user }, //destructuring object : {state : {user: User}}
+    state: user, //destructuring object : {state : {user: User}}
     dispatch,
   } = useContext(UserContext);
 
@@ -124,7 +124,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex-1 bg-darkGray flex flex-col">
+    <div className="flex-1 bg-darkGray flex flex-col w-full h-full">
       {notification.message && (
         <Notification
           message={notification.message}

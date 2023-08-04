@@ -5,7 +5,6 @@ import { Artist, Track } from "@prisma/client";
 import axios from "axios";
 import Color from "color-thief-react";
 import { GetServerSideProps } from "next";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { MdVerified } from "react-icons/md";
@@ -17,6 +16,7 @@ interface ArtistDetailProps {
 const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
   const [artist, setArtist] = useState<Artist>();
   const [tracks, setTracks] = useState<Track[]>();
+  const [showMore, setShowMore] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -52,7 +52,7 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
     <Color src={artist?.image || ""} crossOrigin="anonymous" format="hex">
       {({ data: dominantColor }) => {
         return (
-          <div className="text-white w-full h-full overflow-x-scroll no-scrollbar bg-darkGray">
+          <div className="text-white w-full  bg-darkGray">
             <div
               className={`p-5 h-[450px] bg-no-repeat flex items-end relative`}
               style={{
@@ -91,23 +91,33 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
                   </button>
                 </div>
                 <p className="text-white font-bold text-2xl">Popular</p>
-                <div className="w-full z-[100] h-full mt-2">
-                  {tracks?.map((track: Track, index: number) => {
-                    return (
-                      <Link
-                        href={{ pathname: `/song/${track.id}`, query: track }}
-                      >
+                <div className="w-full h-full mt-2">
+                  {tracks &&
+                    tracks.map((track: Track, index: number) => {
+                      if (index > 4 && !showMore) {
+                        return null;
+                      }
+                      return (
                         <HorizontalSongCard
                           {...track}
-                          withNo
-                          index={index + 1}
-                          key={track.id}
                           //@ts-ignore
                           artists={track.artists}
+                          key={track.id}
+                          withNo
+                          index={index + 1}
                         />
-                      </Link>
-                    );
-                  })}
+                      );
+                    })}
+                  {tracks?.length! > 5 && (
+                    <h2
+                      className="hover:text-white text-gray-500 font-semibold pl-4"
+                      onClick={() => {
+                        setShowMore((prev) => !prev);
+                      }}
+                    >
+                      See {showMore ? "less" : "more"}
+                    </h2>
+                  )}
                 </div>
                 <div className="w-full flex h-[500px] gap-3 my-6">
                   <div className="flex-[0.6] flex flex-col">

@@ -10,9 +10,10 @@ import { usePathname } from "next/navigation";
 import CircularButton from "./CircularButton";
 import { RiSearchLine } from "react-icons/ri";
 import Input from "../Input";
-import { UserContext } from "@/context/UserContext";
 import { RxCross2 } from "react-icons/rx";
 import SortTabs from "./SortTabs";
+import { InfoContext } from "@/context/InfoContext";
+import { UserContext } from "@/context/UserContext";
 
 const TopBar = () => {
   const router = useRouter();
@@ -20,9 +21,12 @@ const TopBar = () => {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { state, dispatch } = useContext(UserContext);
+  const {
+    state: { scrollTop, search },
+    dispatch,
+  } = useContext(InfoContext);
 
-  const { user: user, scrollTop, search } = state;
+  const { state: user } = useContext(UserContext);
 
   const [history, setHistory] = useState<string[]>([pathname]);
   const [initialized, setInitialized] = useState<boolean>(false);
@@ -45,21 +49,22 @@ const TopBar = () => {
       inputRef.current && inputRef.current.focus();
       setBorder("border border-2");
     }
+    dispatch({ type: "CHANGE_SCROLL_TOP", payload: 0 });
   }, [pathname]);
 
   return (
     <div
-      className={`px-6 pt-4 transition-all duration-300 ${
+      className={`px-6 pt-4 ${
         search != "" ? "pb-1" : "pb-4"
       } flex-col gap-9 flex w-full z-[200] ${
         (pathname == "/profile" ||
           pathname.includes("/song/") ||
           pathname.includes("/artist/")) &&
         scrollTop <= 200
-          ? "bg-transparent absolute top-0 left-0"
+          ? "bg-transparent absolute top-0 left-0 transition-all duration-300"
           : pathname == "/search"
           ? "bg-darkGray "
-          : "bg-darkGray absolute top-0 left-0"
+          : "bg-darkGray transition-all duration-300"
       }`}
     >
       <div className="flex justify-between w-full ">
@@ -150,7 +155,7 @@ const TopBar = () => {
                 iconObject={{ size: 22, color: "#B3B3B3", hoverColor: "#fff" }}
                 className="bg-transparent px-0 py-0 w-full text-sm rounded-none"
               />
-              {state.search != "" && (
+              {search != "" && (
                 <CircularButton>
                   <RxCross2
                     size={20}
@@ -198,7 +203,7 @@ const TopBar = () => {
         </div>
       </div>
 
-      {state.search != "" && <SortTabs />}
+      {search != "" && <SortTabs />}
     </div>
   );
 };
