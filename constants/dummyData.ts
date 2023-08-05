@@ -10,6 +10,8 @@ export const User = {
   recentSearches: [],
 };
 
+export const darkerAmount = 50;
+
 export const musicTypes = [
   {
     name: "Podcasts",

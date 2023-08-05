@@ -11,7 +11,7 @@ const useRemoveRecentSearch = () => {
       payload: { id },
     });
 
-    await axios.post("/api/actions/removeRecentSearch", {
+    await axios.post("/api/actions/recentSearch/removeRecentSearch", {
       id,
     });
   };

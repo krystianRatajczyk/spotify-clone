@@ -22,7 +22,7 @@ const TopBar = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const {
-    state: { scrollTop, search },
+    state: { scrollTop, search, absolute },
     dispatch,
   } = useContext(InfoContext);
 
@@ -57,10 +57,7 @@ const TopBar = () => {
       className={`px-6 pt-4 ${
         search != "" ? "pb-1" : "pb-4"
       } flex-col gap-9 flex w-full z-[200] ${
-        (pathname == "/profile" ||
-          pathname.includes("/song/") ||
-          pathname.includes("/artist/")) &&
-        scrollTop <= 200
+        absolute && scrollTop <= 200
           ? "bg-transparent absolute top-0 left-0 transition-all duration-300"
           : pathname == "/search"
           ? "bg-darkGray "

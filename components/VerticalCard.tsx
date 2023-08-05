@@ -51,7 +51,7 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
       <div
         className={`bg-[#191919] p-4 rounded-md relative 
     hover:bg-[#282828] transition duration-300 ${
-      modal == "playpause" && "w-[210px]"
+      (modal == "playpause" || (type == "profile" && !isRecentSearch)) && "w-[210px]"
     }`}
         onClick={async () => {
           if (!isRecentSearch && addRecentSearch) {

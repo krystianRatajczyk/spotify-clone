@@ -7,6 +7,7 @@ type InfoState = {
   search: string;
   sortTab: string;
   scrollTop: number;
+  absolute: boolean;
 };
 
 //Action Type
@@ -14,7 +15,8 @@ type InfoState = {
 type ActionType =
   | { type: "CHANGE_SEARCH"; payload: string }
   | { type: "CHANGE_SORT_TAB"; payload: string }
-  | { type: "CHANGE_SCROLL_TOP"; payload: number };
+  | { type: "CHANGE_SCROLL_TOP"; payload: number }
+  | { type: "CHANGE_ABSOLUTE"; payload: boolean };
 
 //reducer func
 const reducer = (state: InfoState, action: ActionType): InfoState => {
@@ -25,6 +27,8 @@ const reducer = (state: InfoState, action: ActionType): InfoState => {
       return { ...state, sortTab: action.payload };
     case "CHANGE_SCROLL_TOP":
       return { ...state, scrollTop: action.payload };
+    case "CHANGE_ABSOLUTE":
+      return { ...state, absolute: action.payload };
     default:
       //@ts-ignore
       throw new Error(`Unhandled action type: ${action.type}`);
@@ -39,6 +43,7 @@ type ContextType = {
 
 export const InfoContext = React.createContext<ContextType>({
   state: {
+    absolute: false,
     search: "",
     sortTab: "All",
     scrollTop: 0,
@@ -55,12 +60,22 @@ export const InfoContextProvider = ({
     search: "",
     sortTab: "All",
     scrollTop: 0,
+    absolute: false,
   });
 
   const pathname = usePathname();
 
+  const absolutePathnames = ["/profile", "/song", "/artist", "/users"];
+
   useEffect(() => {
     dispatch({ type: "CHANGE_SEARCH", payload: "" });
+
+    const parts = pathname.split("/");
+    const firstPart = "/" + parts[1];
+    dispatch({
+      type: "CHANGE_ABSOLUTE",
+      payload: absolutePathnames.includes(firstPart),
+    });
   }, [pathname]);
 
   return (

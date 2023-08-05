@@ -16,6 +16,8 @@ import { InfoContext } from "@/context/InfoContext";
 import useAddRecentSearch from "@/hooks/useAddRecentSearch";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { GetServerSideProps } from "next";
+import Picture from "@/components/Picture";
+import { GoPerson } from "react-icons/go";
 
 const types = ["track", "artist", "user"];
 
@@ -29,6 +31,9 @@ const Search = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [artists, setArtists] = useState<Artist[]>([]);
+  const [topResult, setTopResult] = useState<
+    ((Track | Artist | User) & { type: string }) | null
+  >(null);
 
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -87,6 +92,26 @@ const Search = () => {
 
   const [addRecentSearch] = useAddRecentSearch();
 
+  useEffect(() => {
+    setTopResult(
+      tracks[0]
+        ? { ...tracks[0], type: "song" }
+        : artists[0]
+        ? { ...artists[0], type: "artist" }
+        : users[0]
+        ? { ...users[0], type: "users" }
+        : null
+    );
+    console.log(topResult); // set top result in order track > artist > user > nothing
+  }, [tracks, artists, users]);
+
+  const links: Record<string, string> = {
+    artist: "Artist",
+    song: "Song",
+    users: "Profile",
+    playlist: "Playlist",
+  };
+
   return (
     <div
       className={`px-5  ${
@@ -102,42 +127,24 @@ const Search = () => {
         (users.length > 0 || artists.length > 0 || tracks.length > 0) && (
           <div className="w-full ">
             <div className="w-full flex flex-row gap-5">
-              {sortTab == "All" && (
+              {sortTab == "All" && topResult && (
                 <Link
                   href={{
-                    pathname: `${
-                      tracks[0]
-                        ? `/song/${tracks[0].id}`
-                        : artists[0]
-                        ? `/artist/${artists[0].id}`
-                        : `/users/${users[0].id}`
-                    }`,
-                    query: tracks[0],
+                    pathname: `/${topResult.type}/${topResult.id}`,
+                    query: topResult.id,
                   }}
                   className="flex-[0.4]"
                 >
                   <div
                     onClick={async () => {
-                      let arg;
-                      if (tracks[0]) {
-                        arg = {
-                          name: tracks[0].name,
-                          image: tracks[0].image,
-                          type: "track",
-                          typeId: tracks[0].id,
-                        };
-                      } else if (artists[0]) {
-                        arg = {
-                          name: artists[0].name,
-                          image: artists[0].image,
-                          type: "artist",
-                          typeId: artists[0].id,
-                        };
-                      }
-
-                      if (arg && addRecentSearch) {
-                        await addRecentSearch(arg);
-                      }
+                      topResult &&
+                        addRecentSearch &&
+                        (await addRecentSearch({
+                          name: topResult.name,
+                          image: topResult.image || "",
+                          type: topResult.type,
+                          typeId: topResult.id,
+                        }));
                     }}
                   >
                     <h2 className="font-bold text-2xl">Top result</h2>
@@ -159,26 +166,21 @@ const Search = () => {
                             cursor-pointer"
                     >
                       {/* Top song */}
-                      <img
-                        src={
-                          tracks[0]?.image ||
-                          artists[0]?.image ||
-                          (users[0]?.image ? users[0]?.image : "")
-                        }
-                        alt=""
-                        className="object-cover rounded-full w-[100px] h-[100px]"
-                      />
-                      <h2 className="font-bold text-3xl">
-                        {tracks[0]?.name || artists[0]?.name || users[0]?.name}
-                      </h2>
+                      {topResult && topResult.image ? (
+                        <img
+                          src={topResult.image || ""}
+                          alt=""
+                          className="object-cover rounded-full w-[100px] h-[100px]"
+                        />
+                      ) : (
+                        <Picture className="w-[100px] h-[100px]">
+                          <GoPerson size={60} color="#B3B3B3" />
+                        </Picture>
+                      )}
+
+                      <h2 className="font-bold text-3xl">{topResult.name}</h2>
                       <p className="font-semibold px-4 py-1 bg-[#0f0f0f] w-fit rounded-full">
-                        {tracks.length
-                          ? "Song"
-                          : artists.length
-                          ? "Artist"
-                          : users.length
-                          ? "Profile"
-                          : ""}
+                        {links[topResult.type]}
                       </p>
 
                       {isHover && (tracks.length > 0 || artists.length > 0) && (
@@ -258,9 +260,9 @@ const Search = () => {
                   {sortTab == "All" && (
                     <h2 className="font-bold text-2xl">Profiles</h2>
                   )}
-                  <div className="flex flex-wrap mt-4 w-full flex-row gap-5">
+                  <div className="flex flex-wrap mt-4 w-full flex-row gap-5 mb-4">
                     {users.map((user: User, index: number) => {
-                      if (index > 5) {
+                      if (index > 5 && sortTab != "Profiles") {
                         return;
                       }
                       return (

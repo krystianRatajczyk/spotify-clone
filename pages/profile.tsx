@@ -18,6 +18,10 @@ import {
 } from "@/constants/initialStates";
 import Picture from "@/components/Picture";
 import { UserContext } from "@/context/UserContext";
+import Color from "color-thief-react";
+import { darkenColor } from "@/lib/darkerColor";
+import { darkerAmount } from "@/constants/dummyData";
+import { getDownGradient, getUpGradient } from "@/constants/styles";
 
 const Profile = () => {
   const {
@@ -124,133 +128,152 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex-1 bg-darkGray flex flex-col w-full h-full">
-      {notification.message && (
-        <Notification
-          message={notification.message}
-          setNotification={setNotification}
-          color={notification.color}
-        />
-      )}
-      <Modal isOpen={isModalOpen} onClose={closeModal} title="Profile details">
-        <div className="flex gap-5 items-center mt-3">
-          <Picture>
-            {url != "" && !error.url.value ? (
-              <img src={url} className="object-cover h-full w-full" />
-            ) : (
-              <GoPerson size={60} color="#B3B3B3" />
+    <Color src={user?.image || ""} crossOrigin="anonymous" format="hex">
+      {({ data: dominantColor }) => {
+        return (
+          <div className="flex-1 bg-darkGray flex flex-col w-full h-full">
+            {notification.message && (
+              <Notification
+                message={notification.message}
+                setNotification={setNotification}
+                color={notification.color}
+              />
             )}
-          </Picture>
-          <div>
-            <div className="flex flex-col gap-3 w-[300px]">
-              <div className="relative">
-                {inputNameActive && (
-                  <p className="absolute -top-[8px] left-3 text-lightGray z-[100] font-semibold text-sm">
-                    Name
-                  </p>
-                )}
-                <Input
-                  type="text"
-                  className={`bg-mediumGray w-full ${
-                    error.name
-                      ? "outline-red-300 outline-[1px]"
-                      : "focus:outline-lightGray focus:outline-[1px] "
-                  }`}
-                  placeholder="Name"
-                  state={newName}
-                  setstate={setNewName}
-                  onFocus={() => {
-                    setInputNameActive(true);
-                  }}
-                  onBlur={() => {
-                    setInputNameActive(false);
-                  }}
-                />
+            <Modal
+              isOpen={isModalOpen}
+              onClose={closeModal}
+              title="Profile details"
+            >
+              <div className="flex gap-5 items-center mt-3">
+                <Picture>
+                  {url != "" && !error.url.value ? (
+                    <img src={url} className="object-cover h-full w-full" />
+                  ) : (
+                    <GoPerson size={60} color="#B3B3B3" />
+                  )}
+                </Picture>
+                <div>
+                  <div className="flex flex-col gap-3 w-[300px]">
+                    <div className="relative">
+                      {inputNameActive && (
+                        <p className="absolute -top-[8px] left-3 text-lightGray z-[100] font-semibold text-sm">
+                          Name
+                        </p>
+                      )}
+                      <Input
+                        type="text"
+                        className={`bg-mediumGray w-full ${
+                          error.name
+                            ? "outline-red-300 outline-[1px]"
+                            : "focus:outline-lightGray focus:outline-[1px] "
+                        }`}
+                        placeholder="Name"
+                        state={newName}
+                        setstate={setNewName}
+                        onFocus={() => {
+                          setInputNameActive(true);
+                        }}
+                        onBlur={() => {
+                          setInputNameActive(false);
+                        }}
+                      />
+                    </div>
+                    <div className="relative">
+                      {inputImageActive && (
+                        <p className="absolute -top-[8px] left-3 text-lightGray z-[100] font-semibold text-sm">
+                          Image
+                        </p>
+                      )}
+                      <Input
+                        type="text"
+                        className={`bg-mediumGray w-full ${
+                          error.url.value
+                            ? "outline-red-300 outline-[1px]"
+                            : "focus:outline-lightGray focus:outline-[1px] "
+                        }`}
+                        placeholder="Image url"
+                        state={url}
+                        setstate={setUrl}
+                        onFocus={() => {
+                          setInputImageActive(true);
+                        }}
+                        onBlur={() => {
+                          setInputImageActive(false);
+                        }}
+                        ref={imageInputRef}
+                      />
+                      {
+                        <h2 className="mt-1 font-bold text-red-300">
+                          {error.url.message}
+                        </h2>
+                      }
+                    </div>
+                  </div>
+                  <div className="flex gap-3 mt-2 justify-end ">
+                    <Button
+                      className="font-bold bg-mediumGray text-white py-2 px-8 hover:drop-shadow-2xl hover:scale-[1.04]"
+                      onClick={onAction.bind(null, "delete")}
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      className="font-bold py-2 px-8 hover:drop-shadow-2xl hover:scale-[1.04]"
+                      onClick={onAction.bind(null, "save")}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                </div>
               </div>
-              <div className="relative">
-                {inputImageActive && (
-                  <p className="absolute -top-[8px] left-3 text-lightGray z-[100] font-semibold text-sm">
-                    Image
-                  </p>
-                )}
-                <Input
-                  type="text"
-                  className={`bg-mediumGray w-full ${
-                    error.url.value
-                      ? "outline-red-300 outline-[1px]"
-                      : "focus:outline-lightGray focus:outline-[1px] "
-                  }`}
-                  placeholder="Image url"
-                  state={url}
-                  setstate={setUrl}
-                  onFocus={() => {
-                    setInputImageActive(true);
-                  }}
-                  onBlur={() => {
-                    setInputImageActive(false);
-                  }}
-                  ref={imageInputRef}
-                />
-                {
-                  <h2 className="mt-1 font-bold text-red-300">
-                    {error.url.message}
-                  </h2>
-                }
-              </div>
-            </div>
-            <div className="flex gap-3 mt-2 justify-end ">
-              <Button
-                className="font-bold bg-mediumGray text-white py-2 px-8 hover:drop-shadow-2xl hover:scale-[1.04]"
-                onClick={onAction.bind(null, "delete")}
-              >
-                Delete
-              </Button>
-              <Button
-                className="font-bold py-2 px-8 hover:drop-shadow-2xl hover:scale-[1.04]"
-                onClick={onAction.bind(null, "save")}
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Modal>
-      <div className="p-5 pt-[100px] flex gap-5 items-center bg-gradient-to-b from-[#5e5c5c] to-mediumGray ">
-        <Picture
-          className="
+            </Modal>
+            <div
+              style={getUpGradient(dominantColor)}
+              className="p-5 pt-[100px] flex gap-5 items-center"
+            >
+              <Picture
+                className="
             min-w-[230px] h-[230px]
             max-w-[230px]"
-          ref={divRef}
-          onClick={openModal}
-        >
-          {isHover ? (
-            <div className="flex items-center flex-col">
-              <HiOutlinePencil size={60} />
-              <h3>Choose picture</h3>
-            </div>
-          ) : !user.image ? (
-            <GoPerson size={60} color="B3B3B3" />
-          ) : (
-            <img src={user.image} className="object-cover w-full h-full" />
-          )}
-        </Picture>
-        <div className="flex  flex-col overflow-hidden">
-          <h4 className="font-bold">Profile</h4>
-          {user ? (
-            <h2 className="text-bold text-white text-[100px] font-bold ">
-              {user.name}
-            </h2>
-          ) : (
-            <BeatLoader color="white" />
-          )}
+                ref={divRef}
+                onClick={openModal}
+              >
+                {isHover ? (
+                  <div className="flex items-center flex-col">
+                    <HiOutlinePencil size={60} />
+                    <h3>Choose picture</h3>
+                  </div>
+                ) : !user.image ? (
+                  <GoPerson size={60} color="B3B3B3" />
+                ) : (
+                  <img
+                    src={user.image}
+                    className="object-cover w-full h-full"
+                  />
+                )}
+              </Picture>
+              <div className="flex  flex-col overflow-hidden">
+                <h4 className="font-bold">Profile</h4>
+                {user ? (
+                  <h2 className="text-bold text-white text-[100px] font-bold ">
+                    {user.name}
+                  </h2>
+                ) : (
+                  <BeatLoader color="white" />
+                )}
 
-          <p className="font-semibold">
-            1 followers <span>•</span> 11 following
-          </p>
-        </div>
-      </div>
-      <div className="flex-1 bg-gradient-to-b from-[#242424] via-darkGray to-darkGray drop-shadow-md"></div>
-    </div>
+                <p className="font-semibold">
+                  1 followers <span>•</span> 11 following
+                </p>
+              </div>
+            </div>
+            <div
+              style={getDownGradient(dominantColor)}
+              className="flex-1 drop-shadow-md"
+            ></div>
+          </div>
+        );
+      }}
+    </Color>
   );
 };
 

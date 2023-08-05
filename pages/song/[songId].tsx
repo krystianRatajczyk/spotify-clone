@@ -28,7 +28,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
     const getTrack = async () => {
       try {
         if (!trackData.artistsIds) {
-          const track = await axios.post("/api/actions/getTrackById", {
+          const track = await axios.post("/api/actions/tracks/getTrackById", {
             id: router.query.songId,
           }); //load full track when going back in history
 
@@ -36,7 +36,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
           let ids = track.data.artists.map((artist: Artist) => artist.id);
 
           const artistsWithTracks = await axios.post(
-            "/api/actions/getArtistsByIds",
+            "/api/actions/artists/getArtistsByIds",
             {
               ids,
               options: {
@@ -48,7 +48,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
           );
           setArtists(artistsWithTracks.data);
         } else {
-          const artists = await axios.post("/api/actions/getArtistsByIds", {
+          const artists = await axios.post("/api/actions/artists/getArtistsByIds", {
             ids: trackData.artistsIds,
             options: {
               tracks: {

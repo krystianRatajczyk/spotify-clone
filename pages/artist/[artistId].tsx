@@ -1,4 +1,5 @@
 import HorizontalSongCard from "@/components/HorizontalSongCard";
+import Button from "@/components/Layout/Button";
 import PlayPause from "@/components/PlayPause";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { Artist, Track } from "@prisma/client";
@@ -23,16 +24,19 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
   useEffect(() => {
     const getArtist = async () => {
       try {
-        const artist = await axios.post("/api/actions/getArtistsByIds", {
-          ids: [artistData.id || router.query.artistId],
-          options: { tracks: false },
-        });
+        const artist = await axios.post(
+          "/api/actions/artists/getArtistsByIds",
+          {
+            ids: [artistData.id || router.query.artistId],
+            options: { tracks: false },
+          }
+        );
 
         const { tracksIds, ...rest } = artist.data[0];
         setArtist(rest);
 
         const tracksWithArtists = await axios.post(
-          "/api/actions/getTracksByIds",
+          "/api/actions/tracks/getTracksByIds",
           {
             ids: tracksIds,
             options: { artists: true },
@@ -86,9 +90,9 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
                     isVisible
                     className="w-[60px] h-[60px]"
                   />
-                  <button className="font-bold px-2 py-1 border border-gray-400 hover:border-white rounded-md">
+                  <Button className="font-bold px-4 py-1 border border-gray-600 hover:border-white rounded-md bg-transparent text-white text-[16px]">
                     FOLLOW
-                  </button>
+                  </Button>
                 </div>
                 <p className="text-white font-bold text-2xl">Popular</p>
                 <div className="w-full h-full mt-2">

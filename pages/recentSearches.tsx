@@ -33,7 +33,11 @@ const recentSearches = () => {
         {user.recentSearches.map((item: any, index: number) => {
           return (
             <div className="col-span-1" key={index}>
-              <VerticalCard {...item} modal="both" isRecentSearch />
+              <VerticalCard
+                {...item}
+                modal={item.type == "profile" ? "cross" : "both"}
+                isRecentSearch
+              />
             </div>
           );
         })}

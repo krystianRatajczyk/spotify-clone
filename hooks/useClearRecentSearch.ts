@@ -12,7 +12,7 @@ const useClearRecentSearch = () => {
 
     callback && callback();
 
-    await axios.get("/api/actions/clearRecentSearch");
+    await axios.get("/api/actions/recentSearch/clearRecentSearch");
   };
 
   return [clearRecentSearch];

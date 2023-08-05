@@ -13,6 +13,7 @@ const useAddRecentSearch = () => {
     typeId: string;
   }) => {
     if (user.recentSearches[0]?.name != item.name) {
+      if (item.type == "users") item.type = "profile";
       const itemWithId = {
         ...item,
         id: generateUniqueId(),
@@ -25,7 +26,7 @@ const useAddRecentSearch = () => {
         },
       });
 
-      await axios.post("/api/actions/addRecentSearch", {
+      await axios.post("/api/actions/recentSearch/addRecentSearch", {
         item: itemWithId,
       });
     }
