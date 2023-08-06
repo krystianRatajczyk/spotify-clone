@@ -5,6 +5,7 @@ import React, { Dispatch, useEffect, useReducer } from "react";
 
 type InfoState = {
   search: string;
+  labelName: string;
   sortTab: string;
   scrollTop: number;
   absolute: boolean;
@@ -16,7 +17,8 @@ type ActionType =
   | { type: "CHANGE_SEARCH"; payload: string }
   | { type: "CHANGE_SORT_TAB"; payload: string }
   | { type: "CHANGE_SCROLL_TOP"; payload: number }
-  | { type: "CHANGE_ABSOLUTE"; payload: boolean };
+  | { type: "CHANGE_ABSOLUTE"; payload: boolean }
+  | { type: "CHANGE_LABEL_NAME"; payload: string };
 
 //reducer func
 const reducer = (state: InfoState, action: ActionType): InfoState => {
@@ -29,6 +31,9 @@ const reducer = (state: InfoState, action: ActionType): InfoState => {
       return { ...state, scrollTop: action.payload };
     case "CHANGE_ABSOLUTE":
       return { ...state, absolute: action.payload };
+    case "CHANGE_LABEL_NAME":
+      return { ...state, labelName: action.payload };
+
     default:
       //@ts-ignore
       throw new Error(`Unhandled action type: ${action.type}`);
@@ -44,6 +49,7 @@ type ContextType = {
 export const InfoContext = React.createContext<ContextType>({
   state: {
     absolute: false,
+    labelName: "",
     search: "",
     sortTab: "All",
     scrollTop: 0,
@@ -57,6 +63,7 @@ export const InfoContextProvider = ({
   children: React.ReactNode;
 }) => {
   const [state, dispatch] = useReducer(reducer, {
+    labelName: "",
     search: "",
     sortTab: "All",
     scrollTop: 0,
@@ -65,7 +72,13 @@ export const InfoContextProvider = ({
 
   const pathname = usePathname();
 
-  const absolutePathnames = ["/profile", "/song", "/artist", "/users"];
+  const absolutePathnames = [
+    "/profile",
+    "/song",
+    "/artist",
+    "/users",
+    "/category",
+  ];
 
   useEffect(() => {
     dispatch({ type: "CHANGE_SEARCH", payload: "" });

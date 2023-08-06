@@ -14,6 +14,7 @@ import { RxCross2 } from "react-icons/rx";
 import SortTabs from "./SortTabs";
 import { InfoContext } from "@/context/InfoContext";
 import { UserContext } from "@/context/UserContext";
+import PlayPause from "../PlayPause";
 
 const TopBar = () => {
   const router = useRouter();
@@ -22,7 +23,7 @@ const TopBar = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const {
-    state: { scrollTop, search, absolute },
+    state: { labelName, scrollTop, search, absolute },
     dispatch,
   } = useContext(InfoContext);
 
@@ -117,7 +118,7 @@ const TopBar = () => {
             />
           </CircularButton>
 
-          {pathname == "/search" && (
+          {pathname == "/search" ? (
             <div
               onMouseEnter={() => setIsHover(true)}
               onMouseLeave={() => setIsHover(false)}
@@ -157,7 +158,7 @@ const TopBar = () => {
                   <RxCross2
                     size={20}
                     onClick={() => {
-                      dispatch({ type: "CHANGE_SEARCH", payload: "" });
+                    dispatch({ type: "CHANGE_SEARCH", payload: "" });
 
                       inputRef.current?.focus();
                     }}
@@ -165,6 +166,21 @@ const TopBar = () => {
                 </CircularButton>
               )}
             </div>
+          ) : (
+            scrollTop >= 230 && (
+              <div
+                className="flex gap-2 items-center absolute left-[85px] w-[700px]"
+              >
+                <PlayPause
+                  isPlaying
+                  isVisible
+                  className="w-[45px] h-[45px] "
+                  iconSize={25}
+                  animation={false}
+                />
+                <h2 className="font-bold text-xl">{labelName}</h2>
+              </div>
+            )
           )}
         </div>
         <div className="flex gap-3 items-center justify-center">

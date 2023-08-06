@@ -10,11 +10,12 @@ export default async function handler(
     return res.status(405).end();
   }
   try {
-    const { query, key } = req.body;
-
-    //@ts-ignore
-    const tracks = await prisma[key].findMany(query);
-    console.log(tracks);
+    const { genre } = req.body;
+    const tracks = await prisma.track.findMany({
+      where: { genre },
+      include: { artists: true },
+    });
+    
     if (tracks) {
       return res.status(200).json(tracks);
     }

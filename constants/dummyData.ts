@@ -12,11 +12,18 @@ export const User = {
 
 export const darkerAmount = 50;
 
+export const musicCryteriaObjects = {
+  Podcasts: {},
+  Relax: {},
+};
+
 export const musicTypes = [
   {
     name: "Podcasts",
     color: "#ff5b00",
     url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cG9kY2FzdHN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+    start: 0,
+    end: 20,
   },
   {
     name: "Hip-Hop",
@@ -82,40 +89,56 @@ export const musicTypes = [
     name: "Relax",
     color: "#8d67ab",
     url: " https://images.unsplash.com/photo-1481833761820-0509d3217039?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cmVsYXh8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
+    start: 21,
+    end: 40,
   },
   {
     name: "Made for you",
     color: "#d84000",
     url: "https://images.unsplash.com/photo-1473691955023-da1c49c95c78?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8cmVnZ2FlfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+    start: 41,
+    end: 62,
   },
   {
     name: "New Releases",
     color: "#537aa1",
     url: "https://images.unsplash.com/photo-1541904845547-0eaf866de232?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8ZGFuY2luZ3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    start: 63,
+    end: 85,
   },
   {
     name: "Summer",
     color: "#dc148c",
     url: "https://images.unsplash.com/photo-1615537510721-bcb43bef66fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8c3VtbWVyJTIwYmFja2dyb3VuZHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    start: 85,
+    end: 100,
   },
   {
     name: "Discover",
     color: "#777777",
     url: "https://images.unsplash.com/photo-1483356256511-b48749959172?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZXhwbG9yZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+    start: 101,
+    end: 120,
   },
   {
     name: "Party",
     color: "#777777",
     url: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8UGFydHl8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+    start: 121,
+    end: 145,
   },
   {
     name: "Chill",
     color: "#056952",
     url: "https://images.unsplash.com/photo-1564415051543-cb73a7468103?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8Y2hpbGx8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+    start: 145,
+    end: 170,
   },
   {
     name: "Mood",
     color: "#ba5d07",
     url: "https://images.unsplash.com/photo-1495001258031-d1b407bc1776?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8bW9vZHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    start: 170,
+    end: 200,
   },
 ];

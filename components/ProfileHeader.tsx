@@ -16,7 +16,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   image,
   name,
   dominantColor,
-  darkerAmount,
 }) => {
   return (
     <div

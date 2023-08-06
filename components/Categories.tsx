@@ -8,7 +8,7 @@ const Categories = () => {
       <h2 className="font-bold text-2xl my-3">Browse all</h2>
       <div className="grid grid-cols-6 gap-5">
         {musicTypes.map((music: any, index: number) => {
-          return <SquareCard {...music} key={index}/>;
+          return <SquareCard {...music} key={index} />;
         })}
       </div>
     </div>

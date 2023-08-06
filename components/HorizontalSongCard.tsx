@@ -4,6 +4,7 @@ import useHover from "@/hooks/useHover";
 import { convertTime, generateUniqueId } from "@/lib/track";
 import { Artist } from "@prisma/client";
 import axios from "axios";
+import { format } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useContext, useRef } from "react";
@@ -14,8 +15,13 @@ interface HorizontalSongCardProps {
   image: string;
   name: string;
   duration: number;
+  currentRank: number;
+  previousRank: number;
+  releaseDate: string;
   artists: Artist[];
   withNo?: boolean;
+  withDate?: boolean;
+  withRank?: boolean;
   index?: number;
   isSearchCard?: boolean;
 }
@@ -29,6 +35,10 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
   withNo,
   index,
   isSearchCard,
+  releaseDate,
+  withDate,
+  currentRank,
+  previousRank,
 }) => {
   const divRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(divRef);
@@ -53,12 +63,26 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
         className="w-full p-2 pl-5 rounded-md hover:bg-[rgba(0,0,0,0.4)] justify-between flex-row flex items-center"
         ref={divRef}
       >
-        <div className="flex flex-row gap-4 items-center relative">
+        <div className="flex flex-row gap-4 items-center relative flex-[0.7]">
           {withNo && !isHover && (
             <div
-              className={`font-semibold text-[#757575] justify-end flex w-[18px]`}
+              className={`font-semibold text-[#757575] justify-end flex w-[18px] gap-1 flex-col items-center`}
             >
               {index}
+              {currentRank != previousRank && (
+                <div
+                  className={`w-[10px] h-[10px] relative ${
+                    previousRank > currentRank && "rotate-[180deg]"
+                  }`}
+                >
+                  <div
+                    className={`${
+                      previousRank > currentRank ? "bg-red-500" : "bg-green-500"
+                    } w-full h-full rotate-[45deg]`}
+                  />
+                  <div className="absolute w-[20px] h-[10px] bg-darkGray -bottom-[5px] -left-[5px]" />
+                </div>
+              )}
             </div>
           )}
           {withNo && isHover && (
@@ -97,8 +121,19 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
             </p>
           </div>
         </div>
-        <div className="text-sm text-[#757575]">
-          {convertTime(duration).formattedTime}
+        <div
+          className={`flex flex-row flex-[0.3] items-center ${
+            withDate ? "justify-between" : "justify-end"
+          } `}
+        >
+          {withDate && (
+            <div className="text-[#757575] font-semibold text-sm">
+              {format(new Date(releaseDate), "d MMM yyyy")}
+            </div>
+          )}
+          <div className="text-sm text-[#757575]">
+            {convertTime(duration).formattedTime}
+          </div>
         </div>
       </div>
     </Link>

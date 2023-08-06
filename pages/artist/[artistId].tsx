@@ -1,13 +1,14 @@
 import HorizontalSongCard from "@/components/HorizontalSongCard";
 import Button from "@/components/Layout/Button";
 import PlayPause from "@/components/PlayPause";
+import { InfoContext } from "@/context/InfoContext";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { Artist, Track } from "@prisma/client";
 import axios from "axios";
 import Color from "color-thief-react";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { MdVerified } from "react-icons/md";
 
 interface ArtistDetailProps {
@@ -18,6 +19,8 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
   const [artist, setArtist] = useState<Artist>();
   const [tracks, setTracks] = useState<Track[]>();
   const [showMore, setShowMore] = useState<boolean>(false);
+
+  const { dispatch } = useContext(InfoContext);
 
   const router = useRouter();
 
@@ -31,6 +34,7 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
             options: { tracks: false },
           }
         );
+        dispatch({ type: "CHANGE_LABEL_NAME", payload: artist.data[0]?.name });
 
         const { tracksIds, ...rest } = artist.data[0];
         setArtist(rest);
@@ -56,7 +60,7 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
     <Color src={artist?.image || ""} crossOrigin="anonymous" format="hex">
       {({ data: dominantColor }) => {
         return (
-          <div className="text-white w-full  bg-darkGray">
+          <div className="text-white w-full bg-darkGray">
             <div
               className={`p-5 h-[450px] bg-no-repeat flex items-end relative`}
               style={{

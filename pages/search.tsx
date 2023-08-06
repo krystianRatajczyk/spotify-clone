@@ -102,7 +102,7 @@ const Search = () => {
         ? { ...users[0], type: "users" }
         : null
     );
-    console.log(topResult); // set top result in order track > artist > user > nothing
+    // set top result in order track > artist > user > nothing
   }, [tracks, artists, users]);
 
   const links: Record<string, string> = {

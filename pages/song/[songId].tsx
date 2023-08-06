@@ -7,13 +7,14 @@ import { format } from "date-fns";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import Color from "color-thief-react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import PlayPause from "@/components/PlayPause";
 import { AiOutlineHeart } from "react-icons/ai";
 import Header from "@/components/Header";
 import HorizontalSongCard from "@/components/HorizontalSongCard";
 import VerticalCard from "@/components/VerticalCard";
 import Link from "next/link";
+import { InfoContext } from "@/context/InfoContext";
 
 interface SongDetailProps {
   trackData: Track;
@@ -23,6 +24,8 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
   const [track, setTrack] = useState(emptyTrackState);
   const [artists, setArtists] = useState([]);
   const router = useRouter();
+
+  const { dispatch } = useContext(InfoContext);
 
   useEffect(() => {
     const getTrack = async () => {
@@ -48,15 +51,18 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
           );
           setArtists(artistsWithTracks.data);
         } else {
-          const artists = await axios.post("/api/actions/artists/getArtistsByIds", {
-            ids: trackData.artistsIds,
-            options: {
-              tracks: {
-                take: 6,
+          const artists = await axios.post(
+            "/api/actions/artists/getArtistsByIds",
+            {
+              ids: trackData.artistsIds,
+              options: {
+                tracks: {
+                  take: 6,
+                },
               },
-            },
-          });
-          //@ts-ignore
+            }
+          );
+
           setArtists(artists.data);
           const { artistsIds, ...rest } = trackData;
 
@@ -72,6 +78,10 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
     };
     getTrack();
   }, [router.query.songId]);
+
+  useEffect(() => {
+    dispatch({ type: "CHANGE_LABEL_NAME", payload: track.name });
+  }, [track]);
 
   if (!track?.id) return null;
 
@@ -141,7 +151,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
                   iconSize={35}
                   animation={false}
                 />
-                <AiOutlineHeart size={50} color={"#fff"} />
+                <AiOutlineHeart size={50} color={"darkGray"} />
                 <p className="bg-primary rounded-full px-4 py-2 text-black font-semibold">
                   Add to queue
                 </p>
