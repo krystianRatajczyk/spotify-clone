@@ -1,6 +1,5 @@
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { GetServerSideProps } from "next";
-import Link from "next/link";
 
 export default function Home() {
   return (

@@ -1,4 +1,4 @@
-import VerticalCard from "@/components/VerticalCard";
+import { VerticalCard } from "@/components";
 import { UserContext } from "@/context/UserContext";
 import useClearRecentSearch from "@/hooks/useClearRecentSearch";
 import { requireAuthentication } from "@/lib/isAuthenticated";

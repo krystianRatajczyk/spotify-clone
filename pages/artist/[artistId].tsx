@@ -1,6 +1,4 @@
-import HorizontalSongCard from "@/components/HorizontalSongCard";
-import Button from "@/components/Layout/Button";
-import PlayPause from "@/components/PlayPause";
+import { HorizontalSongCard, PlayPause, Button } from "@/components";
 import { InfoContext } from "@/context/InfoContext";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { Artist, Track } from "@prisma/client";
@@ -91,7 +89,7 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
                 <div className="w-full flex gap-6 items-center pb-4 p-6">
                   <PlayPause
                     isPlaying
-                    isVisible
+                    animation={false}
                     className="w-[60px] h-[60px]"
                   />
                   <Button className="font-bold px-4 py-1 border border-gray-600 hover:border-white rounded-md bg-transparent text-white text-[16px]">

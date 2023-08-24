@@ -8,11 +8,11 @@ import { FaGithub } from "react-icons/fa";
 
 import { SyncLoader } from "react-spinners";
 
-import Input from "@/components/Input";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { GetServerSideProps } from "next";
 import { isEmailValid, isPasswordValid, isUsernameValid } from "@/lib/isValid";
 import { authErrorState } from "@/constants/initialStates";
+import { Input } from "@/components";
 
 const Auth = ({}) => {
   const router = useRouter();

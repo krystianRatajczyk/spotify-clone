@@ -1,7 +1,6 @@
 import React from "react";
 import Picture from "./Picture";
 import { GoPerson } from "react-icons/go";
-import { darkenColor } from "@/lib/darkerColor";
 import { getUpGradient } from "@/constants/styles";
 
 interface ProfileHeaderProps {

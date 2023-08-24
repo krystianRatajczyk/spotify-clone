@@ -1,4 +1,4 @@
-import React, { use, useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { GoPerson } from "react-icons/go";
 
@@ -173,7 +173,6 @@ const TopBar = () => {
               >
                 <PlayPause
                   isPlaying
-                  isVisible
                   className="w-[45px] h-[45px] "
                   iconSize={25}
                   animation={false}

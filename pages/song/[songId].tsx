@@ -8,11 +8,13 @@ import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import Color from "color-thief-react";
 import React, { useContext, useEffect, useState } from "react";
-import PlayPause from "@/components/PlayPause";
+import {
+  PlayPause,
+  Header,
+  HorizontalSongCard,
+  VerticalCard,
+} from "@/components";
 import { AiOutlineHeart } from "react-icons/ai";
-import Header from "@/components/Header";
-import HorizontalSongCard from "@/components/HorizontalSongCard";
-import VerticalCard from "@/components/VerticalCard";
 import Link from "next/link";
 import { InfoContext } from "@/context/InfoContext";
 
@@ -146,7 +148,6 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
               <div className="flex gap-7 items-center">
                 <PlayPause
                   isPlaying
-                  isVisible
                   className="w-[65px] h-[65px]"
                   iconSize={35}
                   animation={false}

@@ -1,14 +1,12 @@
-import { UserContext } from "@/context/UserContext";
 import useAddRecentSearch from "@/hooks/useAddRecentSearch";
 import useHover from "@/hooks/useHover";
-import { convertTime, generateUniqueId } from "@/lib/track";
+import { convertTime } from "@/lib/track";
 import { Artist } from "@prisma/client";
-import axios from "axios";
 import { format } from "date-fns";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useContext, useRef } from "react";
+import React, { useRef } from "react";
 import { BsFillPlayFill } from "react-icons/bs";
+import Triangle from "./Layout/Triangle";
 
 interface HorizontalSongCardProps {
   id: string;
@@ -69,20 +67,7 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
               className={`font-semibold text-[#757575] justify-end flex w-[18px] gap-1 flex-col items-center`}
             >
               {index}
-              {currentRank != previousRank && (
-                <div
-                  className={`w-[10px] h-[10px] relative ${
-                    previousRank > currentRank && "rotate-[180deg]"
-                  }`}
-                >
-                  <div
-                    className={`${
-                      previousRank > currentRank ? "bg-red-500" : "bg-green-500"
-                    } w-full h-full rotate-[45deg]`}
-                  />
-                  <div className="absolute w-[20px] h-[10px] bg-darkGray -bottom-[5px] -left-[5px]" />
-                </div>
-              )}
+              <Triangle previousRank={previousRank} currentRank={currentRank} />
             </div>
           )}
           {withNo && isHover && (

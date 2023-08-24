@@ -1,8 +1,12 @@
-import Categories from "@/components/Categories";
-import HorizontalSongCard from "@/components/HorizontalSongCard";
-import PlayPause from "@/components/PlayPause";
-import RecentSearches from "@/components/RecentSearches";
-import VerticalCard from "@/components/VerticalCard";
+import {
+  Categories,
+  HorizontalSongCard,
+  PlayPause,
+  RecentSearches,
+  VerticalCard,
+  Header,
+  Picture,
+} from "@/components";
 
 import prisma from "@/lib/prismadb";
 import { Artist, Track, User } from "@prisma/client";
@@ -11,13 +15,12 @@ import axios from "axios";
 import { SyncLoader } from "react-spinners";
 import React, { useContext, useEffect, useState } from "react";
 import Link from "next/link";
-import Header from "@/components/Header";
 import { InfoContext } from "@/context/InfoContext";
 import useAddRecentSearch from "@/hooks/useAddRecentSearch";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { GetServerSideProps } from "next";
-import Picture from "@/components/Picture";
 import { GoPerson } from "react-icons/go";
+import { AnimatePresence } from "framer-motion";
 
 const types = ["track", "artist", "user"];
 
@@ -182,15 +185,16 @@ const Search = () => {
                       <p className="font-semibold px-4 py-1 bg-[#0f0f0f] w-fit rounded-full">
                         {links[topResult.type]}
                       </p>
-
-                      {isHover && (tracks.length > 0 || artists.length > 0) && (
-                        <PlayPause
-                          className="absolute right-5 bottom-5 drop-shadow-2xl"
-                          hoverClassName="scale-[1.1]"
-                          isPlaying={true}
-                          isVisible={isHover}
-                        />
-                      )}
+                      <AnimatePresence>
+                        {isHover &&
+                          (tracks.length > 0 || artists.length > 0) && (
+                            <PlayPause
+                              className="absolute right-5 bottom-5 drop-shadow-2xl"
+                              hoverClassName="scale-[1.1]"
+                              isPlaying={true}
+                            />
+                          )}
+                      </AnimatePresence>
                     </div>
                   </div>
                 </Link>

@@ -1,10 +1,7 @@
-import Button from "@/components/Layout/Button";
-import ProfileHeader from "@/components/ProfileHeader";
+import { Button, ProfileHeader } from "@/components";
 import { darkerAmount } from "@/constants/dummyData";
 import { getDownGradient } from "@/constants/styles";
-import { darkenColor } from "@/lib/darkerColor";
 import { requireAuthentication } from "@/lib/isAuthenticated";
-import { User } from "@prisma/client";
 import axios from "axios";
 import Color from "color-thief-react";
 import { GetServerSideProps } from "next";

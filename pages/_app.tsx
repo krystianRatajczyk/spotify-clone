@@ -1,4 +1,3 @@
-import Layout from "@/components/Layout/Layout";
 import "@/styles/globals.css";
 import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth";
@@ -7,6 +6,7 @@ import { authOptions } from "./api/auth/[...nextauth]";
 import { usePathname } from "next/navigation";
 import { UserContextProvider } from "@/context/UserContext";
 import { InfoContextProvider } from "@/context/InfoContext";
+import { Layout } from "@/components";
 
 export default function App({ Component, pageProps }: AppProps) {
   const pathname = usePathname();

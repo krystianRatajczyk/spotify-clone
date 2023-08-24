@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { BiPause } from "react-icons/bi";
 import { BsFillPlayFill } from "react-icons/bs";
 import { twMerge } from "tailwind-merge";
+import { motion } from "framer-motion";
+import { buttonSlide, hoverButton } from "@/motion/motion";
 
 interface PlayPauseProps {
   isPlaying: boolean;
   className?: string;
   hoverClassName?: string;
-  isVisible: boolean;
   iconSize?: number;
   animation?: boolean;
 }
@@ -15,14 +16,16 @@ interface PlayPauseProps {
 const PlayPause: React.FC<PlayPauseProps> = ({
   isPlaying,
   className,
-  isVisible: visible,
   iconSize,
   animation = true,
 }) => {
-  const [isVisible, setIsVisible] = useState<boolean>(visible);
-
   return (
-    <div
+    <motion.div
+      variants={animation ? buttonSlide() : hoverButton()}
+      animate="visible"
+      exit="exit"
+      initial="hidden"
+      whileHover="hover"
       className={twMerge(
         `w-[50px] h-[50px] 
         rounded-full 
@@ -32,11 +35,8 @@ const PlayPause: React.FC<PlayPauseProps> = ({
         justify-center
         transition-all
         ease-out 
-        duration-150
-        hover:scale-[1.1]
         cursor-pointer
         `,
-        isVisible && animation ? "animate-slide_bottom" : "",
         className
       )}
     >
@@ -45,7 +45,7 @@ const PlayPause: React.FC<PlayPauseProps> = ({
       ) : (
         <BiPause size={iconSize || 30} color="#000" />
       )}
-    </div>
+    </motion.div>
   );
 };
 

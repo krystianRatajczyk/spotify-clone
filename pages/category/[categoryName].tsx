@@ -1,6 +1,4 @@
-import Header from "@/components/Header";
-import HorizontalSongCard from "@/components/HorizontalSongCard";
-import PlayPause from "@/components/PlayPause";
+import { Header, PlayPause, HorizontalSongCard } from "@/components";
 import { musicTypes } from "@/constants/dummyData";
 import { InfoContext } from "@/context/InfoContext";
 import { requireAuthentication } from "@/lib/isAuthenticated";
@@ -99,7 +97,6 @@ const CategoryDetail = ({ url }: CategoryDetailProps) => {
               <div className="w-full flex gap-6 items-center pb-7">
                 <PlayPause
                   isPlaying
-                  isVisible
                   className="w-[65px] h-[65px]"
                   iconSize={35}
                   animation={false}

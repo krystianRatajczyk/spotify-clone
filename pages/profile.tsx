@@ -5,22 +5,16 @@ import { GoPerson } from "react-icons/go";
 import { HiOutlinePencil } from "react-icons/hi";
 import { BeatLoader } from "react-spinners";
 import useHover from "@/hooks/useHover";
-import Modal from "@/components/Modal";
-import Input from "@/components/Input";
-import Button from "@/components/Layout/Button";
+import { Modal, Input, Button, Notification, Picture } from "@/components";
 import { checkImageExists } from "@/lib/checkImageExists";
 import axios from "axios";
-import Notification from "@/components/Notification";
 import {
   errorType,
   notificationState,
   profileErrorState,
 } from "@/constants/initialStates";
-import Picture from "@/components/Picture";
 import { UserContext } from "@/context/UserContext";
 import Color from "color-thief-react";
-import { darkenColor } from "@/lib/darkerColor";
-import { darkerAmount } from "@/constants/dummyData";
 import { getDownGradient, getUpGradient } from "@/constants/styles";
 
 const Profile = () => {

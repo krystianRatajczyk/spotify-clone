@@ -12,11 +12,6 @@ export const User = {
 
 export const darkerAmount = 50;
 
-export const musicCryteriaObjects = {
-  Podcasts: {},
-  Relax: {},
-};
-
 export const musicTypes = [
   {
     name: "Podcasts",
