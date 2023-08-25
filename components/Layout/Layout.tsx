@@ -1,20 +1,44 @@
-import React, { ReactNode, useContext } from "react";
+import React, { ReactNode, useContext, useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import { InfoContext } from "@/context/InfoContext";
+import { UserContext } from "@/context/UserContext";
+import { arrayEquals } from "@/lib/track";
+import axios from "axios";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const [initialized, setInitialized] = useState<boolean>(false);
   const { dispatch } = useContext(InfoContext);
+  const { state: user } = useContext(UserContext);
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
     const element = event.currentTarget;
     const scrolled = element.scrollTop;
     dispatch({ type: "CHANGE_SCROLL_TOP", payload: scrolled });
   };
+
+  useEffect(() => {
+    if (initialized) {
+      const timeout = setTimeout(async () => {
+        const currentUser = await axios.get("/api/current");
+        // update array of ids in db only if 2 seconds past and something changed
+        if (!arrayEquals(currentUser.data.likedSongsIds, user.likedSongsIds)) {
+          const res = await axios.post(
+            "/api/actions/likedSongs/updateLikedSongs",
+            { ids: user.likedSongsIds }
+          );
+        }
+      }, 2000);
+
+      return () => clearTimeout(timeout);
+    } else {
+      setInitialized(true);
+    }
+  }, [user.likedSongsIds]);
 
   return (
     <div className="p-2 flex h-screen">

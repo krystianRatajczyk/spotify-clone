@@ -125,10 +125,19 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
             </div>
           )}
           <div className="text-sm text-[#757575] flex items-center gap-7">
-            {HeartIcon && (
-              <HeartIcon.icon
+            {isLikedSong ? (
+              <AiFillHeart
+                color="#1ed860"
                 size={25}
-                color={HeartIcon.color}
+                onClick={(e) => {
+                  e.preventDefault();
+                  addOrRemoveLikedSong(dispatch, !!isLikedSong, id);
+                }}
+              />
+            ) : isHover && (
+              <AiOutlineHeart
+                color="#fff"
+                size={25}
                 onClick={(e) => {
                   e.preventDefault();
                   addOrRemoveLikedSong(dispatch, !!isLikedSong, id);

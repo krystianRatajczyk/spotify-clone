@@ -1,6 +1,7 @@
 import { Header, HorizontalSongCard, PlayPause } from "@/components";
 import { InfoContext } from "@/context/InfoContext";
 import { UserContext } from "@/context/UserContext";
+import useCurrentUser from "@/hooks/useCurrentUser";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { Track } from "@prisma/client";
 import axios from "axios";
@@ -11,10 +12,12 @@ import { AiFillHeart } from "react-icons/ai";
 const likedSongs = () => {
   const { state: user, dispatch: UserDispatch } = useContext(UserContext);
   const { dispatch: InfoDispatch } = useContext(InfoContext);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     InfoDispatch({ type: "CHANGE_LABEL_NAME", payload: "Liked Songs" });
     const getTracks = async () => {
+      setIsLoading(true);
       const receivedTracks = await axios.post(
         "/api/actions/tracks/getTracksByIds",
         {
@@ -28,6 +31,7 @@ const likedSongs = () => {
       });
       const likedTracks = user.likedSongsIds.map((id) => tracksMap.get(id)); // getting certain tracks in user likes songs order
 
+      setIsLoading(false);
       UserDispatch({
         type: "ADD_FULL_LIKED_SONGS",
         payload: likedTracks,
@@ -35,7 +39,7 @@ const likedSongs = () => {
     };
 
     getTracks();
-  }, []);
+  }, [user.likedSongsIds]);
 
   return (
     <div className="min-h-full bg-[#1b1b1b] flex flex-col">
@@ -65,7 +69,7 @@ const likedSongs = () => {
         className="w-full min-h-full flex-1 -mt-[325px] bg-[rgba(0,0,0,0.3)] p-5
          "
       >
-        {user.likedSongs?.length ? (
+        {user.likedSongs?.length > 0 && (
           <div className="h-full">
             <div className="pl-3">
               <PlayPause
@@ -79,9 +83,11 @@ const likedSongs = () => {
               <Header withDate />
             </div>
             <div className="h-full">
-              {user.likedSongs.map((track, index) => (
+              {user.likedSongs?.map((track, index) => (
                 <HorizontalSongCard
+                  key={index}
                   {...track}
+                  //@ts-ignore
                   artists={track.artists}
                   withNo
                   withDate
@@ -89,11 +95,6 @@ const likedSongs = () => {
                 />
               ))}
             </div>
-          </div>
-        ) : (
-          <div className="text-center font-bold text-lg ">
-            You dont have any liked songs <br />
-            Click heart to add one!
           </div>
         )}
       </div>

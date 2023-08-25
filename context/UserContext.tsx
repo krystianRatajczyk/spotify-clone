@@ -38,6 +38,7 @@ const reducer = (state: UserState, action: ActionType): UserState => {
 
       return {
         ...state,
+        //@ts-ignore
         recentSearches: newRecentSearches,
       };
     }
@@ -55,7 +56,7 @@ const reducer = (state: UserState, action: ActionType): UserState => {
     case "ADD_LIKED_SONG": {
       return {
         ...state,
-        likedSongsIds: [ action.payload.id,...state.likedSongsIds,],
+        likedSongsIds: [action.payload.id, ...state.likedSongsIds],
       };
     }
 
@@ -105,7 +106,6 @@ export const UserContextProvider = ({
     const fetchCurrentUser = async () => {
       try {
         const currentUser = await axios.get("/api/current");
-
         dispatch({ type: "CHANGE_PROFILE", payload: currentUser.data });
       } catch (error) {
         console.error("Error fetching current user:", error);

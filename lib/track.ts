@@ -1,3 +1,4 @@
+import useCurrentUser from "@/hooks/useCurrentUser";
 import { Track, User } from "@prisma/client";
 
 // converts the time to format 0:00
@@ -42,4 +43,13 @@ export const addOrRemoveLikedSong = (
     type: type,
     payload: { id },
   });
+};
+
+export const arrayEquals = (a: string[], b: string[]) => {
+  return (
+    Array.isArray(a) &&
+    Array.isArray(b) &&
+    a.length === b.length &&
+    a.every((val, index) => val === b[index])
+  );
 };
