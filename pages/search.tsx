@@ -168,7 +168,7 @@ const Search = () => {
                             relative
                             cursor-pointer"
                     >
-                      {/* Top song */}
+                      {/* Top Result */}
                       {topResult && topResult.image ? (
                         <img
                           src={topResult.image || ""}

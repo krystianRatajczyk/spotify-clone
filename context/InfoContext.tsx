@@ -78,6 +78,7 @@ export const InfoContextProvider = ({
     "/artist",
     "/users",
     "/category",
+    "/likedSongs"
   ];
 
   useEffect(() => {

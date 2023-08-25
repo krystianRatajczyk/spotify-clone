@@ -1,6 +1,6 @@
 import { emptyTrackState } from "@/constants/initialStates";
 import { requireAuthentication } from "@/lib/isAuthenticated";
-import { convertTime } from "@/lib/track";
+import { addOrRemoveLikedSong, convertTime } from "@/lib/track";
 import { Artist, Track } from "@prisma/client";
 import axios from "axios";
 import { format } from "date-fns";
@@ -14,9 +14,10 @@ import {
   HorizontalSongCard,
   VerticalCard,
 } from "@/components";
-import { AiOutlineHeart } from "react-icons/ai";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import Link from "next/link";
 import { InfoContext } from "@/context/InfoContext";
+import { UserContext } from "@/context/UserContext";
 
 interface SongDetailProps {
   trackData: Track;
@@ -27,7 +28,8 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
   const [artists, setArtists] = useState([]);
   const router = useRouter();
 
-  const { dispatch } = useContext(InfoContext);
+  const { dispatch: InfoDispatch } = useContext(InfoContext);
+  const { state: user, dispatch: UserDispatch } = useContext(UserContext);
 
   useEffect(() => {
     const getTrack = async () => {
@@ -82,10 +84,29 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
   }, [router.query.songId]);
 
   useEffect(() => {
-    dispatch({ type: "CHANGE_LABEL_NAME", payload: track.name });
+    InfoDispatch({ type: "CHANGE_LABEL_NAME", payload: track.name });
   }, [track]);
 
   if (!track?.id) return null;
+
+  const isSongLiked = user.likedSongsIds.find((song) => song == track.id);
+  const HeartIcon = isSongLiked ? (
+    <AiFillHeart
+      size={35}
+      color="#1ed860"
+      onClick={() =>
+        addOrRemoveLikedSong(UserDispatch, !!isSongLiked, track.id)
+      }
+    />
+  ) : (
+    <AiOutlineHeart
+      size={35}
+      color={"lightGray"}
+      onClick={() =>
+        addOrRemoveLikedSong(UserDispatch, !!isSongLiked, track.id)
+      }
+    />
+  );
 
   return (
     <Color src={track?.image} crossOrigin="anonymous" format="hex">
@@ -144,7 +165,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
                 </div>
               </div>
             </div>
-            <div className=" w-full bg-[rgba(0,0,0,0.3)] -mt-[325px] p-5 ">
+            <div className="w-full bg-[rgba(0,0,0,0.3)] -mt-[325px] p-5 ">
               <div className="flex gap-7 items-center">
                 <PlayPause
                   isPlaying
@@ -152,7 +173,8 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
                   iconSize={35}
                   animation={false}
                 />
-                <AiOutlineHeart size={50} color={"darkGray"} />
+
+                {HeartIcon}
                 <p className="bg-primary rounded-full px-4 py-2 text-black font-semibold">
                   Add to queue
                 </p>

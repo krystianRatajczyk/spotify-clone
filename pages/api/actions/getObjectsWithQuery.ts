@@ -14,7 +14,6 @@ export default async function handler(
 
     //@ts-ignore
     const tracks = await prisma[key].findMany(query);
-    console.log(tracks);
     if (tracks) {
       return res.status(200).json(tracks);
     }

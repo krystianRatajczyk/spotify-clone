@@ -59,10 +59,10 @@ const Sidebar: React.FC = () => {
           );
         })}
       </div>
-      <div className="flex bg-darkGray py-4 px-3 flex-col h-full rounded-xl gap-4">
+      <div className="flex bg-darkGray py-4 flex-col h-full rounded-xl gap-4">
         <div className="flex justify-between items-center cursor-pointer px-2">
           <div
-            className="flex gap-4 items-center justify-center"
+            className="flex gap-4 px-3 items-center justify-center"
             onClick={() => setIsLibraryOpened((prev) => !prev)}
             onMouseEnter={() => setIsHover(true)}
             onMouseLeave={() => setIsHover(false)}
@@ -91,7 +91,9 @@ const Sidebar: React.FC = () => {
             </CircularButton>
           )}
         </div>
-        <Library isLibraryOpened={isLibraryOpened} />
+        <div className="px-2">
+          <Library isLibraryOpened={isLibraryOpened} />
+        </div>
       </div>
     </div>
   );

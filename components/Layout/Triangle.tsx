@@ -6,6 +6,7 @@ interface TriangleProps {
 }
 
 const Triangle: React.FC<TriangleProps> = ({ previousRank, currentRank }) => {
+  if (previousRank == currentRank) return null;
   return (
     <div
       className={` w-0 h-0 border-x-[6px] border-x-transparent  

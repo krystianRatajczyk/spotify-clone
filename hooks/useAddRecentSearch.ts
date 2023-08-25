@@ -13,6 +13,7 @@ const useAddRecentSearch = () => {
     typeId: string;
   }) => {
     if (user.recentSearches[0]?.name != item.name) {
+      if (item.type == "song") item.type = "track";
       if (item.type == "users") item.type = "profile";
       const itemWithId = {
         ...item,

@@ -11,15 +11,16 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
   name           String
-  email          String          @unique
+  email          String   @unique
   emailVerified  DateTime
   image          String?
   hashedPassword String
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
   recentSearches Json[]
+  likedSongsIds  String[] @db.ObjectId
 }
 
 model Track {

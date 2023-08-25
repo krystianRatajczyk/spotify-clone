@@ -1,12 +1,14 @@
 import useAddRecentSearch from "@/hooks/useAddRecentSearch";
 import useHover from "@/hooks/useHover";
-import { convertTime } from "@/lib/track";
+import { addOrRemoveLikedSong, convertTime } from "@/lib/track";
 import { Artist } from "@prisma/client";
 import { format } from "date-fns";
 import Link from "next/link";
-import React, { useRef } from "react";
+import React, { useContext, useRef } from "react";
 import { BsFillPlayFill } from "react-icons/bs";
 import Triangle from "./Layout/Triangle";
+import { UserContext } from "@/context/UserContext";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
 interface HorizontalSongCardProps {
   id: string;
@@ -41,7 +43,13 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
   const divRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(divRef);
 
+  const { state: user, dispatch } = useContext(UserContext);
   const [addRecentSearch] = useAddRecentSearch();
+
+  const isLikedSong = user.likedSongsIds.find((s) => s === id);
+  const HeartIcon = isLikedSong
+    ? { icon: AiFillHeart, color: "#1ed860" }
+    : isHover && { icon: AiOutlineHeart, color: "#fff" };
 
   return (
     <Link
@@ -83,7 +91,7 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
           </div>
 
           <div className="flex flex-col justify-between">
-            <h3 className="font-semibold ">{name}</h3>
+            <h3 className="font-semibold">{name}</h3>
             <p className="text-lightGray">
               {artists.map((artist: Artist, index: number) => {
                 if (index == artists.length - 1) {
@@ -116,7 +124,17 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
               {format(new Date(releaseDate), "d MMM yyyy")}
             </div>
           )}
-          <div className="text-sm text-[#757575]">
+          <div className="text-sm text-[#757575] flex items-center gap-7">
+            {HeartIcon && (
+              <HeartIcon.icon
+                size={25}
+                color={HeartIcon.color}
+                onClick={(e) => {
+                  e.preventDefault();
+                  addOrRemoveLikedSong(dispatch, !!isLikedSong, id);
+                }}
+              />
+            )}
             {convertTime(duration).formattedTime}
           </div>
         </div>

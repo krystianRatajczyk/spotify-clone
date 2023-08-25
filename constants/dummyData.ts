@@ -8,6 +8,8 @@ export const User = {
   createdAt: new Date(),
   updatedAt: new Date(),
   recentSearches: [],
+  likedSongsIds: [],
+  likedSongs: [],
 };
 
 export const darkerAmount = 50;

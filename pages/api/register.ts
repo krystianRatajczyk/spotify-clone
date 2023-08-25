@@ -27,6 +27,7 @@ export default async function handler(
         image: "",
         emailVerified: new Date(),
         recentSearches: [],
+        likedSongsIds: [],
       },
     });
     return res.status(200).json(user);

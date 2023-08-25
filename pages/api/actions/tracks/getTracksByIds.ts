@@ -17,7 +17,7 @@ export default async function handler(
           in: ids,
         },
       },
-      include: {...options},
+      include: { ...options },
     });
 
     if (tracks) {

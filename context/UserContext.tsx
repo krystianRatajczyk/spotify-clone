@@ -3,6 +3,7 @@ import { User as UserType } from "@/constants/formattedTypesPrisma";
 
 import axios from "axios";
 import React, { Dispatch, useEffect, useReducer } from "react";
+import { Track } from "@prisma/client";
 
 //State
 
@@ -18,8 +19,10 @@ type ActionType =
       };
     }
   | { type: "REMOVE_RECENT_SEARCHES"; payload: { id: string } }
-  | { type: "CLEAR_RECENT_SEARCHES" };
-
+  | { type: "ADD_LIKED_SONG"; payload: { id: string } }
+  | { type: "REMOVE_LIKED_SONG"; payload: { id: string } }
+  | { type: "CLEAR_RECENT_SEARCHES" }
+  | { type: "ADD_FULL_LIKED_SONGS"; payload: Track[] };
 //reducer func
 const reducer = (state: UserState, action: ActionType): UserState => {
   switch (action.type) {
@@ -29,7 +32,7 @@ const reducer = (state: UserState, action: ActionType): UserState => {
         recentSearches: [],
       };
     }
-    
+
     case "ADD_RECENT_SEARCHES": {
       const newRecentSearches = [action.payload.item, ...state.recentSearches];
 
@@ -49,6 +52,29 @@ const reducer = (state: UserState, action: ActionType): UserState => {
         recentSearches: newRecentSearches,
       };
     }
+    case "ADD_LIKED_SONG": {
+      return {
+        ...state,
+        likedSongsIds: [ action.payload.id,...state.likedSongsIds,],
+      };
+    }
+
+    case "REMOVE_LIKED_SONG": {
+      return {
+        ...state,
+        likedSongsIds: state.likedSongsIds.filter(
+          (likedSong) => likedSong != action.payload.id
+        ),
+        likedSongs: state.likedSongs?.filter(
+          (likedSong) => likedSong.id !== action.payload.id
+        ),
+      };
+    }
+
+    case "ADD_FULL_LIKED_SONGS": {
+      return { ...state, likedSongs: action.payload };
+    }
+
     case "CHANGE_PROFILE":
       return action.payload;
     default:

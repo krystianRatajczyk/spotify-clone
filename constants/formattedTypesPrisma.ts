@@ -1,3 +1,5 @@
+import { Track } from "@prisma/client";
+
 export interface Search {
   id: string;
   name: string;
@@ -15,4 +17,6 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
   recentSearches: Search[];
+  likedSongsIds: string[];
+  likedSongs: Track[];
 }
