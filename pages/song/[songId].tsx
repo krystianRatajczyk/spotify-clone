@@ -89,13 +89,13 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
 
   if (!track?.id) return null;
 
-  const isSongLiked = user.likedSongsIds.find((song) => song == track.id);
+  const isSongLiked = user.liked.songs.find((song) => song.id == track.id);
   const HeartIcon = isSongLiked ? (
     <AiFillHeart
       size={35}
       color="#1ed860"
       onClick={() =>
-        addOrRemoveLikedSong(UserDispatch, !!isSongLiked, track.id)
+        addOrRemoveLikedSong(UserDispatch, !!isSongLiked, track)
       }
     />
   ) : (
@@ -103,7 +103,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
       size={35}
       color={"lightGray"}
       onClick={() =>
-        addOrRemoveLikedSong(UserDispatch, !!isSongLiked, track.id)
+        addOrRemoveLikedSong(UserDispatch, !!isSongLiked, track)
       }
     />
   );

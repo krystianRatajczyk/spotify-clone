@@ -51,7 +51,7 @@ const Library: React.FC<LibraryProps> = ({ isLibraryOpened }) => {
         items-center"
         >
           <AiFillPushpin color="#1ed760" /> Playlist <span> • </span>{" "}
-          {user.likedSongsIds.length} songs
+          {user.liked.songs.length} songs
         </p>
       </div>
     </Link>

@@ -19,7 +19,7 @@ type ActionType =
       };
     }
   | { type: "REMOVE_RECENT_SEARCHES"; payload: { id: string } }
-  | { type: "ADD_LIKED_SONG"; payload: { id: string } }
+  | { type: "ADD_LIKED_SONG"; payload: { track: Track } }
   | { type: "REMOVE_LIKED_SONG"; payload: { id: string } }
   | { type: "CLEAR_RECENT_SEARCHES" }
   | { type: "ADD_FULL_LIKED_SONGS"; payload: Track[] };
@@ -56,24 +56,24 @@ const reducer = (state: UserState, action: ActionType): UserState => {
     case "ADD_LIKED_SONG": {
       return {
         ...state,
-        likedSongsIds: [action.payload.id, ...state.likedSongsIds],
+        liked: { songs: [action.payload.track, ...state.liked.songs] },
       };
     }
 
     case "REMOVE_LIKED_SONG": {
       return {
         ...state,
-        likedSongsIds: state.likedSongsIds.filter(
-          (likedSong) => likedSong != action.payload.id
-        ),
-        likedSongs: state.likedSongs?.filter(
-          (likedSong) => likedSong.id !== action.payload.id
-        ),
+        liked: {
+          ...state.liked,
+          songs: state.liked.songs?.filter(
+            (likedSong) => likedSong.id !== action.payload.id
+          ),
+        },
       };
     }
 
     case "ADD_FULL_LIKED_SONGS": {
-      return { ...state, likedSongs: action.payload };
+      return { ...state, liked: { ...state.liked, songs: action.payload } };
     }
 
     case "CHANGE_PROFILE":
@@ -106,7 +106,28 @@ export const UserContextProvider = ({
     const fetchCurrentUser = async () => {
       try {
         const currentUser = await axios.get("/api/current");
-        dispatch({ type: "CHANGE_PROFILE", payload: currentUser.data });
+
+        const receivedTracks = await axios.post(
+          "/api/actions/tracks/getTracksByIds",
+          {
+            ids: currentUser.data.liked?.songs,
+            options: { artists: true },
+          }
+        );
+        const tracksMap = new Map();
+        receivedTracks.data.forEach((track: Track) => {
+          tracksMap.set(track.id, track); // setting key value pairs "id" -> track
+        });
+        const likedTracks = currentUser.data.liked.songs.map((id: string) =>
+          tracksMap.get(id)
+        ); // getting certain tracks in user likes songs order
+
+        const userObject = {
+          ...currentUser.data,
+          liked: { songs: likedTracks },
+        };
+        
+        dispatch({ type: "CHANGE_PROFILE", payload: userObject });
       } catch (error) {
         console.error("Error fetching current user:", error);
       }

@@ -28,21 +28,25 @@ export const generateUniqueId = (): string => {
   return `${timestamp}-${randomPart}`;
 };
 
+type Payload = { track: Track } | { id: string };
+
 export const addOrRemoveLikedSong = (
   //@ts-ignore
-  UserDispatch: ({ type: string, payload: { id: string } }) => void,
+  UserDispatch: ({ type: string, payload: Payload }) => void,
   isLiked: boolean,
-  id: string
+  track: Track
 ) => {
-  let type: "REMOVE_LIKED_SONG" | "ADD_LIKED_SONG" = "REMOVE_LIKED_SONG";
   if (!isLiked) {
-    type = "ADD_LIKED_SONG";
+    UserDispatch({
+      type: "ADD_LIKED_SONG",
+      payload: { track },
+    });
+  } else {
+    UserDispatch({
+      type: "REMOVE_LIKED_SONG",
+      payload: { id: track.id },
+    });
   }
-
-  UserDispatch({
-    type: type,
-    payload: { id },
-  });
 };
 
 export const arrayEquals = (a: string[], b: string[]) => {

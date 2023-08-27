@@ -1,45 +1,18 @@
 import { Header, HorizontalSongCard, PlayPause } from "@/components";
 import { InfoContext } from "@/context/InfoContext";
 import { UserContext } from "@/context/UserContext";
-import useCurrentUser from "@/hooks/useCurrentUser";
 import { requireAuthentication } from "@/lib/isAuthenticated";
-import { Track } from "@prisma/client";
-import axios from "axios";
 import { GetServerSideProps } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import { AiFillHeart } from "react-icons/ai";
 
 const likedSongs = () => {
-  const { state: user, dispatch: UserDispatch } = useContext(UserContext);
-  const { dispatch: InfoDispatch } = useContext(InfoContext);
-  const [isLoading, setIsLoading] = useState(false);
+  const { state: user } = useContext(UserContext);
+  const { dispatch } = useContext(InfoContext);
 
   useEffect(() => {
-    InfoDispatch({ type: "CHANGE_LABEL_NAME", payload: "Liked Songs" });
-    const getTracks = async () => {
-      setIsLoading(true);
-      const receivedTracks = await axios.post(
-        "/api/actions/tracks/getTracksByIds",
-        {
-          ids: user.likedSongsIds,
-          options: { artists: true },
-        }
-      );
-      const tracksMap = new Map();
-      receivedTracks.data.forEach((track: Track) => {
-        tracksMap.set(track.id, track); // setting key value pairs "id" -> track
-      });
-      const likedTracks = user.likedSongsIds.map((id) => tracksMap.get(id)); // getting certain tracks in user likes songs order
-
-      setIsLoading(false);
-      UserDispatch({
-        type: "ADD_FULL_LIKED_SONGS",
-        payload: likedTracks,
-      });
-    };
-
-    getTracks();
-  }, [user.likedSongsIds]);
+    dispatch({ type: "CHANGE_LABEL_NAME", payload: "Liked Songs" });
+  }, []);
 
   return (
     <div className="min-h-full bg-[#1b1b1b] flex flex-col">
@@ -60,7 +33,7 @@ const likedSongs = () => {
             <h2 className="text-[90px] font-bold">Liked Songs</h2>
             <p className="font-semibold">
               <span className="font-bold">{user.name}</span>
-              <span> • </span> {user.likedSongsIds.length} songs
+              <span> • </span> {user.liked.songs.length} songs
             </p>
           </div>
         </div>
@@ -69,7 +42,7 @@ const likedSongs = () => {
         className="w-full min-h-full flex-1 -mt-[325px] bg-[rgba(0,0,0,0.3)] p-5
          "
       >
-        {user.likedSongs?.length > 0 && (
+        {user.liked.songs?.length > 0 && (
           <div className="h-full">
             <div className="pl-3">
               <PlayPause
@@ -83,7 +56,7 @@ const likedSongs = () => {
               <Header withDate />
             </div>
             <div className="h-full">
-              {user.likedSongs?.map((track, index) => (
+              {user.liked.songs?.map((track, index) => (
                 <HorizontalSongCard
                   key={index}
                   {...track}

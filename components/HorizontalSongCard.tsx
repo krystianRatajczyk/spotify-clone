@@ -40,16 +40,23 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
   currentRank,
   previousRank,
 }) => {
+  const track = {
+    id,
+    image,
+    name,
+    duration,
+    artists,
+    releaseDate,
+    currentRank,
+    previousRank,
+  };
   const divRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(divRef);
 
   const { state: user, dispatch } = useContext(UserContext);
   const [addRecentSearch] = useAddRecentSearch();
 
-  const isLikedSong = user.likedSongsIds.find((s) => s === id);
-  const HeartIcon = isLikedSong
-    ? { icon: AiFillHeart, color: "#1ed860" }
-    : isHover && { icon: AiOutlineHeart, color: "#fff" };
+  const isLikedSong = user.liked.songs.find((s) => s.id === id);
 
   return (
     <Link
@@ -131,18 +138,22 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
                 size={25}
                 onClick={(e) => {
                   e.preventDefault();
-                  addOrRemoveLikedSong(dispatch, !!isLikedSong, id);
+                  //@ts-ignore
+                  addOrRemoveLikedSong(dispatch, !!isLikedSong, track);
                 }}
               />
-            ) : isHover && (
-              <AiOutlineHeart
-                color="#fff"
-                size={25}
-                onClick={(e) => {
-                  e.preventDefault();
-                  addOrRemoveLikedSong(dispatch, !!isLikedSong, id);
-                }}
-              />
+            ) : (
+              isHover && (
+                <AiOutlineHeart
+                  color="#fff"
+                  size={25}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    //@ts-ignore
+                    addOrRemoveLikedSong(dispatch, !!isLikedSong, track);
+                  }}
+                />
+              )
             )}
             {convertTime(duration).formattedTime}
           </div>

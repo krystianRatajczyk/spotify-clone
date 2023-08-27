@@ -17,7 +17,7 @@ export default async function handler(
     if (ids) {
       const result = await prisma.user.update({
         where: { email: currentUser.email },
-        data: { likedSongsIds: ids },
+        data: { liked: { songs: ids } },
       });
 
       return res.status(200).json(result);

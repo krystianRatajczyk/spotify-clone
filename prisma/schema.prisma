@@ -20,7 +20,7 @@ model User {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   recentSearches Json[]
-  likedSongsIds  String[] @db.ObjectId
+  liked          Json
 }
 
 model Track {

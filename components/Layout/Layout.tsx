@@ -20,16 +20,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     const scrolled = element.scrollTop;
     dispatch({ type: "CHANGE_SCROLL_TOP", payload: scrolled });
   };
+  const likedSongsIds = user.liked.songs.map((song) => song.id);
 
   useEffect(() => {
     if (initialized) {
       const timeout = setTimeout(async () => {
         const currentUser = await axios.get("/api/current");
         // update array of ids in db only if 2 seconds past and something changed
-        if (!arrayEquals(currentUser.data.likedSongsIds, user.likedSongsIds)) {
+        if (!arrayEquals(currentUser.data.liked.songs, likedSongsIds)) {
           const res = await axios.post(
             "/api/actions/likedSongs/updateLikedSongs",
-            { ids: user.likedSongsIds }
+            { ids: likedSongsIds }
           );
         }
       }, 2000);
@@ -38,7 +39,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     } else {
       setInitialized(true);
     }
-  }, [user.likedSongsIds]);
+  }, [likedSongsIds]);
 
   return (
     <div className="p-2 flex h-screen">

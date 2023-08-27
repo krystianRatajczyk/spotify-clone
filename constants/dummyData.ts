@@ -9,7 +9,7 @@ export const User = {
   updatedAt: new Date(),
   recentSearches: [],
   likedSongsIds: [],
-  likedSongs: [],
+  liked: { songs: [] },
 };
 
 export const darkerAmount = 50;
