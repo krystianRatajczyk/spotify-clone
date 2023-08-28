@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import VerticalCard from "./VerticalCard";
-import { UserContext } from "@/context/UserContext";
+import { UserContext } from "@/context/User/UserContext";
 import { useRouter } from "next/router";
 
 const RecentSearches = () => {
@@ -9,7 +9,7 @@ const RecentSearches = () => {
   if (!user.recentSearches.length) return null;
 
   const router = useRouter();
-
+  
   return (
     <div className="mt-3">
       <div className="w-full flex justify-between">

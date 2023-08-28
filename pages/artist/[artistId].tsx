@@ -1,5 +1,7 @@
 import { HorizontalSongCard, PlayPause, Button } from "@/components";
 import { InfoContext } from "@/context/InfoContext";
+import { UserContext } from "@/context/User/UserContext";
+import { addOrRemoveLikedArtist } from "@/lib/artist";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { Artist, Track } from "@prisma/client";
 import axios from "axios";
@@ -17,8 +19,10 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
   const [artist, setArtist] = useState<Artist>();
   const [tracks, setTracks] = useState<Track[]>();
   const [showMore, setShowMore] = useState<boolean>(false);
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
   const { dispatch } = useContext(InfoContext);
+  const { state: user, dispatch: UserDispatch } = useContext(UserContext);
 
   const router = useRouter();
 
@@ -52,7 +56,17 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
     };
 
     getArtist();
-  }, []);
+  }, [router.query.artistId]);
+
+  useEffect(() => {
+    if (artist) {
+      const following = !!user.liked.artists?.find(
+        (a) => a.id == artist.id
+      );
+
+      setIsFollowing(following);
+    }
+  }, [user.liked.artists, artist]);
 
   return (
     <Color src={artist?.image || ""} crossOrigin="anonymous" format="hex">
@@ -92,8 +106,19 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
                     animation={false}
                     className="w-[60px] h-[60px]"
                   />
-                  <Button className="font-bold px-4 py-1 border border-gray-600 hover:border-white rounded-md bg-transparent text-white text-[16px]">
-                    FOLLOW
+                  <Button
+                    onClick={() => {
+                      artist &&
+                        addOrRemoveLikedArtist(UserDispatch, !!isFollowing, {
+                          id: artist.id,
+                          name: artist.name,
+                          image: artist.image,
+                        });
+                    }}
+                    className="font-bold px-4 py-1 border border-gray-600 hover:border-white 
+                    rounded-full bg-transparent text-white text-[16px]"
+                  >
+                    {isFollowing ? "FOLLOWING" : "FOLLOW"}
                   </Button>
                 </div>
                 <p className="text-white font-bold text-2xl">Popular</p>

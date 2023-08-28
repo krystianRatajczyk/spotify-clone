@@ -1,5 +1,5 @@
 import { VerticalCard } from "@/components";
-import { UserContext } from "@/context/UserContext";
+import { UserContext } from "@/context/User/UserContext";
 import useClearRecentSearch from "@/hooks/useClearRecentSearch";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { GetServerSideProps } from "next";

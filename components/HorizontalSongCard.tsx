@@ -7,7 +7,7 @@ import Link from "next/link";
 import React, { useContext, useRef } from "react";
 import { BsFillPlayFill } from "react-icons/bs";
 import Triangle from "./Layout/Triangle";
-import { UserContext } from "@/context/UserContext";
+import { UserContext } from "@/context/User/UserContext";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
 interface HorizontalSongCardProps {
@@ -56,7 +56,7 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
   const { state: user, dispatch } = useContext(UserContext);
   const [addRecentSearch] = useAddRecentSearch();
 
-  const isLikedSong = user.liked.songs.find((s) => s.id === id);
+  const isLikedSong = user.liked.songs?.find((s) => s.id === id);
 
   return (
     <Link

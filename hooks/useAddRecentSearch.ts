@@ -1,4 +1,4 @@
-import { UserContext } from "@/context/UserContext";
+import { UserContext } from "@/context/User/UserContext";
 import { generateUniqueId } from "@/lib/track";
 import axios from "axios";
 import { useContext } from "react";

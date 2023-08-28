@@ -47,7 +47,10 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className={`flex ${isLibraryOpened && "w-[540px]"} flex-col gap-2`}>
+    <div
+      className={`flex ${isLibraryOpened && "w-[520px]"}
+      flex-col gap-2 h-full`}
+    >
       <div className="flex bg-darkGray px-5 py-4 flex-col w-full gap-5 rounded-xl ">
         {navLinks.map((navLink) => {
           return (
@@ -59,8 +62,8 @@ const Sidebar: React.FC = () => {
           );
         })}
       </div>
-      <div className="flex bg-darkGray py-4 flex-col h-full rounded-xl gap-4">
-        <div className="flex justify-between items-center cursor-pointer px-2">
+      <div className="flex bg-darkGray overflow-auto py-4 flex-col rounded-xl gap-4">
+        <div className="flex h-fit justify-between items-center cursor-pointer px-2">
           <div
             className="flex gap-4 px-3 items-center justify-center"
             onClick={() => setIsLibraryOpened((prev) => !prev)}
@@ -91,7 +94,7 @@ const Sidebar: React.FC = () => {
             </CircularButton>
           )}
         </div>
-        <div className="px-2">
+        <div className="px-2 flex-1 overflow-scroll no-scrollbar">
           <Library isLibraryOpened={isLibraryOpened} />
         </div>
       </div>

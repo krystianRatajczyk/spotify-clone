@@ -13,7 +13,7 @@ import {
   notificationState,
   profileErrorState,
 } from "@/constants/initialStates";
-import { UserContext } from "@/context/UserContext";
+import { UserContext } from "@/context/User/UserContext";
 import Color from "color-thief-react";
 import { getDownGradient, getUpGradient } from "@/constants/styles";
 

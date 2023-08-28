@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import type { AppProps } from "next/app";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { usePathname } from "next/navigation";
-import { UserContextProvider } from "@/context/UserContext";
+import { UserContextProvider } from "@/context/User/UserContext";
 import { InfoContextProvider } from "@/context/InfoContext";
 import { Layout } from "@/components";
 

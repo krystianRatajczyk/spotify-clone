@@ -1,0 +1,38 @@
+import { User as UserType } from "@/constants/formattedTypesPrisma";
+import { Track } from "@prisma/client";
+import { likedSongsReducer } from "./reducers/likedSongs/reducer";
+import { likedArtistsReducer } from "./reducers/likedArtists/reducer";
+import { recentSearchesReducer } from "./reducers/recentSearch/reducer";
+import { userReducer } from "./reducers/user/reducer";
+
+type UserState = UserType;
+
+export type ActionType =
+  | { type: "CHANGE_PROFILE"; payload: UserType }
+  | {
+      type: "ADD_RECENT_SEARCHES";
+      payload: {
+        item: { id: string; name: string; image: string; type: string };
+      };
+    }
+  | { type: "REMOVE_RECENT_SEARCHES"; payload: { id: string } }
+  | { type: "ADD_LIKED_SONG"; payload: { track: Track } }
+  | { type: "REMOVE_LIKED_SONG"; payload: { id: string } }
+  | { type: "CLEAR_RECENT_SEARCHES" }
+  | {
+      type: "ADD_LIKED_ARTIST";
+      payload: { artist: { name: string; image: string; id: string } };
+    }
+  | { type: "REMOVE_LIKED_ARTIST"; payload: { id: string } };
+
+const rootReducer = (state: UserState, action: ActionType): UserState => {
+  return {
+    ...state,
+    ...userReducer(state, action),
+    ...recentSearchesReducer(state, action),
+    ...likedArtistsReducer(state, action),
+    ...likedSongsReducer(state, action),
+  };
+};
+
+export default rootReducer;

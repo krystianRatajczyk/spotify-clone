@@ -17,7 +17,7 @@ import {
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import Link from "next/link";
 import { InfoContext } from "@/context/InfoContext";
-import { UserContext } from "@/context/UserContext";
+import { UserContext } from "@/context/User/UserContext";
 
 interface SongDetailProps {
   trackData: Track;

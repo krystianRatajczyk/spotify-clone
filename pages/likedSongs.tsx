@@ -1,6 +1,6 @@
 import { Header, HorizontalSongCard, PlayPause } from "@/components";
 import { InfoContext } from "@/context/InfoContext";
-import { UserContext } from "@/context/UserContext";
+import { UserContext } from "@/context/User/UserContext";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { GetServerSideProps } from "next";
 import React, { useContext, useEffect, useState } from "react";

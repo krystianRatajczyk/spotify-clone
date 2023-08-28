@@ -2,7 +2,6 @@ import { usePathname } from "next/navigation";
 import React, { Dispatch, useEffect, useReducer } from "react";
 
 //State
-
 type InfoState = {
   search: string;
   labelName: string;

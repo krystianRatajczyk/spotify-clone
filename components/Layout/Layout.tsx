@@ -2,7 +2,7 @@ import React, { ReactNode, useContext, useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import { InfoContext } from "@/context/InfoContext";
-import { UserContext } from "@/context/UserContext";
+import { UserContext } from "@/context/User/UserContext";
 import { arrayEquals } from "@/lib/track";
 import axios from "axios";
 
@@ -20,20 +20,25 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     const scrolled = element.scrollTop;
     dispatch({ type: "CHANGE_SCROLL_TOP", payload: scrolled });
   };
-  const likedSongsIds = user.liked.songs.map((song) => song.id);
+  const likedSongsIds = user.liked.songs?.map((song) => song.id);
+  const likedArtistsIds = user.liked.artists?.map((artist) => artist.id);
 
   useEffect(() => {
     if (initialized) {
       const timeout = setTimeout(async () => {
         const currentUser = await axios.get("/api/current");
         // update array of ids in db only if 2 seconds past and something changed
-        if (!arrayEquals(currentUser.data.liked.songs, likedSongsIds)) {
-          const res = await axios.post(
-            "/api/actions/likedSongs/updateLikedSongs",
-            { ids: likedSongsIds }
-          );
+
+        if (
+          !arrayEquals(currentUser.data.liked.songs, likedSongsIds) ||
+          !arrayEquals(currentUser.data.liked.artists, likedArtistsIds)
+        ) {
+          const res = await axios.post("/api/actions/liked/updateLiked", {
+            songsIds: likedSongsIds,
+            artistsIds: likedArtistsIds,
+          });
         }
-      }, 2000);
+      }, 1000);
 
       return () => clearTimeout(timeout);
     } else {

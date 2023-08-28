@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import prisma from "@/lib/prismadb";
-import serverAuth from "@/lib/serverAuth";
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,16 +10,17 @@ export default async function handler(
     return res.status(405).end();
   }
   try {
-    const { ids } = req.body;
-    const { currentUser } = await serverAuth(req, res);
-
-    if (ids) {
-      const result = await prisma.user.update({
-        where: { email: currentUser.email },
-        data: { liked: { songs: ids } },
-      });
-
-      return res.status(200).json(result);
+    let { ids, select } = req.body;
+    const artists = await prisma.artist.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+      select: {...select}
+    });
+    if (artists) {
+      return res.status(200).json(artists);
     }
   } catch (error) {
     console.log(error);

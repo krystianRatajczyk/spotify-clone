@@ -17,5 +17,8 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
   recentSearches: Search[];
-  liked: { songs: Track[] };
+  liked: {
+    songs: Track[];
+    artists: { name: string; image: string; id: string }[];
+  };
 }

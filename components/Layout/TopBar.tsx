@@ -13,7 +13,7 @@ import Input from "../Input";
 import { RxCross2 } from "react-icons/rx";
 import SortTabs from "./SortTabs";
 import { InfoContext } from "@/context/InfoContext";
-import { UserContext } from "@/context/UserContext";
+import { UserContext } from "@/context/User/UserContext";
 import PlayPause from "../PlayPause";
 
 const TopBar = () => {
