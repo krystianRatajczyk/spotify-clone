@@ -3,31 +3,11 @@ import { User as UserType } from "@/constants/formattedTypesPrisma";
 
 import axios from "axios";
 import React, { Dispatch, useEffect, useReducer } from "react";
-import { Artist, Track } from "@prisma/client";
-import rootReducer from "./root";
+import rootReducer, { ActionType } from "./root";
 import { getFormattedObjects } from "@/lib/artist";
 
 //State
 type UserState = UserType;
-
-//Action Type
-type ActionType =
-  | { type: "CHANGE_PROFILE"; payload: UserType }
-  | {
-      type: "ADD_RECENT_SEARCHES";
-      payload: {
-        item: { id: string; name: string; image: string; type: string };
-      };
-    }
-  | { type: "REMOVE_RECENT_SEARCHES"; payload: { id: string } }
-  | { type: "ADD_LIKED_SONG"; payload: { track: Track } }
-  | { type: "REMOVE_LIKED_SONG"; payload: { id: string } }
-  | { type: "CLEAR_RECENT_SEARCHES" }
-  | {
-      type: "ADD_LIKED_ARTIST";
-      payload: { artist: { name: string; image: string; id: string } };
-    }
-  | { type: "REMOVE_LIKED_ARTIST"; payload: { id: string } };
 
 //context object type {state, dispatch}
 type ContextType = {
@@ -61,18 +41,39 @@ export const UserContextProvider = ({
         );
 
         const likedArtists = await getFormattedObjects(
-          "/api/actions/artists/getArtistsByIds",
+          "/api/actions/artists/getArtistsByIdsWithSelect",
           {
-            selec: { image: true, id: true, name: true },
+            select: {
+              image: true,
+              id: true,
+              name: true,
+            },
           },
           "artists"
         );
 
+        const likedPlaylists = await getFormattedObjects(
+          "/api/actions/playlist/getPlaylistsByIdsWithSelect",
+          {
+            select: {
+              image: true,
+              id: true,
+              name: true,
+              author: true,
+            },
+          },
+          "playlists"
+        );
+
         const userObject = {
           ...currentUser.data,
-          liked: { songs: likedTracks, artists: likedArtists },
+          liked: {
+            songs: likedTracks,
+            artists: likedArtists,
+            playlists: likedPlaylists,
+          },
         };
-        
+
         dispatch({ type: "CHANGE_PROFILE", payload: userObject });
       } catch (error) {
         console.error("Error fetching current user:", error);

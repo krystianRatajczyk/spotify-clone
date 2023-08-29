@@ -90,22 +90,13 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
   if (!track?.id) return null;
 
   const isSongLiked = user.liked.songs.find((song) => song.id == track.id);
+  const handleHeartClick = () =>
+    addOrRemoveLikedSong(UserDispatch, !!isSongLiked, track);
+    
   const HeartIcon = isSongLiked ? (
-    <AiFillHeart
-      size={35}
-      color="#1ed860"
-      onClick={() =>
-        addOrRemoveLikedSong(UserDispatch, !!isSongLiked, track)
-      }
-    />
+    <AiFillHeart size={35} color="#1ed860" onClick={handleHeartClick} />
   ) : (
-    <AiOutlineHeart
-      size={35}
-      color={"lightGray"}
-      onClick={() =>
-        addOrRemoveLikedSong(UserDispatch, !!isSongLiked, track)
-      }
-    />
+    <AiOutlineHeart size={35} color={"lightGray"} onClick={handleHeartClick} />
   );
 
   return (
@@ -196,18 +187,21 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
                         More by {artist.name}
                       </h2>
                       <div className="flex gap-5">
-                        {artist.tracks?.map((track: Track) => {
-                          return (
-                            <VerticalCard
-                              typeId={track.id}
-                              type="track"
-                              {...track}
-                              modal="playpause"
-                              imageClassName="w-[180px] h-[180px]"
-                              isRecentSearch
-                            />
-                          );
-                        })}
+                        {
+                          //@ts-ignore
+                          artist.tracks?.map((track: Track) => {
+                            return (
+                              <VerticalCard
+                                typeId={track.id}
+                                type="track"
+                                {...track}
+                                modal="playpause"
+                                imageClassName="w-[180px] h-[180px]"
+                                isRecentSearch
+                              />
+                            );
+                          })
+                        }
                       </div>
                     </div>
                   );

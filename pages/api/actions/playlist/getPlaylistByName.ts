@@ -10,17 +10,18 @@ export default async function handler(
     return res.status(405).end();
   }
   try {
-    let { ids, select } = req.body;
-    const artists = await prisma.artist.findMany({
+    let { name, author } = req.body;
+
+    const playlist = await prisma.playlist.findFirst({
       where: {
-        id: {
-          in: ids,
-        },
+        name,
+        author,
       },
-      select: { ...select },
     });
-    if (artists) {
-      return res.status(200).json(artists);
+
+
+    if (playlist) {
+      return res.status(200).json(playlist);
     }
   } catch (error) {
     console.log(error);

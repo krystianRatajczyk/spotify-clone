@@ -22,21 +22,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
   const likedSongsIds = user.liked.songs?.map((song) => song.id);
   const likedArtistsIds = user.liked.artists?.map((artist) => artist.id);
+  const likedPlaylistsIds = user.liked.playlists?.map(
+    (playlist) => playlist.id
+  );
 
   useEffect(() => {
     if (initialized) {
       const timeout = setTimeout(async () => {
         const currentUser = await axios.get("/api/current");
         // update array of ids in db only if 2 seconds past and something changed
-
         if (
           !arrayEquals(currentUser.data.liked.songs, likedSongsIds) ||
-          !arrayEquals(currentUser.data.liked.artists, likedArtistsIds)
+          !arrayEquals(currentUser.data.liked.artists, likedArtistsIds) ||
+          !arrayEquals(currentUser.data.liked.playlists, likedPlaylistsIds)
         ) {
           const res = await axios.post("/api/actions/liked/updateLiked", {
             songsIds: likedSongsIds,
             artistsIds: likedArtistsIds,
+            playlistsIds: likedPlaylistsIds,
           });
+          
         }
       }, 1000);
 
@@ -44,7 +49,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     } else {
       setInitialized(true);
     }
-  }, [likedSongsIds]);
+  }, [likedSongsIds, likedArtistsIds]);
 
   return (
     <div className="p-2 flex h-screen">

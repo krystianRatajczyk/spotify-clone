@@ -11,13 +11,19 @@ export default async function handler(
     return res.status(405).end();
   }
   try {
-    const { songsIds, artistsIds } = req.body;
+    const { songsIds, artistsIds, playlistsIds } = req.body;
     const { currentUser } = await serverAuth(req, res);
-
+    
     if (songsIds && artistsIds) {
       const result = await prisma.user.update({
         where: { email: currentUser.email },
-        data: { liked: { artists: artistsIds, songs: songsIds } },
+        data: {
+          liked: {
+            artists: artistsIds,
+            songs: songsIds,
+            playlists: playlistsIds,
+          },
+        },
       });
 
       return res.status(200).json(result);

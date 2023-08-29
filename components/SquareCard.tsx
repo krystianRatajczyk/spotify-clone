@@ -9,7 +9,7 @@ interface SquareCardProps {
 
 const SquareCard: React.FC<SquareCardProps> = ({ name, color, url }) => {
   return (
-    <Link href={{ pathname: `/category/${name}`, query: url }}>
+    <Link href={{ pathname: `/category/${name}` }}>
       <div
         className={`p-5 aspect-[1/1] rounded-md relative overflow-hidden cursor-pointer`}
         style={{ backgroundColor: color }}

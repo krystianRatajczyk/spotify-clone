@@ -4,6 +4,7 @@ import { likedSongsReducer } from "./reducers/likedSongs/reducer";
 import { likedArtistsReducer } from "./reducers/likedArtists/reducer";
 import { recentSearchesReducer } from "./reducers/recentSearch/reducer";
 import { userReducer } from "./reducers/user/reducer";
+import { likedPlaylistsReducer } from "./reducers/likedPlaylists/reducer";
 
 type UserState = UserType;
 
@@ -23,7 +24,14 @@ export type ActionType =
       type: "ADD_LIKED_ARTIST";
       payload: { artist: { name: string; image: string; id: string } };
     }
-  | { type: "REMOVE_LIKED_ARTIST"; payload: { id: string } };
+  | { type: "REMOVE_LIKED_ARTIST"; payload: { id: string } }
+  | {
+      type: "ADD_LIKED_PLAYLIST";
+      payload: {
+        playlist: { id: string; name: string; author: string; image: string };
+      };
+    }
+  | { type: "REMOVE_LIKED_PLAYLIST"; payload: { id: string } };
 
 const rootReducer = (state: UserState, action: ActionType): UserState => {
   return {
@@ -32,6 +40,7 @@ const rootReducer = (state: UserState, action: ActionType): UserState => {
     ...recentSearchesReducer(state, action),
     ...likedArtistsReducer(state, action),
     ...likedSongsReducer(state, action),
+    ...likedPlaylistsReducer(state, action),
   };
 };
 

@@ -11,27 +11,28 @@ datasource db {
 }
 
 model User {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
   name           String
-  email          String   @unique
+  email          String     @unique
   emailVerified  DateTime
   image          String?
   hashedPassword String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  playlists      Playlist[]
   recentSearches Json[]
   liked          Json
 }
 
 model Track {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  name         String   @unique
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  name         String     @unique
   image        String
   releaseDate  String
   currentRank  Int
   previousRank Int
-  artistsIds   String[] @db.ObjectId
-  artists      Artist[] @relation(fields: [artistsIds], references: [id])
+  artistsIds   String[]   @db.ObjectId
+  artists      Artist[]   @relation(fields: [artistsIds], references: [id])
   duration     Int
   genre        String
 }
@@ -44,4 +45,15 @@ model Artist {
   image        String
   currentRank  Int
   previousRank Int
+}
+
+model Playlist {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  tracks    Json[]
+  image     String?
+  isPublic  Boolean  @default(true)
+  author    String?
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?  @db.ObjectId
 }

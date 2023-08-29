@@ -62,7 +62,7 @@ const Sidebar: React.FC = () => {
           );
         })}
       </div>
-      <div className="flex bg-darkGray overflow-auto py-4 flex-col rounded-xl gap-4">
+      <div className="flex flex-1 bg-darkGray overflow-auto py-4 flex-col rounded-xl gap-4">
         <div className="flex h-fit justify-between items-center cursor-pointer px-2">
           <div
             className="flex gap-4 px-3 items-center justify-center"

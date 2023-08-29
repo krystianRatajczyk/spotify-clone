@@ -10,7 +10,7 @@ export default async function handler(
     return res.status(405).end();
   }
   try {
-    let { ids, options, select } = req.body;
+    let { ids, options } = req.body;
 
     if (typeof ids === "string") {
       ids = [ids];

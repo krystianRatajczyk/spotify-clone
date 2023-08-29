@@ -20,5 +20,6 @@ export interface User {
   liked: {
     songs: Track[];
     artists: { name: string; image: string; id: string }[];
+    playlists: { id: string; name: string; author: string; image: string }[];
   };
 }
