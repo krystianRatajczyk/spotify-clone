@@ -1,4 +1,4 @@
-import { Track } from "@prisma/client";
+import { Playlist, Track } from "@prisma/client";
 
 export interface Search {
   id: string;
@@ -16,6 +16,7 @@ export interface User {
   hashedPassword: string;
   createdAt: Date;
   updatedAt: Date;
+  playlists: Playlist[];
   recentSearches: Search[];
   liked: {
     songs: Track[];

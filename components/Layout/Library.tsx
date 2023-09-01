@@ -21,6 +21,20 @@ const Library: React.FC<LibraryProps> = ({ isLibraryOpened }) => {
         >
           <AiFillHeart size={20} color="#fff" />
         </Link>
+        {user.liked.playlists.map((playlist) => (
+          <Link
+            href={
+              playlist.author === "Spotify" ? `/category/${playlist.name}` : ""
+            }
+          >
+            <img
+              src={playlist.image}
+              alt=""
+              className="w-[50px] h-[50px] rounded-lg
+              object-cover"
+            />
+          </Link>
+        ))}
         {user.liked.artists?.map((artist) => (
           <Link href={`/artist/${artist.id}`}>
             <img
@@ -59,10 +73,23 @@ const Library: React.FC<LibraryProps> = ({ isLibraryOpened }) => {
           </p>
         </div>
       </Link>
+      {user.playlists.map((playlist) => (
+        <LibraryItem
+          key={playlist.id}
+          href={`/playlists/${playlist.id}`}
+          image={playlist.image!}
+          name={playlist.name}
+          label={`Playlist • ${playlist.author || playlist.user.name}`}
+        />
+      ))}
       {user.liked.playlists?.map((playlist) => (
         <LibraryItem
           key={playlist.id}
-          href={playlist.author && `/category/${playlist.name}`}
+          href={
+            playlist.author
+              ? `/category/${playlist.name}`
+              : `/playlists/${playlist.id}`
+          }
           image={playlist.image}
           name={playlist.name}
           label={`Playlist • ${playlist.author}`}

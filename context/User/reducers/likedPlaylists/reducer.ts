@@ -8,8 +8,38 @@ export const likedPlaylistsReducer = (
   action: ActionType
 ): UserState | {} => {
   switch (action.type) {
+    case "CREATE_PLAYLIST": {
+      const index = state.playlists.length + 1;
+
+      return {
+        ...state,
+        playlists: [
+          {
+            id: index,
+            name: `My Playlist #${index}`,
+            author: state.name,
+            image: "",
+          },
+          ...state.playlists,
+        ],
+      };
+    }
+
+    case "DELETE_PLAYLIST": {
+      return state;
+    }
+
+    case "CHANGE_PLAYLIST_ID": {
+      const { newId } = action.payload;
+      const updatedPlaylist = { ...state.playlists[0], id: newId };
+      const updatedPlaylists = [
+        updatedPlaylist,
+        ...state.playlists.slice(1),
+      ];
+      return { ...state, playlists: updatedPlaylists };
+    }
+
     case "ADD_LIKED_PLAYLIST": {
-      console.log(state)
       return {
         ...state,
         liked: {

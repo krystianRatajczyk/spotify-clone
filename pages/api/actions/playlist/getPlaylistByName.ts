@@ -11,7 +11,7 @@ export default async function handler(
   }
   try {
     let { name, author } = req.body;
-
+    console.log(name, author)
     const playlist = await prisma.playlist.findFirst({
       where: {
         name,

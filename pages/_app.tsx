@@ -12,7 +12,11 @@ export default function App({ Component, pageProps }: AppProps) {
   const pathname = usePathname();
 
   if (pathname == "/auth") {
-    return <Component {...pageProps} />;
+    return (
+      <UserContextProvider>
+        <Component {...pageProps} />
+      </UserContextProvider>
+    );
   }
 
   return (

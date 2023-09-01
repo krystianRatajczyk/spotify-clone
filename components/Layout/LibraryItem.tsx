@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { BsMusicNoteBeamed } from "react-icons/bs";
 
 interface LibraryItemProps {
   href: string;
@@ -20,13 +21,23 @@ const LibraryItem: React.FC<LibraryItemProps> = ({
       className="hover:bg-[#1a1a1a] p-2 rounded-lg 
   flex w-full  gap-2 items-center"
     >
-      <img
-        src={image}
-        className={`w-[50px] h-[50px] ${
-          label == "Artist" ? "rounded-full" : "rounded-lg"
-        } object-cover`}
-        alt=""
-      />
+      {image != "" ? (
+        <img
+          src={image}
+          className={`w-[50px] h-[50px] ${
+            label == "Artist" ? "rounded-full" : "rounded-lg"
+          } object-cover`}
+          alt=""
+        />
+      ) : (
+        <div
+          className="w-[50px] h-[50px] rounded-lg flex items-center
+        justify-center bg-[#282828]"
+        >
+          <BsMusicNoteBeamed size={30} color="#b3b3b3"/>
+        </div>
+      )}
+
       <div>
         <h2 className="font-semibold text-[17px]">{name}</h2>
         <p className="text-[#929292] font-semibold text-[15px] ">{label}</p>

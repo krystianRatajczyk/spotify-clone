@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { NextApiResponse, NextApiRequest } from "next";
 import prismadb from "@/lib/prismadb";
+import { Playlist } from "@prisma/client";
 
 export default async function handler(
   req: NextApiRequest,
@@ -19,6 +20,7 @@ export default async function handler(
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+    
     const user = await prismadb.user.create({
       data: {
         email,
@@ -30,6 +32,7 @@ export default async function handler(
         liked: {},
       },
     });
+    
     return res.status(200).json(user);
   } catch (error) {
     console.log(error);

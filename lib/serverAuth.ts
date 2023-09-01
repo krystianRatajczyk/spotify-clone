@@ -16,8 +16,15 @@ const serverAuth = async (
 
   const currentUser = await prismadb.user.findUnique({
     where: { email: session.user.email },
+    include: {
+      playlists: {
+        include: {
+          user: { select: { name: true } },
+        },
+      },
+    },
   });
-  
+
   if (!currentUser) {
     throw new Error("Not signed in");
   }

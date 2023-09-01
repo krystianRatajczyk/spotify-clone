@@ -31,7 +31,10 @@ export type ActionType =
         playlist: { id: string; name: string; author: string; image: string };
       };
     }
-  | { type: "REMOVE_LIKED_PLAYLIST"; payload: { id: string } };
+  | { type: "REMOVE_LIKED_PLAYLIST"; payload: { id: string } }
+  | { type: "CREATE_PLAYLIST" }
+  | { type: "DELETE_PLAYLIST"; payload: { id: string } }
+  | { type: "CHANGE_PLAYLIST_ID"; payload: { newId: string } };
 
 const rootReducer = (state: UserState, action: ActionType): UserState => {
   return {

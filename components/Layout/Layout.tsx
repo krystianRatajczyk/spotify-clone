@@ -32,16 +32,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         const currentUser = await axios.get("/api/current");
         // update array of ids in db only if 2 seconds past and something changed
         if (
-          !arrayEquals(currentUser.data.liked.songs, likedSongsIds) ||
-          !arrayEquals(currentUser.data.liked.artists, likedArtistsIds) ||
-          !arrayEquals(currentUser.data.liked.playlists, likedPlaylistsIds)
+          (!arrayEquals(currentUser.data.liked.songs, likedSongsIds) ||
+            !arrayEquals(currentUser.data.liked.artists, likedArtistsIds) ||
+            !arrayEquals(
+              currentUser.data.liked.playlists,
+              likedPlaylistsIds
+            )) &&
+          user.id
         ) {
           const res = await axios.post("/api/actions/liked/updateLiked", {
             songsIds: likedSongsIds,
             artistsIds: likedArtistsIds,
             playlistsIds: likedPlaylistsIds,
           });
-          
         }
       }, 1000);
 
@@ -49,7 +52,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     } else {
       setInitialized(true);
     }
-  }, [likedSongsIds, likedArtistsIds]);
+  }, [likedSongsIds, likedArtistsIds, likedPlaylistsIds]);
 
   return (
     <div className="p-2 flex h-screen">

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { VscLibrary } from "react-icons/vsc";
 import {
@@ -12,6 +12,8 @@ import { BsPlus } from "react-icons/bs";
 import SidebarItem from "./SidebarItem";
 import CircularButton from "./CircularButton";
 import Library from "./Library";
+import { UserContext } from "@/context/User/UserContext";
+import axios from "axios";
 
 const Sidebar: React.FC = () => {
   const pathname = usePathname();
@@ -19,6 +21,7 @@ const Sidebar: React.FC = () => {
   const [isLibraryOpened, setIsLibraryOpened] = useState(true);
   const [isHover, setIsHover] = useState(false);
   const [isPlusHover, setIsPlusHover] = useState(false);
+  const { state: user, dispatch } = useContext(UserContext);
 
   const navLinks = useMemo(
     () => [
@@ -44,6 +47,16 @@ const Sidebar: React.FC = () => {
 
   const getHoverState = (state: boolean) => {
     setIsPlusHover(state);
+  };
+
+  const createPlaylist = async () => {
+    dispatch({ type: "CREATE_PLAYLIST" });
+    const res = await axios.post("/api/actions/playlist/createPlaylist", {
+      user,
+    });
+
+    dispatch({ type: "CHANGE_PLAYLIST_ID", payload: { newId: res.data.id } });
+    
   };
 
   return (
@@ -87,6 +100,7 @@ const Sidebar: React.FC = () => {
           </div>
           {isLibraryOpened && (
             <CircularButton
+              onClick={createPlaylist}
               hoverClassName="bg-[#212121] "
               isHover={getHoverState}
             >

@@ -30,6 +30,7 @@ export const getFormattedObjects = async (
   type: "songs" | "artists" | "playlists"
 ) => {
   const currentUser = await axios.get("/api/current");
+ 
   const received = await axios.post(path, {
     ids: currentUser.data.liked[type],
     ...body,

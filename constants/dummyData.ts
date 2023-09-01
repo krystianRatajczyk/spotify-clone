@@ -7,6 +7,7 @@ export const User = {
   hashedPassword: "",
   createdAt: new Date(),
   updatedAt: new Date(),
+  playlists: [],
   recentSearches: [],
   liked: { songs: [], artists: [], playlists: [] },
 };

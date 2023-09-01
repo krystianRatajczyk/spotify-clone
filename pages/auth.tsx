@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect, useContext } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import axios from "axios";
@@ -13,6 +13,7 @@ import { GetServerSideProps } from "next";
 import { isEmailValid, isPasswordValid, isUsernameValid } from "@/lib/isValid";
 import { authErrorState } from "@/constants/initialStates";
 import { Input } from "@/components";
+import { UserContext } from "@/context/User/UserContext";
 
 const Auth = ({}) => {
   const router = useRouter();
@@ -34,6 +35,8 @@ const Auth = ({}) => {
     setType((currentType) => (currentType == "login" ? "register" : "login"));
     setError(authErrorState);
   }, []);
+
+  const { dispatch } = useContext(UserContext);
 
   const login = useCallback(async () => {
     setError(authErrorState);
@@ -98,11 +101,21 @@ const Auth = ({}) => {
         isPasswordValid(password)
       ) {
         setIsLoggingIn(true);
-        await axios.post("/api/register", {
+        const user = await axios.post("/api/register", {
           email,
           name,
           password,
         });
+
+        dispatch({
+          type: "CHANGE_PROFILE",
+          payload: {
+            ...user.data,
+            liked: { artists: [], songs: [], playlists: [] },
+            playlists: [],
+          },
+        });
+
         login();
       }
     } catch (error: any) {

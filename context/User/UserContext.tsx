@@ -30,51 +30,54 @@ export const UserContextProvider = ({
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const currentUser = await axios.get("/api/current");
+        if (state.id == "") {
+          // do it if user wasnt registered, usually on refresh
+          const currentUser = await axios.get("/api/current");
 
-        const likedTracks = await getFormattedObjects(
-          "/api/actions/tracks/getTracksByIds",
-          {
-            options: { artists: true },
-          },
-          "songs"
-        );
-
-        const likedArtists = await getFormattedObjects(
-          "/api/actions/artists/getArtistsByIdsWithSelect",
-          {
-            select: {
-              image: true,
-              id: true,
-              name: true,
+          const likedTracks = await getFormattedObjects(
+            "/api/actions/tracks/getTracksByIds",
+            {
+              options: { artists: true },
             },
-          },
-          "artists"
-        );
-
-        const likedPlaylists = await getFormattedObjects(
-          "/api/actions/playlist/getPlaylistsByIdsWithSelect",
-          {
-            select: {
-              image: true,
-              id: true,
-              name: true,
-              author: true,
+            "songs"
+          );
+          const likedArtists = await getFormattedObjects(
+            "/api/actions/artists/getArtistsByIdsWithSelect",
+            {
+              select: {
+                image: true,
+                id: true,
+                name: true,
+              },
             },
-          },
-          "playlists"
-        );
+            "artists"
+          );
 
-        const userObject = {
-          ...currentUser.data,
-          liked: {
-            songs: likedTracks,
-            artists: likedArtists,
-            playlists: likedPlaylists,
-          },
-        };
+          const likedPlaylists = await getFormattedObjects(
+            "/api/actions/playlist/getPlaylistsByIdsWithSelect",
+            {
+              select: {
+                image: true,
+                id: true,
+                name: true,
+                author: true,
+              },
+            },
+            "playlists"
+          );
 
-        dispatch({ type: "CHANGE_PROFILE", payload: userObject });
+          const userObject = {
+            ...currentUser.data,
+            playlists: currentUser.data.playlists.reverse(),
+            liked: {
+              songs: likedTracks,
+              artists: likedArtists,
+              playlists: likedPlaylists,
+            },
+          };
+          
+          dispatch({ type: "CHANGE_PROFILE", payload: userObject });
+        }
       } catch (error) {
         console.error("Error fetching current user:", error);
       }
