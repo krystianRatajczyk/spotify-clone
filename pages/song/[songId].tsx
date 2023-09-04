@@ -92,7 +92,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
   const isSongLiked = user.liked.songs.find((song) => song.id == track.id);
   const handleHeartClick = () =>
     addOrRemoveLikedSong(UserDispatch, !!isSongLiked, track);
-    
+
   const HeartIcon = isSongLiked ? (
     <AiFillHeart size={35} color="#1ed860" onClick={handleHeartClick} />
   ) : (
@@ -166,9 +166,6 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
                 />
 
                 {HeartIcon}
-                <p className="bg-primary rounded-full px-4 py-2 text-black font-semibold">
-                  Add to queue
-                </p>
               </div>
               <Header className={"bg-transparent mt-6"} />
               {track?.artists && (

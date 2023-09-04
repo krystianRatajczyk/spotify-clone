@@ -3,6 +3,7 @@ import { AiFillHeart, AiFillPushpin } from "react-icons/ai";
 import { UserContext } from "@/context/User/UserContext";
 import Link from "next/link";
 import LibraryItem from "./LibraryItem";
+import { BsMusicNoteBeamed } from "react-icons/bs";
 
 interface LibraryProps {
   isLibraryOpened: boolean;
@@ -21,6 +22,31 @@ const Library: React.FC<LibraryProps> = ({ isLibraryOpened }) => {
         >
           <AiFillHeart size={20} color="#fff" />
         </Link>
+        {user.playlists.map((playlist) => (
+          <Link
+            href={
+              playlist.author
+                ? `category/${playlist.name}`
+                : `/playlist/${playlist.id}`
+            }
+          >
+            {playlist.image ? (
+              <img
+                src={playlist.image}
+                alt=""
+                className="w-[50px] h-[50px] rounded-full
+        object-cover"
+              />
+            ) : (
+              <div
+                className="w-[50px] h-[50px] rounded-lg flex items-center
+        justify-center bg-[#282828]"
+              >
+                <BsMusicNoteBeamed size={30} color="#b3b3b3" />
+              </div>
+            )}
+          </Link>
+        ))}
         {user.liked.playlists.map((playlist) => (
           <Link
             href={
@@ -76,10 +102,10 @@ const Library: React.FC<LibraryProps> = ({ isLibraryOpened }) => {
       {user.playlists.map((playlist) => (
         <LibraryItem
           key={playlist.id}
-          href={`/playlists/${playlist.id}`}
+          href={`/playlist/${playlist.id}`}
           image={playlist.image!}
           name={playlist.name}
-          label={`Playlist • ${playlist.author || playlist.user.name}`}
+          label={`Playlist • ${playlist.author || playlist.user.name!}`}
         />
       ))}
       {user.liked.playlists?.map((playlist) => (
@@ -88,7 +114,7 @@ const Library: React.FC<LibraryProps> = ({ isLibraryOpened }) => {
           href={
             playlist.author
               ? `/category/${playlist.name}`
-              : `/playlists/${playlist.id}`
+              : `/playlist/${playlist.id}`
           }
           image={playlist.image}
           name={playlist.name}

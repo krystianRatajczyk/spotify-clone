@@ -38,12 +38,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               currentUser.data.liked.playlists,
               likedPlaylistsIds
             )) &&
-          user.id
+          user.id // get rid of instant uploading empty arrays because of delay in deliver data
         ) {
           const res = await axios.post("/api/actions/liked/updateLiked", {
-            songsIds: likedSongsIds,
-            artistsIds: likedArtistsIds,
-            playlistsIds: likedPlaylistsIds,
+            songsIds: likedSongsIds || [],
+            artistsIds: likedArtistsIds || [],
+            playlistsIds: likedPlaylistsIds || [],
           });
         }
       }, 1000);

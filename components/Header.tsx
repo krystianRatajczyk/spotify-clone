@@ -26,10 +26,9 @@ const Header: React.FC<HeaderProps> = ({ className, withDate }) => {
           }`}
         >
           {withDate && <div>Release Date</div>}
-          <AiOutlineClockCircle
-            size={20}
-            color={"#757575"}
-          />
+          <div className="mr-">
+            <AiOutlineClockCircle size={20} color={"#757575"} />
+          </div>
         </div>
       </div>
       <div className="w-full h-[1px] bg-[#2a2a2a]" />

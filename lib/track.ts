@@ -14,6 +14,7 @@ export const convertTime = (seconds: number) => {
 };
 
 export const timeReducer = (tracks: Track[]) => {
+  console.log(tracks);
   const durations = tracks.map((track) => track.duration);
   const totalDuration = durations.reduce((prev, curr) => {
     return (prev += curr);

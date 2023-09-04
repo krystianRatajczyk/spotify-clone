@@ -9,6 +9,8 @@ const useAddRecentSearch = () => {
   const addRecentSearch = async (item: {
     name: string;
     type: string;
+    username?: string;
+    authorId?: string;
     image: string;
     typeId: string;
   }) => {

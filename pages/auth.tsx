@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect, useContext } from "react";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { AiOutlineUser, AiFillLock, AiOutlineMail } from "react-icons/ai";
@@ -47,7 +47,7 @@ const Auth = ({}) => {
           email,
           password,
           redirect: false,
-        }).then(({ ok, error }: any) => {
+        }).then(async ({ ok, error }: any) => {
           if (ok) {
             router.push("/");
           } else {

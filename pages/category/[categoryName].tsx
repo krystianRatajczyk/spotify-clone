@@ -16,7 +16,6 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 const CategoryDetail = () => {
   const [tracks, setTracks] = useState<Track[] | []>([]);
   const [playlist, setPlaylist] = useState<Playlist | undefined>(undefined);
-
   const { dispatch } = useContext(InfoContext);
   const { state: user, dispatch: UserDispatch } = useContext(UserContext);
 
@@ -32,6 +31,7 @@ const CategoryDetail = () => {
         name: category?.name,
         author: "Spotify",
       });
+      
       setPlaylist(res?.data);
       setTracks(res?.data.tracks);
     };
@@ -99,7 +99,7 @@ const CategoryDetail = () => {
               </div>
             </div>
             <div
-              className="w-full h-full pt-8 p-6"
+              className="w-full h-full pt-8 p-6 flex flex-col"
               style={{
                 backgroundImage: `linear-gradient(to bottom, ${dominantColor} 0, #121212 200px)`,
               }}
@@ -114,7 +114,7 @@ const CategoryDetail = () => {
                 {HeartIcon}
               </div>
               <Header withDate />
-              <div className="pb-7">
+              <div className="pb-7 flex-1 ">
                 {tracks?.map((track, index: number) => (
                   //@ts-ignore
                   <HorizontalSongCard

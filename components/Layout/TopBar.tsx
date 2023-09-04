@@ -27,7 +27,7 @@ const TopBar = () => {
     dispatch,
   } = useContext(InfoContext);
 
-  const { state: user } = useContext(UserContext);
+  const { state: user, dispatch: UserDispatch } = useContext(UserContext);
 
   const [history, setHistory] = useState<string[]>([pathname]);
   const [initialized, setInitialized] = useState<boolean>(false);
@@ -158,7 +158,7 @@ const TopBar = () => {
                   <RxCross2
                     size={20}
                     onClick={() => {
-                    dispatch({ type: "CHANGE_SEARCH", payload: "" });
+                      dispatch({ type: "CHANGE_SEARCH", payload: "" });
 
                       inputRef.current?.focus();
                     }}
@@ -168,9 +168,7 @@ const TopBar = () => {
             </div>
           ) : (
             scrollTop >= 230 && (
-              <div
-                className="flex gap-2 items-center absolute left-[85px] w-[700px]"
-              >
+              <div className="flex gap-2 items-center absolute left-[85px] w-[700px]">
                 <PlayPause
                   isPlaying
                   className="w-[45px] h-[45px] "
@@ -185,7 +183,10 @@ const TopBar = () => {
         <div className="flex gap-3 items-center justify-center">
           <Button
             className="bg-white text-black  hover:scale-[1.05]"
-            onClick={signOut}
+            onClick={() => {
+              UserDispatch({ type: "CHANGE_PROFILE", payload: { id: "" } });
+              signOut();
+            }}
           >
             Logout
           </Button>

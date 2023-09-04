@@ -11,10 +11,11 @@ import Link from "next/link";
 import useAddRecentSearch from "@/hooks/useAddRecentSearch";
 import useRemoveRecentSearch from "@/hooks/useRemoveRecentSearch";
 import { AnimatePresence } from "framer-motion";
+import { BsMusicNoteBeamed } from "react-icons/bs";
 
 interface VerticalCardProps {
   id: string;
-  type: "profile" | "playlist" | "artist" | "track";
+  type: "profile" | "playlist" | "artist" | "track" | "category";
   typeId: string;
   name: string;
   image: string;
@@ -22,6 +23,8 @@ interface VerticalCardProps {
   modal: "playpause" | "cross" | "both" | "none";
   releaseDate?: string;
   isRecentSearch?: boolean;
+  authorId?: string;
+  username?: string;
 }
 
 const VerticalCard: React.FC<VerticalCardProps> = ({
@@ -34,6 +37,8 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
   imageClassName,
   releaseDate,
   isRecentSearch,
+  authorId,
+  username,
 }) => {
   const divRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(divRef);
@@ -44,7 +49,8 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
     artist: "artist",
     track: "song",
     profile: "users",
-    playlist: "playlist",
+    playlist: username == "Spotify" ? "category" : "playlist",
+    category: "category",
   };
 
   return (
@@ -60,7 +66,9 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
             addRecentSearch({
               name,
               image,
-              type,
+              username,
+              authorId,
+              type: username == "Spotify" ? "category" : "playlist",
               typeId,
             });
           }
@@ -80,10 +88,17 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
           </CircularButton>
         )}
         <div className="relative">
-          {image == "" ? (
+          {image == "" && type !== "playlist" ? (
             <Picture className="w-full h-full aspect-[1/1]">
               <GoPerson size={60} color="#B3B3B3" />
             </Picture>
+          ) : type === "playlist" && image === "" ? (
+            <div
+              className="w-full aspect-[1/1] rounded-lg flex items-center
+          justify-center bg-[#282828] shadow-[rgba(0,_0,_0,_0.4)_0px_30px_90px]"
+            >
+              <BsMusicNoteBeamed size={60} color="#b3b3b3" />
+            </div>
           ) : (
             <img
               src={image}
@@ -111,9 +126,22 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
         <div className="flex mt-3 gap-1 flex-col">
           <h2 className="font-bold text-lg truncate">{name}</h2>
           <p className="font-semibold text-gray-500">
-            {!releaseDate
-              ? type.charAt(0).toUpperCase() + type.slice(1)
-              : format(new Date(releaseDate), "yyyy")}
+            {!releaseDate ? (
+              type == "playlist" || type == "category" ? (
+                <div>
+                  By{" "}
+                  {username !== "Spotify" ? (
+                    <Link href={`/users/${authorId}`}>{username}</Link>
+                  ) : (
+                    "Spotify"
+                  )}
+                </div>
+              ) : (
+                type.charAt(0).toUpperCase() + type.slice(1)
+              )
+            ) : (
+              format(new Date(releaseDate), "yyyy")
+            )}
           </p>
         </div>
       </div>

@@ -20,7 +20,7 @@ export default async function handler(
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    
+
     const user = await prismadb.user.create({
       data: {
         email,
@@ -29,10 +29,10 @@ export default async function handler(
         image: "",
         emailVerified: new Date(),
         recentSearches: [],
-        liked: {},
+        liked: { songs: [], artists: [], playlists: [] },
       },
     });
-    
+
     return res.status(200).json(user);
   } catch (error) {
     console.log(error);

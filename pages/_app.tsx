@@ -7,26 +7,31 @@ import { usePathname } from "next/navigation";
 import { UserContextProvider } from "@/context/User/UserContext";
 import { InfoContextProvider } from "@/context/InfoContext";
 import { Layout } from "@/components";
+import { SessionProvider } from "next-auth/react";
 
 export default function App({ Component, pageProps }: AppProps) {
   const pathname = usePathname();
 
   if (pathname == "/auth") {
     return (
-      <UserContextProvider>
-        <Component {...pageProps} />
-      </UserContextProvider>
+      <SessionProvider>
+        <UserContextProvider>
+          <Component {...pageProps} />
+        </UserContextProvider>
+      </SessionProvider>
     );
   }
 
   return (
-    <UserContextProvider>
-      <InfoContextProvider>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </InfoContextProvider>
-    </UserContextProvider>
+    <SessionProvider>
+      <UserContextProvider>
+        <InfoContextProvider>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </InfoContextProvider>
+      </UserContextProvider>
+    </SessionProvider>
   );
 }
 

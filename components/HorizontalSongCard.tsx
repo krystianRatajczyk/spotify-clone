@@ -4,11 +4,14 @@ import { addOrRemoveLikedSong, convertTime } from "@/lib/track";
 import { Artist } from "@prisma/client";
 import { format } from "date-fns";
 import Link from "next/link";
-import React, { useContext, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { BsFillPlayFill } from "react-icons/bs";
 import Triangle from "./Layout/Triangle";
 import { UserContext } from "@/context/User/UserContext";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import CircularButton from "./Layout/CircularButton";
+import { BiDotsHorizontalRounded } from "react-icons/bi";
+import ContextMenu from "./ContextMenu";
 
 interface HorizontalSongCardProps {
   id: string;
@@ -52,11 +55,35 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
   };
   const divRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(divRef);
+  const [optionsOpen, setOptionsOpen] = useState<boolean>(false);
 
   const { state: user, dispatch } = useContext(UserContext);
   const [addRecentSearch] = useAddRecentSearch();
 
   const isLikedSong = user.liked.songs?.find((s) => s.id === id);
+
+  const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
+
+  const handleOutsideClick = (e: MouseEvent) => {
+    if (
+      !menuRef.current?.contains(e.target as Node) &&
+      !buttonRef.current?.contains(e.target as Node)
+    ) {
+      // Clicked outside of the button, so close the context menu
+      setOptionsOpen(false);
+    }
+  };
+
+  // Add a click event listener to the document body when the component mounts
+  useEffect(() => {
+    document.addEventListener("click", handleOutsideClick);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, []);
 
   return (
     <Link
@@ -73,7 +100,10 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
       }}
     >
       <div
-        className="w-full p-2 pl-5 rounded-md hover:bg-[rgba(0,0,0,0.4)] justify-between flex-row flex items-center"
+        className={`w-full p-2 pl-5 rounded-md ${
+          !optionsOpen && "hover:bg-[rgba(0,0,0,0.4)]"
+        } justify-between 
+        flex-row flex items-center ${optionsOpen && "bg-[#313131]"}`}
         ref={divRef}
       >
         <div className="flex flex-row gap-4 items-center relative flex-[0.7]">
@@ -100,7 +130,7 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
           <div className="flex flex-col justify-between">
             <h3 className="font-semibold">{name}</h3>
             <p className="text-lightGray">
-              {artists.map((artist: Artist, index: number) => {
+              {artists?.map((artist: Artist, index: number) => {
                 if (index == artists.length - 1) {
                   return (
                     <Link
@@ -131,7 +161,7 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
               {format(new Date(releaseDate), "d MMM yyyy")}
             </div>
           )}
-          <div className="text-sm text-[#757575] flex items-center gap-7">
+          <div className="text-sm text-[#757575] flex items-center gap-6">
             {isLikedSong ? (
               <AiFillHeart
                 color="#1ed860"
@@ -155,7 +185,44 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
                 />
               )
             )}
-            {convertTime(duration).formattedTime}
+            <div>{convertTime(duration).formattedTime}</div>
+            {
+              <div className="relative">
+                {optionsOpen && (
+                  <div ref={menuRef}>
+                    <ContextMenu
+                      isSongLiked={!!isLikedSong}
+                      onClose={() => setOptionsOpen(false)}
+                      song={{
+                        id,
+                        image,
+                        name,
+                        duration,
+                        artists,
+                        releaseDate,
+                        currentRank,
+                        previousRank,
+                      }}
+                    />
+                  </div>
+                )}
+                <div ref={buttonRef}>
+                  <CircularButton
+                    hoverClassName="bg-[#212121]"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // Toggle the options menu
+                      setOptionsOpen(!optionsOpen);
+                    }}
+                  >
+                    <BiDotsHorizontalRounded
+                      size={30}
+                      color={isHover ? `#B3B3B3` : "rgba(0,0,0,0)"}
+                    />
+                  </CircularButton>
+                </div>
+              </div>
+            }
           </div>
         </div>
       </div>

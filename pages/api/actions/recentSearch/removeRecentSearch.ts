@@ -11,15 +11,10 @@ export default async function handler(
     return res.status(405).end();
   }
   try {
-    const { id } = req.body;
+    const { updateRecentSearches } = req.body;
     const { currentUser } = await serverAuth(req, res);
 
-    if (id) {
-      const updateRecentSearches = currentUser.recentSearches?.filter(
-        //@ts-ignore
-        (item) => item?.id != id
-      );
-
+    if (updateRecentSearches) {
       const result = await prisma.user.update({
         where: { email: currentUser.email },
         //@ts-ignore

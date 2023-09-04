@@ -30,19 +30,22 @@ export const getFormattedObjects = async (
   type: "songs" | "artists" | "playlists"
 ) => {
   const currentUser = await axios.get("/api/current");
- 
-  const received = await axios.post(path, {
-    ids: currentUser.data.liked[type],
-    ...body,
-  });
 
-  const map = new Map();
-  received.data.forEach((obj: Track) => {
-    map.set(obj.id, obj); // setting key value pairs "id" -> doc
-  });
+  try {
+    const received = await axios.post(path, {
+      ids: currentUser.data.liked[type],
+      ...body,
+    });
+    const map = new Map();
+    received.data.forEach((obj: Track) => {
+      map.set(obj.id, obj); // setting key value pairs "id" -> doc
+    });
 
-  const liked = currentUser.data.liked[type].map((id: string) => map.get(id)); // getting certain tracks in user likes songs order
-  // getting certain tracks in user likes songs order
+    const liked = currentUser.data.liked[type].map((id: string) => map.get(id)); // getting certain tracks in user likes songs order
+    // getting certain tracks in user likes songs order
 
-  return liked;
+    return liked;
+  } catch (error) {
+    console.log(error);
+  }
 };

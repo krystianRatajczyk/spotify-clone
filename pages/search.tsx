@@ -9,7 +9,7 @@ import {
 } from "@/components";
 
 import prisma from "@/lib/prismadb";
-import { Artist, Track, User } from "@prisma/client";
+import { Artist, Playlist, Track, User } from "@prisma/client";
 import axios from "axios";
 
 import { SyncLoader } from "react-spinners";
@@ -22,7 +22,7 @@ import { GetServerSideProps } from "next";
 import { GoPerson } from "react-icons/go";
 import { AnimatePresence } from "framer-motion";
 
-const types = ["track", "artist", "user"];
+const types = ["track", "artist", "user", "playlist"];
 
 const Search = () => {
   const {
@@ -34,8 +34,9 @@ const Search = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [artists, setArtists] = useState<Artist[]>([]);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [topResult, setTopResult] = useState<
-    ((Track | Artist | User) & { type: string }) | null
+    ((Track | Artist | User | Playlist) & { type: string }) | null
   >(null);
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -46,12 +47,14 @@ const Search = () => {
     loading: boolean,
     tracks: Track[] | [],
     artists: Artist[] | [],
-    users: User[] | []
+    users: User[] | [],
+    playlists: Playlist[] | []
   ) => {
     setLoading(loading);
     setTracks(tracks);
     setArtists(artists);
     setUsers(users);
+    setPlaylists(playlists);
   };
 
   useEffect(() => {
@@ -61,7 +64,8 @@ const Search = () => {
           let users = [];
           let tracks = [];
           let artists = [];
-          setStates(true, [], [], []);
+          let playlists = [];
+          setStates(true, [], [], [], []);
           for (const type of types) {
             //@ts-ignore
             const key: keyof typeof prisma = type;
@@ -70,21 +74,29 @@ const Search = () => {
                 where: {
                   name: { contains: search, mode: "insensitive" },
                 },
-                include: type == "track" ? { artists: true } : null,
+                include:
+                  type == "track"
+                    ? { artists: true }
+                    : type == "playlist"
+                    ? { user: { select: { name: true } } }
+                    : null,
               },
               key,
             });
+
             if (type == "track") {
               tracks = res.data;
             } else if (type == "artist") {
               artists = res.data;
+            } else if (type == "playlist") {
+              playlists = res.data;
             } else {
               users = res.data;
             }
           }
-          setStates(false, tracks, artists, users);
+          setStates(false, tracks, artists, users, playlists);
         } else {
-          setStates(true, [], [], []);
+          setStates(true, [], [], [], []);
         }
       }, 500);
 
@@ -103,9 +115,11 @@ const Search = () => {
         ? { ...artists[0], type: "artist" }
         : users[0]
         ? { ...users[0], type: "users" }
+        : playlists[0]
+        ? { ...playlists[0], type: "playlist" }
         : null
     );
-    // set top result in order track > artist > user > nothing
+    // set top result in order track > artist > user > playlist >nothing
   }, [tracks, artists, users]);
 
   const links: Record<string, string> = {
@@ -278,6 +292,36 @@ const Search = () => {
                           name={user.name}
                           image={user.image ? user.image : ""}
                           modal="none"
+                          key={index}
+                          imageClassName="w-[180px] h-[180px]"
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            {playlists.length > 0 &&
+              (sortTab == "All" || sortTab == "Playlists") && (
+                <div className="w-full mt-5">
+                  {sortTab == "All" && (
+                    <h2 className="font-bold text-2xl">Playlists</h2>
+                  )}
+                  <div className="flex flex-wrap mt-4 w-full flex-row gap-5 mb-4">
+                    {playlists?.map((playlist: Playlist, index: number) => {
+                      if (index > 5 && sortTab != "Playlists") {
+                        return;
+                      }
+                      return (
+                        <VerticalCard
+                          isRecentSearch={false}
+                          typeId={playlist.author ? playlist.name : playlist.id}
+                          type="playlist"
+                          id={playlist.name}
+                          username={playlist.author || playlist.user.name}
+                          authorId={playlist.userId || playlist.name}
+                          name={playlist.name}
+                          image={playlist.image ? playlist.image : ""}
+                          modal="playpause"
                           key={index}
                           imageClassName="w-[180px] h-[180px]"
                         />

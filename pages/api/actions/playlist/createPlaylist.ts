@@ -15,7 +15,6 @@ export default async function handler(
     const createdPlaylist = await prismadb.playlist.create({
       data: {
         name: playlistName,
-        tracks: [],
         user: { connect: { id: user.id } },
         image: "",
       },

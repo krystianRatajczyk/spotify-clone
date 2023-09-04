@@ -25,16 +25,18 @@ model User {
 }
 
 model Track {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  name         String   @unique
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  name         String     @unique
   image        String
   releaseDate  String
   currentRank  Int
   previousRank Int
-  artistsIds   String[] @db.ObjectId
-  artists      Artist[] @relation(fields: [artistsIds], references: [id])
+  artistsIds   String[]   @db.ObjectId
+  artists      Artist[]   @relation(fields: [artistsIds], references: [id])
   duration     Int
   genre        String
+  playlists    Playlist[] @relation(fields: [playlistsIds], references: [id])
+  playlistsIds String[]   @db.ObjectId
 }
 
 model Artist {
@@ -48,12 +50,13 @@ model Artist {
 }
 
 model Playlist {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
-  tracks   Json[]
-  image    String?
-  isPublic Boolean @default(true)
-  author   String?
-  user     User?   @relation(fields: [userId], references: [id])
-  userId   String? @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  tracks    Track[]  @relation(fields: [tracksIds], references: [id])
+  tracksIds String[] @db.ObjectId
+  image     String?
+  isPublic  Boolean  @default(true)
+  author    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?  @db.ObjectId
 }

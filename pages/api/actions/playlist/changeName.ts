@@ -10,13 +10,14 @@ export default async function handler(
     return res.status(405).end();
   }
   try {
-    let { name, author } = req.body;
-    const playlist = await prisma.playlist.findFirst({
+    let { id, newName } = req.body;
+    const playlist = await prisma.playlist.update({
       where: {
-        name,
-        author,
+        id,
       },
-      include: { tracks: { include: { artists: true } } },
+      data: {
+        name: newName,
+      },
     });
 
     if (playlist) {
