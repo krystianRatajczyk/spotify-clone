@@ -14,9 +14,8 @@ export const convertTime = (seconds: number) => {
 };
 
 export const timeReducer = (tracks: Track[]) => {
-  console.log(tracks);
-  const durations = tracks.map((track) => track.duration);
-  const totalDuration = durations.reduce((prev, curr) => {
+  const durations = tracks?.map((track) => track.duration);
+  const totalDuration = durations?.reduce((prev, curr) => {
     return (prev += curr);
   }, 0);
 
@@ -28,8 +27,6 @@ export const generateUniqueId = (): string => {
   const randomPart = Math.floor(Math.random() * 1000000).toString(16); // Generate a random number and convert to hexadecimal
   return `${timestamp}-${randomPart}`;
 };
-
-type Payload = { track: Track } | { id: string };
 
 export const addOrRemoveLikedSong = (
   //@ts-ignore
@@ -57,4 +54,16 @@ export const arrayEquals = (a: string[], b: string[]) => {
     a.length === b.length &&
     a.every((val, index) => val === b[index])
   );
+};
+
+export const findMissingElements = (a: string[], b: string[]) => {
+  const missingElements = [];
+
+  for (const element of a) {
+    if (!b.includes(element)) {
+      missingElements.push(element);
+    }
+  }
+
+  return missingElements;
 };

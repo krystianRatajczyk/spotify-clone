@@ -1,7 +1,3 @@
-type Payload =
-  | { playlist: { id: string; name: string; image: string; author: string } }
-  | { id: string };
-
 export const addOrRemoveLikedPlaylist = (
   //@ts-ignore
   UserDispatch: ({ type: string, payload: Payload }) => void,

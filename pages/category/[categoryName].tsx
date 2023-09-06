@@ -94,7 +94,7 @@ const CategoryDetail = () => {
                   <span className="font-bold">Spotify</span>
                   <span> • </span> 304,899 likes <span> • </span>{" "}
                   {tracks.length} songs,{" "}
-                  <span className="font-bold text-gray-400">{getTime()}</span>
+                  <span className="font-bold text-[rgba(175,175,175,0.75)]">{getTime()}</span>
                 </p>
               </div>
             </div>

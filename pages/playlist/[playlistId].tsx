@@ -1,17 +1,22 @@
 import {
   Button,
+  CircularButton,
   Header,
   HorizontalSongCard,
   Modal,
   PlayPause,
 } from "@/components";
+import { InfoContext } from "@/context/InfoContext";
 import { UserContext } from "@/context/User/UserContext";
+import { requireAuthentication } from "@/lib/isAuthenticated";
 import { timeReducer } from "@/lib/track";
-import { Playlist } from "@prisma/client";
+import { Playlist, Track } from "@prisma/client";
 import axios from "axios";
 import Color from "color-thief-react";
+import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
+import { BiDotsHorizontalRounded } from "react-icons/bi";
 import { BsMusicNoteBeamed } from "react-icons/bs";
 
 const PlaylistDetail = () => {
@@ -21,6 +26,7 @@ const PlaylistDetail = () => {
   const [newName, setNewName] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { state: user, dispatch } = useContext(UserContext);
+  const { dispatch: InfoDispatch } = useContext(InfoContext);
 
   const router = useRouter();
 
@@ -32,10 +38,12 @@ const PlaylistDetail = () => {
         const res = await axios.post("/api/actions/playlist/getPlaylistById", {
           id: router.query.playlistId,
         });
+
         setPlaylist(res?.data);
       } else {
         setPlaylist(playlist);
       }
+      InfoDispatch({ type: "CHANGE_LABEL_NAME", payload: playlist.name });
       setNewName(playlist?.name);
     };
 
@@ -43,13 +51,12 @@ const PlaylistDetail = () => {
   }, [router.query.playlistId, user.playlists]);
 
   const getTime = (): string => {
-    console.log(playlist?.tracks);
     const time = timeReducer(playlist?.tracks!);
 
     if (time.hours) {
       return time.hours + " hr " + time.minutes + "min";
     }
-    return time.minutes + " min";
+    return time.minutes + " min " + time.remainingSeconds + " sec";
   };
 
   const openModal = () => {
@@ -78,8 +85,10 @@ const PlaylistDetail = () => {
     }
   };
 
+  const src = playlist?.tracks.length == 0 ? "" : playlist?.tracks[0]?.image;
+
   return (
-    <Color src={playlist?.image || ""} crossOrigin="anonymous" format="hex">
+    <Color src={src} crossOrigin="anonymous" format="hex">
       {({ data: dominantColor }) => {
         return (
           <div className="min-h-full bg-[#1b1b1b] flex flex-col">
@@ -121,17 +130,50 @@ const PlaylistDetail = () => {
               </div>
             </Modal>
             <div
+              style={
+                src !== ""
+                  ? {
+                      backgroundImage: `linear-gradient(to bottom, ${dominantColor}, #1b1b1b )`,
+                    }
+                  : {}
+              }
               className={`h-fit bg-gradient-to-b
-    from-[#545454] via-[#333333] to-[#1b1b1b] pt-[70px] pb-[350px] p-5`}
+                  ${
+                    !src && "from-[#545454] via-[#333333] to-[#1b1b1b]"
+                  } pt-[70px] pb-[350px] p-5`}
             >
               <div className="flex gap-5 items-end">
-                <div
-                  className="w-[230px] h-[230px]
+                {playlist?.tracks.length === 0 ? (
+                  <div
+                    className="w-[240px] h-[240px]
             bg-[#282828]
             flex items-center justify-center shadow-[rgba(0,_0,_0,_0.4)_0px_30px_90px]"
-                >
-                  <BsMusicNoteBeamed size={100} color="#b3b3b3" />
-                </div>
+                  >
+                    <BsMusicNoteBeamed size={100} color="#b3b3b3" />
+                  </div>
+                ) : (
+                  <div className="w-[240px] h-[240px]">
+                    {playlist?.tracks.length < 4 && (
+                      <img
+                        className="w-full h-full object-contain"
+                        src={playlist?.tracks[0]?.image}
+                      />
+                    )}
+                    {playlist?.tracks.length >= 4 && (
+                      <div
+                        className="w-full h-full 
+                    grid grid-cols-2 grid-rows-2 items-center"
+                      >
+                        {playlist?.tracks?.slice(0, 4).map((track) => (
+                          <img
+                            src={track.image}
+                            className="w-[120px] h-[120px]"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div>
                   <h4 className="font-semibold">
                     {playlist?.isPublic ? "Public" : "Private"} Playlist
@@ -141,7 +183,10 @@ const PlaylistDetail = () => {
                   </h2>
                   <p className="font-semibold">
                     <span className="font-bold">{playlist?.user.name}</span>
-                    <span> • </span> {playlist?.tracks.length} songs
+                    <span> • </span> {playlist?.tracks.length} songs{", "}
+                    <span className="font-bold text-[rgba(201,198,198,0.75)]">
+                      {getTime()}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -150,15 +195,21 @@ const PlaylistDetail = () => {
               className="w-full min-h-full flex-1 -mt-[325px] bg-[rgba(0,0,0,0.3)] p-5
          "
             >
-              {playlist?.tracks.length > 0 && (
+              {playlist?.tracks.length > 0 ? (
                 <div className="h-full">
-                  <div className="pl-3">
+                  <div className="pl-3 flex items-center gap-4">
                     <PlayPause
                       isPlaying
                       className="w-[65px] h-[65px]"
                       iconSize={35}
                       animation={false}
                     />
+                    <CircularButton
+                      hoverClassName="bg-[#252525]"
+                      onClick={() => {}}
+                    >
+                      <BiDotsHorizontalRounded size={40} color={`#B3B3B3`} />
+                    </CircularButton>
                   </div>
                   <div className="mt-3">
                     <Header withDate />
@@ -177,6 +228,15 @@ const PlaylistDetail = () => {
                     ))}
                   </div>
                 </div>
+              ) : (
+                <div className="p-4">
+                  <CircularButton
+                    hoverClassName="w-fit bg-[#252525]"
+                    onClick={() => {}}
+                  >
+                    <BiDotsHorizontalRounded size={40} color={`#B3B3B3`} />
+                  </CircularButton>
+                </div>
               )}
             </div>
           </div>
@@ -187,3 +247,11 @@ const PlaylistDetail = () => {
 };
 
 export default PlaylistDetail;
+
+export const getServerSideProps: GetServerSideProps = requireAuthentication(
+  async (_ctx) => {
+    return {
+      props: {},
+    };
+  }
+);
