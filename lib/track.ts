@@ -1,5 +1,4 @@
-import useCurrentUser from "@/hooks/useCurrentUser";
-import { Track, User } from "@prisma/client";
+import { Track } from "@prisma/client";
 
 // converts the time to format 0:00
 export const convertTime = (seconds: number) => {
@@ -60,7 +59,7 @@ export const findMissingElements = (a: string[], b: string[]) => {
   const missingElements = [];
 
   for (const element of a) {
-    if (!b.includes(element)) {
+    if (!b?.includes(element)) {
       missingElements.push(element);
     }
   }

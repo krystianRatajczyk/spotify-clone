@@ -16,6 +16,7 @@ import {
 import { UserContext } from "@/context/User/UserContext";
 import Color from "color-thief-react";
 import { getDownGradient, getUpGradient } from "@/constants/styles";
+import { AnimatePresence } from "framer-motion";
 
 const Profile = () => {
   const {
@@ -126,13 +127,15 @@ const Profile = () => {
       {({ data: dominantColor }) => {
         return (
           <div className="flex-1 bg-darkGray flex flex-col w-full h-full">
-            {notification.message && (
-              <Notification
-                message={notification.message}
-                setNotification={setNotification}
-                color={notification.color}
-              />
-            )}
+            <AnimatePresence>
+              {notification.message && (
+                <Notification
+                  message={notification.message}
+                  setNotification={setNotification}
+                  color={notification.color}
+                />
+              )}
+            </AnimatePresence>
             <Modal
               isOpen={isModalOpen}
               onClose={closeModal}

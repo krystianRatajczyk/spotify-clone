@@ -5,19 +5,21 @@ import {
   HorizontalSongCard,
   Modal,
   PlayPause,
+  PlaylistImage,
+  ContextMenu,
 } from "@/components";
 import { InfoContext } from "@/context/InfoContext";
 import { UserContext } from "@/context/User/UserContext";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { timeReducer } from "@/lib/track";
-import { Playlist, Track } from "@prisma/client";
+import { Playlist } from "@prisma/client";
 import axios from "axios";
 import Color from "color-thief-react";
 import { GetServerSideProps } from "next";
+import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
-import { BsMusicNoteBeamed } from "react-icons/bs";
 
 const PlaylistDetail = () => {
   const [playlist, setPlaylist] = useState<
@@ -27,8 +29,11 @@ const PlaylistDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { state: user, dispatch } = useContext(UserContext);
   const { dispatch: InfoDispatch } = useContext(InfoContext);
+  const [optionsOpen, setOptionsOpen] = useState<boolean>(false);
 
   const router = useRouter();
+  const pathname = usePathname();
+  const buttonRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const getPlaylist = async () => {
@@ -43,7 +48,7 @@ const PlaylistDetail = () => {
       } else {
         setPlaylist(playlist);
       }
-      InfoDispatch({ type: "CHANGE_LABEL_NAME", payload: playlist.name });
+      InfoDispatch({ type: "CHANGE_LABEL_NAME", payload: playlist?.name });
       setNewName(playlist?.name);
     };
 
@@ -85,7 +90,42 @@ const PlaylistDetail = () => {
     }
   };
 
-  const src = playlist?.tracks.length == 0 ? "" : playlist?.tracks[0]?.image;
+  const src = playlist?.tracks?.length == 0 ? "" : playlist?.tracks[0]?.image;
+
+  const isInPlaylist =
+    pathname.includes("/playlist") &&
+    user.playlists.find((p) => p.id === pathname.split("/")[2]);
+
+  useEffect(() => {
+    InfoDispatch({ type: "SET_SCROLL", payload: !optionsOpen });
+  }, [optionsOpen]);
+
+  const contextMenu = [
+    {
+      id: 1,
+      label: "Edit details",
+    onClick: () => {
+        setIsModalOpen(true);
+      },
+      display: true,
+    },
+    {
+      id: 2,
+      label: "Delete",
+      onClick: async () => {
+        router.push("/");
+        dispatch({
+          type: "DELETE_PLAYLIST",
+          payload: { id: playlist?.id! },
+        });
+
+        const res = await axios.post("/api/actions/playlist/deletePlaylist", {
+          id: playlist?.id,
+        });
+      },
+      display: true,
+    },
+  ];
 
   return (
     <Color src={src} crossOrigin="anonymous" format="hex">
@@ -98,13 +138,7 @@ const PlaylistDetail = () => {
               title="Edit details"
             >
               <div className="flex gap-4 h-full mt-2">
-                <div
-                  className={`w-[177px]
-            bg-[#282828]
-            flex items-center justify-center shadow-[rgba(0,_0,_0,_0.4)_0px_30px_90px]`}
-                >
-                  <BsMusicNoteBeamed size={50} color="#b3b3b3" />
-                </div>
+                <PlaylistImage width={177} tracks={playlist?.tracks} />
                 <div className="flex flex-col gap-4 h-full">
                   <input
                     placeholder="Name"
@@ -143,37 +177,7 @@ const PlaylistDetail = () => {
                   } pt-[70px] pb-[350px] p-5`}
             >
               <div className="flex gap-5 items-end">
-                {playlist?.tracks.length === 0 ? (
-                  <div
-                    className="w-[240px] h-[240px]
-            bg-[#282828]
-            flex items-center justify-center shadow-[rgba(0,_0,_0,_0.4)_0px_30px_90px]"
-                  >
-                    <BsMusicNoteBeamed size={100} color="#b3b3b3" />
-                  </div>
-                ) : (
-                  <div className="w-[240px] h-[240px]">
-                    {playlist?.tracks.length < 4 && (
-                      <img
-                        className="w-full h-full object-contain"
-                        src={playlist?.tracks[0]?.image}
-                      />
-                    )}
-                    {playlist?.tracks.length >= 4 && (
-                      <div
-                        className="w-full h-full 
-                    grid grid-cols-2 grid-rows-2 items-center"
-                      >
-                        {playlist?.tracks?.slice(0, 4).map((track) => (
-                          <img
-                            src={track.image}
-                            className="w-[120px] h-[120px]"
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
+                <PlaylistImage width={240} tracks={playlist?.tracks} />
                 <div>
                   <h4 className="font-semibold">
                     {playlist?.isPublic ? "Public" : "Private"} Playlist
@@ -185,7 +189,7 @@ const PlaylistDetail = () => {
                     <span className="font-bold">{playlist?.user.name}</span>
                     <span> • </span> {playlist?.tracks.length} songs{", "}
                     <span className="font-bold text-[rgba(201,198,198,0.75)]">
-                      {getTime()}
+                      {playlist?.tracks && getTime()}
                     </span>
                   </p>
                 </div>
@@ -204,12 +208,32 @@ const PlaylistDetail = () => {
                       iconSize={35}
                       animation={false}
                     />
-                    <CircularButton
-                      hoverClassName="bg-[#252525]"
-                      onClick={() => {}}
-                    >
-                      <BiDotsHorizontalRounded size={40} color={`#B3B3B3`} />
-                    </CircularButton>
+                    {isInPlaylist && (
+                      <div className="relative">
+                        {optionsOpen && (
+                          <ContextMenu
+                            contextMenu={contextMenu}
+                            onClose={() => setOptionsOpen(false)}
+                            buttonRef={buttonRef}
+                            setOptionsOpen={setOptionsOpen}
+                            className="translate-y-[42px]"
+                          />
+                        )}
+                        <div ref={buttonRef}>
+                          <CircularButton
+                            hoverClassName="bg-[#252525]"
+                            onClick={() => {
+                              setOptionsOpen((prev) => !prev);
+                            }}
+                          >
+                            <BiDotsHorizontalRounded
+                              size={40}
+                              color={`#B3B3B3`}
+                            />
+                          </CircularButton>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className="mt-3">
                     <Header withDate />
@@ -230,12 +254,32 @@ const PlaylistDetail = () => {
                 </div>
               ) : (
                 <div className="p-4">
-                  <CircularButton
-                    hoverClassName="w-fit bg-[#252525]"
-                    onClick={() => {}}
-                  >
-                    <BiDotsHorizontalRounded size={40} color={`#B3B3B3`} />
-                  </CircularButton>
+                  {isInPlaylist && (
+                    <div className="relative">
+                      {optionsOpen && (
+                        <ContextMenu
+                          contextMenu={contextMenu}
+                          onClose={() => setOptionsOpen(false)}
+                          buttonRef={buttonRef}
+                          setOptionsOpen={setOptionsOpen}
+                          className="translate-y-[42px]"
+                        />
+                      )}
+                      <div ref={buttonRef}>
+                        <CircularButton
+                          hoverClassName="w-fit bg-[#252525]"
+                          onClick={() => {
+                            setOptionsOpen((prev) => !prev);
+                          }}
+                        >
+                          <BiDotsHorizontalRounded
+                            size={40}
+                            color={`#B3B3B3`}
+                          />
+                        </CircularButton>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

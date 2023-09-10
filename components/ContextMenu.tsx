@@ -1,12 +1,15 @@
+import { InfoContext } from "@/context/InfoContext";
 import { UserContext } from "@/context/User/UserContext";
-import { addOrRemoveLikedSong } from "@/lib/track";
 import { Artist } from "@prisma/client";
-import { usePathname } from "next/navigation";
-import React, { useContext, useEffect, useState } from "react";
+import React, {
+  RefObject,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { IconType } from "react-icons";
 import { BsSearch } from "react-icons/bs";
-import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
-
 type Song = {
   id: string;
   name: string;
@@ -27,7 +30,7 @@ interface ContextMenuItemProps {
     display?: boolean;
   };
   onClose: () => void;
-  song: Song;
+  song?: Song;
   onClick: () => void;
 }
 
@@ -39,20 +42,35 @@ const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const { state: user, dispatch } = useContext(UserContext);
+  const { dispatch: InfoDispatch } = useContext(InfoContext);
   const [search, setSearch] = useState<string>("");
-  const [playlist, setPlaylist] = useState(user.playlists);
+  const [playlists, setPlaylists] = useState(user.playlists);
 
   useEffect(() => {
     if (search == "") {
-      setPlaylist(user.playlists);
+      setPlaylists(user.playlists);
     } else {
-      setPlaylist(
+      setPlaylists(
         user.playlists.filter((p) =>
           p.name.toLowerCase().includes(search.toLowerCase())
         )
       );
     }
   }, [search]);
+
+  const buttonRef = useRef<HTMLDivElement | null>(null);
+  const [translate, setTranslate] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (open && buttonRef.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+
+      if (buttonRect.bottom > window.innerHeight) {
+        // playlist list doesnt fit in screen
+        setTranslate(true);
+      }
+    }
+  }, [open, buttonRef]);
 
   return (
     <div className="relative">
@@ -83,12 +101,17 @@ const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
       </div>
       {open && contextItem.icon && (
         <div
-          className="absolute translate-x-[-101%] translate-y-[-37px]
-        flex flex-col  bg-[#282828] p-1 rounded-md"
+          ref={buttonRef}
+          className={`absolute translate-x-[-101%] ${
+            !translate && "translate-y-[-37px]"
+          }
+        flex flex-col  bg-[#282828] p-1 rounded-md`}
+          style={translate ? { bottom: "-4px" } : {}}
         >
           <div className="bg-[#3e3e3e] mb-1 rounded-md p-2 flex gap-2 items-center">
             <BsSearch size={15} />
             <input
+              onClick={(e) => e.preventDefault()}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               type="text"
@@ -96,15 +119,45 @@ const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
               className="bg-transparent outline-none"
             />
           </div>
-          {playlist?.map((playlist) => (
+          {playlists?.map((playlist) => (
             <div
               onClick={(e) => {
                 e.preventDefault();
                 onClose();
-                dispatch({
-                  type: "ADD_SONG_TO_PLAYLIST",
-                  payload: { playlistId: playlist.id, song: song },
-                });
+                const index = user.playlists.findIndex(
+                  (p) => p.id === playlist.id
+                );
+                const isExisting = !!user.playlists[index].tracks?.find(
+                  (s: any) => s.id === song?.id
+                );
+                if (isExisting) {
+                  InfoDispatch({
+                    type: "SET_NOTIFICATION",
+                    payload: {
+                      message: `Song is already in this playlist`,
+                      color: "bg-red-600",
+                      display: true,
+                    },
+                  });
+                } else {
+                  let songName = song?.name;
+                  if (song?.name.length! > 45) {
+                    songName = song?.name.slice(0, 45) + "...";
+                  }
+                  dispatch({
+                    type: "ADD_SONG_TO_PLAYLIST",
+                    payload: { song: song, index },
+                  });
+
+                  InfoDispatch({
+                    type: "SET_NOTIFICATION",
+                    payload: {
+                      message: `Added ${songName} to ${playlist.name}`,
+                      color: "bg-blue",
+                      display: true,
+                    },
+                  });
+                }
               }}
               key={playlist.id}
               className="flex p-2 gap-2 items-center hover:bg-[#3e3e3e] relative"
@@ -125,76 +178,56 @@ const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
 
 interface ContextMenuProps {
   onClose: () => void;
-  song: Song;
-  isSongLiked: boolean;
+  song?: Song;
+  className: string;
+  setOptionsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  buttonRef: RefObject<HTMLDivElement>;
+  contextMenu: {
+    id: number;
+    label: string;
+    icon?: IconType;
+    closeIcon?: IconType;
+    onClick: () => void;
+    display: boolean;
+  }[];
 }
 
 const ContextMenu: React.FC<ContextMenuProps> = ({
   onClose,
   song,
-  isSongLiked,
+  setOptionsOpen,
+  buttonRef,
+  className,
+  contextMenu,
 }) => {
-  const { state: user, dispatch } = useContext(UserContext);
-  const pathname = usePathname();
-
-  const getLikeSongsLabel = () => {
-    let likedLabel = "";
-
-    if (isSongLiked) likedLabel = "Remove from ";
-    else likedLabel = "Save to ";
-    return likedLabel + "your liked songs";
+  const menuRef = useRef<HTMLDivElement>(null);
+  const handleOutsideClick = (e: MouseEvent) => {
+    if (
+      !menuRef.current?.contains(e.target as Node) &&
+      !buttonRef.current?.contains(e.target as Node)
+    ) {
+      // Clicked outside of the button, so close the context menu
+      setOptionsOpen(false);
+    }
   };
 
-  const playlist = user.playlists.find((p) => p.id === pathname.split("/")[2]);
+  // Add a click event listener to the document body when the component mounts
+  useEffect(() => {
+    document.addEventListener("click", handleOutsideClick);
 
-  const displayRemoveFromPlaylist = () => {
-    const isInPlaylists = pathname.includes("/playlist") && playlist;
-
-    return !!isInPlaylists;
-  };
-
-  const contextMenu = [
-    {
-      id: 1,
-      label: "Add to queue",
-      onClick: () => {},
-      display: true,
-    },
-    {
-      id: 2,
-      label: "Remove from this playlist",
-      onClick: () => {
-        playlist &&
-          dispatch({
-            type: "REMOVE_SONG_FROM_PLAYLIST",
-            payload: { songId: song.id, playlistId: playlist.id },
-          });
-      },
-      display: displayRemoveFromPlaylist(),
-    },
-    {
-      id: 3,
-      label: getLikeSongsLabel(),
-      //@ts-ignore
-      onClick: addOrRemoveLikedSong.bind(null, dispatch, isSongLiked, song),
-      display: true,
-    },
-    {
-      id: 4,
-      label: "Add to playlist",
-      icon: MdArrowForwardIos,
-      closeIcon: MdArrowBackIos,
-      onClick: () => {},
-      display: true,
-    },
-  ];
+    // Clean up the event listener when the component unmounts
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, []);
 
   return (
     <div
-      className="absolute translate-x-[-90%] translate-y-[-100%] 
-    z-[200] flex flex-col  bg-[#282828] p-1 rounded-md"
+      ref={menuRef}
+      className={`absolute ${className}
+    z-[200] flex flex-col  bg-[#282828] p-1 rounded-md`}
     >
-      {contextMenu.map((contextItem) => {
+      {contextMenu?.map((contextItem) => {
         if (contextItem.display) {
           return (
             <ContextMenuItem

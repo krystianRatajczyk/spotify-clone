@@ -17,6 +17,7 @@ export default async function handler(
         name: playlistName,
         user: { connect: { id: user.id } },
         image: "",
+        tracks: { create: [] },
       },
     });
 

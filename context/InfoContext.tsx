@@ -8,6 +8,8 @@ type InfoState = {
   sortTab: string;
   scrollTop: number;
   absolute: boolean;
+  scroll: boolean;
+  notification: { message: string; color: string; display: boolean };
 };
 
 //Action Type
@@ -17,7 +19,12 @@ type ActionType =
   | { type: "CHANGE_SORT_TAB"; payload: string }
   | { type: "CHANGE_SCROLL_TOP"; payload: number }
   | { type: "CHANGE_ABSOLUTE"; payload: boolean }
-  | { type: "CHANGE_LABEL_NAME"; payload: string };
+  | { type: "CHANGE_LABEL_NAME"; payload: string }
+  | { type: "SET_SCROLL"; payload: boolean }
+  | {
+      type: "SET_NOTIFICATION";
+      payload: { message?: string; color?: string; display?: boolean };
+    };
 
 //reducer func
 const reducer = (state: InfoState, action: ActionType): InfoState => {
@@ -32,7 +39,13 @@ const reducer = (state: InfoState, action: ActionType): InfoState => {
       return { ...state, absolute: action.payload };
     case "CHANGE_LABEL_NAME":
       return { ...state, labelName: action.payload };
-
+    case "SET_SCROLL":
+      return { ...state, scroll: action.payload };
+    case "SET_NOTIFICATION":
+      return {
+        ...state,
+        notification: { ...state.notification, ...action.payload },
+      };
     default:
       //@ts-ignore
       throw new Error(`Unhandled action type: ${action.type}`);
@@ -52,6 +65,8 @@ export const InfoContext = React.createContext<ContextType>({
     search: "",
     sortTab: "All",
     scrollTop: 0,
+    scroll: true,
+    notification: { message: "", color: "", display: false },
   },
   dispatch: () => {},
 });
@@ -67,6 +82,8 @@ export const InfoContextProvider = ({
     sortTab: "All",
     scrollTop: 0,
     absolute: false,
+    scroll: true,
+    notification: { message: "", color: "", display: false },
   });
 
   const pathname = usePathname();

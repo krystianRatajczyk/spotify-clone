@@ -12,6 +12,9 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import CircularButton from "./Layout/CircularButton";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
 import ContextMenu from "./ContextMenu";
+import { InfoContext } from "@/context/InfoContext";
+import { usePathname } from "next/navigation";
+import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
 
 interface HorizontalSongCardProps {
   id: string;
@@ -58,32 +61,107 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
   const [optionsOpen, setOptionsOpen] = useState<boolean>(false);
 
   const { state: user, dispatch } = useContext(UserContext);
+  const { dispatch: InfoDispatch } = useContext(InfoContext);
   const [addRecentSearch] = useAddRecentSearch();
-
   const isLikedSong = user.liked.songs?.find((s) => s.id === id);
 
-  const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
 
-  const handleOutsideClick = (e: MouseEvent) => {
-    if (
-      !menuRef.current?.contains(e.target as Node) &&
-      !buttonRef.current?.contains(e.target as Node)
-    ) {
-      // Clicked outside of the button, so close the context menu
-      setOptionsOpen(false);
+  const [initialize, setInitialize] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (initialize) {
+      InfoDispatch({ type: "SET_SCROLL", payload: !optionsOpen });
+    } else {
+      setInitialize(true);
     }
+  }, [optionsOpen]);
+  const pathname = usePathname();
+  const getLikeSongsLabel = () => {
+    let likedLabel = "";
+
+    if (isLikedSong) likedLabel = "Remove from ";
+    else likedLabel = "Save to ";
+    return likedLabel + "your liked songs";
   };
 
-  // Add a click event listener to the document body when the component mounts
-  useEffect(() => {
-    document.addEventListener("click", handleOutsideClick);
+  const playlist = user.playlists.find((p) => p.id === pathname.split("/")[2]);
 
-    // Clean up the event listener when the component unmounts
-    return () => {
-      document.removeEventListener("click", handleOutsideClick);
-    };
-  }, []);
+  const displayRemoveFromPlaylist = () => {
+    const isInPlaylists = pathname.includes("/playlist") && playlist;
+
+    return !!isInPlaylists;
+  };
+
+  const contextMenu = [
+    {
+      id: 1,
+      label: "Add to queue",
+      onClick: () => {
+        InfoDispatch({
+          type: "SET_NOTIFICATION",
+          payload: {
+            message: "Added to queue",
+            color: "bg-blue",
+            display: true,
+          },
+        });
+      },
+      display: true,
+    },
+    {
+      id: 2,
+      label: "Remove from this playlist",
+      onClick: () => {
+        if (playlist) {
+          let songName = name;
+          if (name.length > 45) {
+            songName = name.slice(0, 45) + "...";
+          }
+          dispatch({
+            type: "REMOVE_SONG_FROM_PLAYLIST",
+            payload: { songId: id, playlistId: playlist.id },
+          });
+          InfoDispatch({
+            type: "SET_NOTIFICATION",
+            payload: {
+              message: `Removed ${songName} from ${playlist.name}`,
+              color: "bg-blue",
+              display: true,
+            },
+          });
+        }
+      },
+      display: displayRemoveFromPlaylist(),
+    },
+    {
+      id: 3,
+      label: getLikeSongsLabel(),
+      //@ts-ignore
+      onClick: () => {
+        addOrRemoveLikedSong(dispatch, !!isLikedSong, track);
+        InfoDispatch({
+          type: "SET_NOTIFICATION",
+          payload: {
+            message: `${
+              isLikedSong ? `Removed from ` : `Added to `
+            } your liked songs`,
+            color: "bg-blue",
+            display: true,
+          },
+        });
+      },
+      display: true,
+    },
+    {
+      id: 4,
+      label: "Add to playlist",
+      icon: MdArrowForwardIos,
+      closeIcon: MdArrowBackIos,
+      onClick: () => {},
+      display: true,
+    },
+  ];
 
   return (
     <Link
@@ -134,7 +212,10 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
                 if (index == artists.length - 1) {
                   return (
                     <Link
-                      href={{ pathname: `/artist/${artist.id}`, query: artist }}
+                      href={{
+                        pathname: `/artist/${artist.id}`,
+                        query: artist,
+                      }}
                     >
                       {artist.name}
                     </Link>
@@ -151,6 +232,7 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
             </p>
           </div>
         </div>
+
         <div
           className={`flex flex-row flex-[0.3] items-center ${
             withDate ? "justify-between" : "justify-end"
@@ -189,22 +271,23 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
             {
               <div className="relative">
                 {optionsOpen && (
-                  <div ref={menuRef}>
-                    <ContextMenu
-                      isSongLiked={!!isLikedSong}
-                      onClose={() => setOptionsOpen(false)}
-                      song={{
-                        id,
-                        image,
-                        name,
-                        duration,
-                        artists,
-                        releaseDate,
-                        currentRank,
-                        previousRank,
-                      }}
-                    />
-                  </div>
+                  <ContextMenu
+                    onClose={() => setOptionsOpen(false)}
+                    song={{
+                      id,
+                      image,
+                      name,
+                      duration,
+                      artists,
+                      releaseDate,
+                      currentRank,
+                      previousRank,
+                    }}
+                    contextMenu={contextMenu}
+                    className="translate-x-[-90%] translate-y-[-100%] "
+                    buttonRef={buttonRef}
+                    setOptionsOpen={setOptionsOpen}
+                  />
                 )}
                 <div ref={buttonRef}>
                   <CircularButton

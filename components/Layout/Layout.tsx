@@ -6,6 +6,8 @@ import { UserContext } from "@/context/User/UserContext";
 import { arrayEquals, findMissingElements } from "@/lib/track";
 import axios from "axios";
 import { Playlist, Track, User } from "@prisma/client";
+import { AnimatePresence } from "framer-motion";
+import { Notification } from "@/components";
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,7 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [playlistsInitialized, setPlaylistInitialized] =
     useState<boolean>(false);
-  const { dispatch } = useContext(InfoContext);
+  const { state: info, dispatch } = useContext(InfoContext);
   const { state: user } = useContext(UserContext);
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
@@ -72,26 +74,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (playlistsInitialized) {
       const timeout = setTimeout(() => {
         user.playlists.forEach(async (playlist) => {
-          const tracksFromDatabase = currentUser?.playlists
-            .find((p: Playlist) => p.id === playlist.id)
-            .tracks?.map((track: Track) => track.id);
+          const tracksFromDatabase = currentUser?.playlists.find(
+            (p: Playlist) => p.id === playlist.id
+          );
+          const tracksIdsFromDatabase = tracksFromDatabase?.tracks?.map(
+            (track: Track) => track.id
+          );
           const tracksIds = playlist.tracks.map((track: Track) => track.id);
 
-          if (tracksIds.length > tracksFromDatabase?.length) {
+          if (tracksIds.length > tracksIdsFromDatabase?.length) {
             //connect new tracks
             const missingTracks = findMissingElements(
               tracksIds,
-              tracksFromDatabase
+              tracksIdsFromDatabase
             );
             const res = await axios.post("/api/actions/playlist/changeSongs", {
               action: "connect",
               ids: missingTracks,
               playlistId: playlist.id,
             });
-          } else if (tracksIds.length < tracksFromDatabase?.length) {
+          } else if (tracksIds.length < tracksIdsFromDatabase?.length) {
             //disconnect
             const missingTracks = findMissingElements(
-              tracksFromDatabase,
+              tracksIdsFromDatabase,
               tracksIds
             );
             const res = await axios.post("/api/actions/playlist/changeSongs", {
@@ -114,8 +119,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <Sidebar />
       <div className="w-full h-full flex flex-col rounded-xl ml-2 overflow-hidden relative">
         <TopBar />
+
+        <AnimatePresence>
+          {info.notification.display && <Notification />}
+        </AnimatePresence>
         <div
-          className="overflow-y-scroll no-scrollbar w-full h-full"
+          className={`${
+            info.scroll ? "overflow-y-scroll" : "overflow-y-hidden"
+          }  no-scrollbar w-full h-full`}
           onScroll={(e) => handleScroll(e)}
         >
           {children}

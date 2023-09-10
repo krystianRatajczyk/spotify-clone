@@ -1,12 +1,15 @@
 import Link from "next/link";
 import React from "react";
 import { BsMusicNoteBeamed } from "react-icons/bs";
+import PlaylistImage from "../PlaylistImage";
+import { Track } from "@prisma/client";
 
 interface LibraryItemProps {
   href: string;
   image: string;
   name: string;
   label: string;
+  tracks?: Track[];
 }
 
 const LibraryItem: React.FC<LibraryItemProps> = ({
@@ -14,6 +17,7 @@ const LibraryItem: React.FC<LibraryItemProps> = ({
   image,
   name,
   label,
+  tracks,
 }) => {
   return (
     <Link
@@ -30,12 +34,7 @@ const LibraryItem: React.FC<LibraryItemProps> = ({
           alt=""
         />
       ) : (
-        <div
-          className="w-[50px] h-[50px] rounded-lg flex items-center
-        justify-center bg-[#282828]"
-        >
-          <BsMusicNoteBeamed size={30} color="#b3b3b3"/>
-        </div>
+        <PlaylistImage tracks={tracks} width={50} iconSize={30} rounded />
       )}
 
       <div>

@@ -20,7 +20,7 @@ const serverAuth = async (
       playlists: {
         include: {
           user: { select: { name: true } },
-          tracks: true,
+          tracks: { include: { artists: { select: { name: true, id: true } } } },
         },
       },
     },

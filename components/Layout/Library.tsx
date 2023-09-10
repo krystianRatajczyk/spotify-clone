@@ -4,6 +4,7 @@ import { UserContext } from "@/context/User/UserContext";
 import Link from "next/link";
 import LibraryItem from "./LibraryItem";
 import { BsMusicNoteBeamed } from "react-icons/bs";
+import PlaylistImage from "../PlaylistImage";
 
 interface LibraryProps {
   isLibraryOpened: boolean;
@@ -30,21 +31,12 @@ const Library: React.FC<LibraryProps> = ({ isLibraryOpened }) => {
                 : `/playlist/${playlist.id}`
             }
           >
-            {playlist.image ? (
-              <img
-                src={playlist.image}
-                alt=""
-                className="w-[50px] h-[50px] rounded-full
-        object-cover"
-              />
-            ) : (
-              <div
-                className="w-[50px] h-[50px] rounded-lg flex items-center
-        justify-center bg-[#282828]"
-              >
-                <BsMusicNoteBeamed size={30} color="#b3b3b3" />
-              </div>
-            )}
+            <PlaylistImage
+              tracks={playlist.tracks}
+              width={50}
+              iconSize={30}
+              rounded
+            />
           </Link>
         ))}
         {user.liked.playlists.map((playlist) => (
@@ -105,6 +97,7 @@ const Library: React.FC<LibraryProps> = ({ isLibraryOpened }) => {
           href={`/playlist/${playlist.id}`}
           image={playlist.image!}
           name={playlist.name}
+          tracks={playlist.tracks!}
           label={`Playlist • ${playlist.author || playlist.user.name!}`}
         />
       ))}

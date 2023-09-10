@@ -17,8 +17,9 @@ export const userPlaylistsReducer = (
           {
             id: index,
             name: `My Playlist #${index}`,
-            author: state.name,
             image: "",
+            tracks: [],
+            user: { name: state.name },
           },
           ...state.playlists,
         ],
@@ -26,7 +27,10 @@ export const userPlaylistsReducer = (
     }
 
     case "DELETE_PLAYLIST": {
-      return state;
+      return {
+        ...state,
+        playlists: state.playlists.filter((p) => p.id !== action.payload.id),
+      };
     }
 
     case "CHANGE_PLAYLIST_ID": {
@@ -64,14 +68,9 @@ export const userPlaylistsReducer = (
     }
 
     case "ADD_SONG_TO_PLAYLIST": {
-      const { song, playlistId } = action.payload;
-      const index = state.playlists.findIndex((p) => p.id === playlistId);
-      //@ts-ignore
-      const isExisting = !!state.playlists[index].tracks?.find(
-        (s: any) => s.id === song.id
-      );
+      const { song, index } = action.payload;
 
-      if (index !== -1 && !isExisting) {
+      if (index !== -1) {
         const updatedPlaylists = [...state.playlists];
         updatedPlaylists[index] = {
           ...updatedPlaylists[index],

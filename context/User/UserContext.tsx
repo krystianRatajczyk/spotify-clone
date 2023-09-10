@@ -5,7 +5,7 @@ import axios from "axios";
 import React, { Dispatch, useEffect, useReducer } from "react";
 import rootReducer, { ActionType } from "./root";
 import { getFormattedObjects } from "@/lib/artist";
-import { getSession, useSession } from "next-auth/react";
+import {  useSession } from "next-auth/react";
 
 //State
 type UserState = UserType;
@@ -69,7 +69,7 @@ export const UserContextProvider = ({
             },
             "songs"
           );
-
+          
           const userObject = {
             ...currentUser.data,
             playlists: currentUser.data.playlists.reverse(),
@@ -79,7 +79,7 @@ export const UserContextProvider = ({
               playlists: likedPlaylists,
             },
           };
-          dispatch({ type: "CHANGE_PROFILE", payload: userObject });
+        dispatch({ type: "CHANGE_PROFILE", payload: userObject });
         }
       } catch (error) {
         console.error("Error fetching current user:", error);

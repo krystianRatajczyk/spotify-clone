@@ -1,52 +1,47 @@
-import { notificationState } from "@/constants/initialStates";
-import React, { useEffect, useState } from "react";
+import { InfoContext } from "@/context/InfoContext";
+import { fadeOut } from "@/motion/motion";
+import { motion } from "framer-motion";
+import React, { useContext, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 
-interface NotificationProps {
-  message: string;
-  color?: string;
-  setNotification: React.Dispatch<React.SetStateAction<notificationState>>;
-}
+const Notification = () => {
+  const { state, dispatch } = useContext(InfoContext);
 
-const Notification: React.FC<NotificationProps> = ({
-  color,
-  message,
-  setNotification,
-}) => {
-  const [animation, setAnimation] = useState<string>("");
+  if (state.notification.message == "") return null;
 
   useEffect(() => {
-    const animationTimeout = setTimeout(() => {
-      setAnimation("hide");
-    }, 1500);
     const notificationTimeout = setTimeout(() => {
-      setNotification({ message: "", color: "" });
-    }, 1850);
+      dispatch({
+        type: "SET_NOTIFICATION",
+        payload: { display: false },
+      });
+    }, 1500);
     return () => {
-      clearTimeout(animationTimeout);
       clearTimeout(notificationTimeout);
     };
-  }, []);
+  }, [state.notification.message]);
 
   return (
-    <div className={`fixed inset-0 flex mx-auto z-50 flex-col `}>
-      <div
-        className={twMerge(
-          `px-4 py-1 
-          self-center 
-          absolute 
-          bottom-[100px] 
-          rounded-md 
-          bg-blue 
-          text-white 
-          font-semibold
-          ${"animate-" + animation}`,
-          color
-        )}
-      >
-        {message}
-      </div>
-    </div>
+    <motion.div
+      variants={fadeOut()}
+      exit="exit"
+      className={twMerge(
+        `px-4 py-1 
+        fixed
+        bottom-[100px] 
+        left-1/2 
+        -translate-x-1/2 
+        rounded-md 
+        bg-blue 
+        z-[1000]
+        text-white 
+        font-semibold
+        `,
+        state.notification.color
+      )}
+    >
+      {state.notification.message}
+    </motion.div>
   );
 };
 

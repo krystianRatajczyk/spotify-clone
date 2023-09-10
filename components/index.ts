@@ -11,6 +11,8 @@ import ProfileHeader from "./ProfileHeader";
 import RecentSearches from "./RecentSearches";
 import SquareCard from "./SquareCard";
 import VerticalCard from "./VerticalCard";
+import PlaylistImage from "./PlaylistImage";
+import ContextMenu from "./ContextMenu";
 
 //Layout
 import Button from "./Layout/Button";
@@ -45,4 +47,6 @@ export {
   SortTabs,
   TopBar,
   Triangle,
+  PlaylistImage,
+  ContextMenu,
 };

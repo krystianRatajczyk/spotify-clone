@@ -54,7 +54,7 @@ type PlaylistActions =
   | { type: "DELETE_PLAYLIST"; payload: { id: string } }
   | { type: "CHANGE_PLAYLIST_ID"; payload: { newId: string } }
   | { type: "CHANGE_PLAYLIST_NAME"; payload: { id: string; newName: string } }
-  | { type: "ADD_SONG_TO_PLAYLIST"; payload: { playlistId: string; song: any } }
+  | { type: "ADD_SONG_TO_PLAYLIST"; payload: { index: number; song: any } }
   | {
       type: "REMOVE_SONG_FROM_PLAYLIST";
       payload: { playlistId: string; songId: string };

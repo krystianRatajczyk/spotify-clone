@@ -55,7 +55,7 @@ const TopBar = () => {
 
   return (
     <div
-      className={`px-6 pt-4 ${
+      className={` px-6 pt-4 ${
         search != "" ? "pb-1" : "pb-4"
       } flex-col gap-9 flex w-full z-[200] ${
         absolute && scrollTop <= 200
