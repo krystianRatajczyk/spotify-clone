@@ -7,7 +7,7 @@ import { arrayEquals, findMissingElements } from "@/lib/track";
 import axios from "axios";
 import { Playlist, Track, User } from "@prisma/client";
 import { AnimatePresence } from "framer-motion";
-import { Notification } from "@/components";
+import { Notification, Player } from "@/components";
 
 interface LayoutProps {
   children: ReactNode;
@@ -115,22 +115,28 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [allTracksInPlaylists]);
 
   return (
-    <div className="p-2 flex h-screen">
-      <Sidebar />
-      <div className="w-full h-full flex flex-col rounded-xl ml-2 overflow-hidden relative">
-        <TopBar />
+    <div className="flex h-screen flex-col p-2">
+      <div className="w-full flex h-calc">
+        <Sidebar />
+        <div className="w-full h-full flex flex-col rounded-xl ml-2 overflow-hidden relative">
+          <TopBar />
 
-        <AnimatePresence>
-          {info.notification.display && <Notification />}
-        </AnimatePresence>
-        <div
-          className={`${
-            info.scroll ? "overflow-y-scroll" : "overflow-y-hidden"
-          }  no-scrollbar w-full h-full`}
-          onScroll={(e) => handleScroll(e)}
-        >
-          {children}
+          <AnimatePresence>
+            {info.notification.display && <Notification />}
+          </AnimatePresence>
+          <div
+            className={`${
+              info.scroll ? "overflow-y-scroll" : "overflow-y-hidden"
+            }  no-scrollbar w-full h-full`}
+            onScroll={(e) => handleScroll(e)}
+          >
+            {children}
+          </div>
         </div>
+      </div>
+
+      <div className="w-full h-[80px] px-3 flex items-center">
+        <Player />
       </div>
     </div>
   );

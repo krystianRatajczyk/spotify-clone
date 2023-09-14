@@ -27,7 +27,7 @@ const useRemoveRecentSearch = () => {
   //     );
   //     console.log(userRecentSearchIds, databaseRecentSearchIds);
   //     if (!arrayEquals(userRecentSearchIds, databaseRecentSearchIds)) {
-  //       console.log("udapting");
+  //       console.log("udaptin]g");
   //
   //     }
   //   }, 1000);

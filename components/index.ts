@@ -13,6 +13,7 @@ import SquareCard from "./SquareCard";
 import VerticalCard from "./VerticalCard";
 import PlaylistImage from "./PlaylistImage";
 import ContextMenu from "./ContextMenu";
+import Player from "./Player";
 
 //Layout
 import Button from "./Layout/Button";
@@ -25,6 +26,11 @@ import SortTabs from "./Layout/SortTabs";
 import TopBar from "./Layout/TopBar";
 import Triangle from "./Layout/Triangle";
 
+//Player
+import Controls from "./PlayerBar/Controls";
+import SeekBar from "./PlayerBar/SeekBar";
+import Track from "./PlayerBar/Track";
+import VolumeBar from "./PlayerBar/VolumeBar";
 export {
   Categories,
   Header,
@@ -49,4 +55,9 @@ export {
   Triangle,
   PlaylistImage,
   ContextMenu,
+  Player,
+  SeekBar,
+  Controls,
+  Track,
+  VolumeBar,
 };
