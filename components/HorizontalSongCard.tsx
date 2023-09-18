@@ -10,11 +10,12 @@ import Triangle from "./Layout/Triangle";
 import { UserContext } from "@/context/User/UserContext";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import CircularButton from "./Layout/CircularButton";
-import { BiDotsHorizontalRounded } from "react-icons/bi";
+import { BiDotsHorizontalRounded, BiPause } from "react-icons/bi";
 import ContextMenu from "./ContextMenu";
 import { InfoContext } from "@/context/InfoContext";
 import { usePathname } from "next/navigation";
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
+import { MusicContext } from "@/context/MusicContext";
 
 interface HorizontalSongCardProps {
   id: string;
@@ -30,6 +31,7 @@ interface HorizontalSongCardProps {
   withRank?: boolean;
   index?: number;
   isSearchCard?: boolean;
+  playSong?: () => void;
 }
 
 const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
@@ -45,6 +47,7 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
   withDate,
   currentRank,
   previousRank,
+  playSong,
 }) => {
   const track = {
     id,
@@ -62,6 +65,8 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
 
   const { state: user, dispatch } = useContext(UserContext);
   const { dispatch: InfoDispatch } = useContext(InfoContext);
+  const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
+
   const [addRecentSearch] = useAddRecentSearch();
   const isLikedSong = user.liked.songs?.find((s) => s.id === id);
 
@@ -187,15 +192,29 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
         <div className="flex flex-row gap-4 items-center relative flex-[0.7]">
           {withNo && !isHover && (
             <div
-              className={`font-semibold text-[#757575] justify-end flex w-[18px] gap-1 flex-col items-center`}
+              className={`${
+                music.currentSongs[music.currentIndex]?.id == id
+                  ? "text-primary"
+                  : "text-[#757575]"
+              } font-semibold  justify-end flex w-[18px] gap-1 flex-col items-center`}
             >
               {index}
               <Triangle previousRank={previousRank} currentRank={currentRank} />
             </div>
           )}
           {withNo && isHover && (
-            <div className="w-[18px]">
-              <BsFillPlayFill size={19} />
+            <div
+              className="w-[18px]"
+              onClick={(e) => {
+                e.preventDefault();
+                playSong && playSong();
+              }}
+            >
+              {music.currentSongs[music.currentIndex]?.id === id ? (
+                <BiPause size={19} />
+              ) : (
+                <BsFillPlayFill size={19} />
+              )}
             </div>
           )}
           <div className="relative flex items-center justify-center">
@@ -206,7 +225,14 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
           </div>
 
           <div className="flex flex-col justify-between">
-            <h3 className="font-semibold">{name}</h3>
+            <h3
+              className={`font-semibold ${
+                music.currentSongs[music.currentIndex]?.id == id &&
+                "text-primary"
+              }`}
+            >
+              {name}
+            </h3>
             <p className="text-lightGray">
               {artists?.map((artist: Artist, index: number) => {
                 if (index == artists.length - 1) {

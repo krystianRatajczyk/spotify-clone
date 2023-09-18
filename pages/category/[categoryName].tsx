@@ -1,6 +1,7 @@
 import { Header, PlayPause, HorizontalSongCard } from "@/components";
 import { musicTypes } from "@/constants/dummyData";
 import { InfoContext } from "@/context/InfoContext";
+import { MusicContext } from "@/context/MusicContext";
 import { UserContext } from "@/context/User/UserContext";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { addOrRemoveLikedPlaylist } from "@/lib/playlist";
@@ -18,6 +19,7 @@ const CategoryDetail = () => {
   const [playlist, setPlaylist] = useState<Playlist | undefined>(undefined);
   const { dispatch } = useContext(InfoContext);
   const { state: user, dispatch: UserDispatch } = useContext(UserContext);
+  const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
 
   const router = useRouter();
 
@@ -31,7 +33,7 @@ const CategoryDetail = () => {
         name: category?.name,
         author: "Spotify",
       });
-      
+
       setPlaylist(res?.data);
       setTracks(res?.data.tracks);
     };
@@ -72,6 +74,51 @@ const CategoryDetail = () => {
     <AiOutlineHeart size={40} color={"lightGray"} onClick={handleHeartClick} />
   );
 
+  const playSongs = (index?: number) => {
+    console.log(index);
+    const convertedTracks = playlist?.tracks?.map((track: Track) => {
+      return {
+        id: track.id,
+        image: track.image,
+        name: track.name,
+        duration: track.duration,
+        artists: track.artists.map((a) => ({ id: a.id, name: a.name })),
+      };
+    });
+    
+    if (
+      music.playlistId !== router.query.categoryName &&
+      index != music.currentIndex
+    ) {
+      MusicDispatch({
+        type: "SET_SONGS",
+        payload: {
+          index: index!,
+          tracks: convertedTracks || [],
+          playlistId: router.query.categoryName,
+        },
+      });
+    } else if (index != music.currentIndex) {
+      MusicDispatch({
+        type: "SET_INDEX",
+        payload: index!,
+      });
+    } else if (music.playlistId === router.query.categoryName) {
+      MusicDispatch({
+        type: "PLAY_PAUSE",
+      });
+    } else {
+      MusicDispatch({
+        type: "SET_SONGS",
+        payload: {
+          index: 0,
+          tracks: convertedTracks || [],
+          playlistId: router.query.categoryName,
+        },
+      });
+    }
+  };
+
   return (
     <Color src={playlist?.image || ""} crossOrigin="anonymous" format="hex">
       {({ data: dominantColor }) => {
@@ -94,7 +141,9 @@ const CategoryDetail = () => {
                   <span className="font-bold">Spotify</span>
                   <span> • </span> 304,899 likes <span> • </span>{" "}
                   {tracks.length} songs,{" "}
-                  <span className="font-bold text-[rgba(175,175,175,0.75)]">{getTime()}</span>
+                  <span className="font-bold text-[rgba(175,175,175,0.75)]">
+                    {getTime()}
+                  </span>
                 </p>
               </div>
             </div>
@@ -106,7 +155,11 @@ const CategoryDetail = () => {
             >
               <div className="w-full flex gap-6 items-center pb-7">
                 <PlayPause
-                  isPlaying
+                  onClick={playSongs.bind(null, music.currentIndex)}
+                  isPlaying={
+                    music.playlistId == router.query.categoryName &&
+                    music.isPlaying
+                  }
                   className="w-[65px] h-[65px]"
                   iconSize={35}
                   animation={false}
@@ -123,6 +176,7 @@ const CategoryDetail = () => {
                     withNo
                     withDate
                     index={index + 1}
+                    playSong={playSongs.bind(null, index)}
                   />
                 ))}
               </div>

@@ -11,21 +11,26 @@ interface PlayPauseProps {
   hoverClassName?: string;
   iconSize?: number;
   animation?: boolean;
+  hover?: boolean;
+  onClick?: () => void;
 }
 
 const PlayPause: React.FC<PlayPauseProps> = ({
   isPlaying,
   className,
   iconSize,
+  onClick,
+  hover = true,
   animation = true,
 }) => {
   return (
     <motion.div
+      onClick={onClick}
       variants={animation ? buttonSlide() : hoverButton()}
       animate="visible"
       exit="exit"
       initial="hidden"
-      whileHover="hover"
+      whileHover={hover ? "hover" : ""}
       className={twMerge(
         `w-[50px] h-[50px] 
         rounded-full 
@@ -40,7 +45,7 @@ const PlayPause: React.FC<PlayPauseProps> = ({
         className
       )}
     >
-      {isPlaying ? (
+      {!isPlaying ? (
         <BsFillPlayFill size={iconSize || 30} color="#000" />
       ) : (
         <BiPause size={iconSize || 30} color="#000" />

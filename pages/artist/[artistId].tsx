@@ -102,7 +102,7 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
               <div className="w-full h-full p-6">
                 <div className="w-full flex gap-6 items-center pb-4 p-6">
                   <PlayPause
-                    isPlaying
+                    isPlaying={false}
                     animation={false}
                     className="w-[60px] h-[60px]"
                   />

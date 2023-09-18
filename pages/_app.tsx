@@ -8,6 +8,7 @@ import { UserContextProvider } from "@/context/User/UserContext";
 import { InfoContextProvider } from "@/context/InfoContext";
 import { Layout } from "@/components";
 import { SessionProvider } from "next-auth/react";
+import { MusicContextProvider } from "@/context/MusicContext";
 
 export default function App({ Component, pageProps }: AppProps) {
   const pathname = usePathname();
@@ -24,13 +25,15 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <SessionProvider>
-      <UserContextProvider>
-        <InfoContextProvider>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </InfoContextProvider>
-      </UserContextProvider>
+      <MusicContextProvider>
+        <UserContextProvider>
+          <InfoContextProvider>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </InfoContextProvider>
+        </UserContextProvider>
+      </MusicContextProvider>
     </SessionProvider>
   );
 }

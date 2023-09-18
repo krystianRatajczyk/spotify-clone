@@ -205,7 +205,7 @@ const Search = () => {
                             <PlayPause
                               className="absolute right-5 bottom-5 drop-shadow-2xl"
                               hoverClassName="scale-[1.1]"
-                              isPlaying={true}
+                              isPlaying={false}
                             />
                           )}
                       </AnimatePresence>

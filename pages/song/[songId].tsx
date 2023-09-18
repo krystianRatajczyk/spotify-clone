@@ -159,7 +159,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
             <div className="w-full bg-[rgba(0,0,0,0.3)] -mt-[325px] p-5 ">
               <div className="flex gap-7 items-center">
                 <PlayPause
-                  isPlaying
+                  isPlaying={false}
                   className="w-[65px] h-[65px]"
                   iconSize={35}
                   animation={false}

@@ -170,7 +170,7 @@ const TopBar = () => {
             scrollTop >= 230 && (
               <div className="flex gap-2 items-center absolute left-[85px] w-[700px]">
                 <PlayPause
-                  isPlaying
+                  isPlaying={false}
                   className="w-[45px] h-[45px] "
                   iconSize={25}
                   animation={false}

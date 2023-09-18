@@ -9,10 +9,11 @@ import {
   ContextMenu,
 } from "@/components";
 import { InfoContext } from "@/context/InfoContext";
+import { MusicContext } from "@/context/MusicContext";
 import { UserContext } from "@/context/User/UserContext";
 import { requireAuthentication } from "@/lib/isAuthenticated";
 import { timeReducer } from "@/lib/track";
-import { Playlist } from "@prisma/client";
+import { Playlist, Track } from "@prisma/client";
 import axios from "axios";
 import Color from "color-thief-react";
 import { GetServerSideProps } from "next";
@@ -29,6 +30,7 @@ const PlaylistDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { state: user, dispatch } = useContext(UserContext);
   const { dispatch: InfoDispatch } = useContext(InfoContext);
+  const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
   const [optionsOpen, setOptionsOpen] = useState<boolean>(false);
 
   const router = useRouter();
@@ -104,7 +106,7 @@ const PlaylistDetail = () => {
     {
       id: 1,
       label: "Edit details",
-    onClick: () => {
+      onClick: () => {
         setIsModalOpen(true);
       },
       display: true,
@@ -126,6 +128,51 @@ const PlaylistDetail = () => {
       display: true,
     },
   ];
+
+  const playSongs = (index?: number) => {
+    console.log(index);
+    const convertedTracks = playlist?.tracks?.map((track: Track) => {
+      return {
+        id: track.id,
+        image: track.image,
+        name: track.name,
+        duration: track.duration,
+        artists: track.artists.map((a) => ({ id: a.id, name: a.name })),
+      };
+    });
+    
+    if (
+      music.playlistId !== router.query.playlistId &&
+      index != music.currentIndex
+    ) {
+      MusicDispatch({
+        type: "SET_SONGS",
+        payload: {
+          index: index!,
+          tracks: convertedTracks || [],
+          playlistId: router.query.playlistId,
+        },
+      });
+    } else if (index != music.currentIndex) {
+      MusicDispatch({
+        type: "SET_INDEX",
+        payload: index!,
+      });
+    } else if (music.playlistId === router.query.playlistId) {
+      MusicDispatch({
+        type: "PLAY_PAUSE",
+      });
+    } else {
+      MusicDispatch({
+        type: "SET_SONGS",
+        payload: {
+          index: 0,
+          tracks: convertedTracks || [],
+          playlistId: router.query.playlistId,
+        },
+      });
+    }
+  };
 
   return (
     <Color src={src} crossOrigin="anonymous" format="hex">
@@ -203,7 +250,11 @@ const PlaylistDetail = () => {
                 <div className="h-full">
                   <div className="pl-3 flex items-center gap-4">
                     <PlayPause
-                      isPlaying
+                      onClick={playSongs.bind(null, music.currentIndex)}
+                      isPlaying={
+                        music.playlistId == router.query.playlistId &&
+                        music.isPlaying
+                      }
                       className="w-[65px] h-[65px]"
                       iconSize={35}
                       animation={false}
@@ -248,6 +299,7 @@ const PlaylistDetail = () => {
                         withNo
                         withDate
                         index={index + 1}
+                        playSong={() => playSongs(index)}
                       />
                     ))}
                   </div>

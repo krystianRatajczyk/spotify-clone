@@ -116,7 +116,7 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
           <AnimatePresence>
             {isHover && (modal == "playpause" || modal == "both") && (
               <PlayPause
-                isPlaying={true}
+                isPlaying={false}
                 className="absolute right-2 bottom-2"
               />
             )}

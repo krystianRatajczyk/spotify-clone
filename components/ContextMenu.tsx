@@ -65,7 +65,7 @@ const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
     if (open && buttonRef.current) {
       const buttonRect = buttonRef.current.getBoundingClientRect();
 
-      if (buttonRect.bottom > window.innerHeight) {
+      if (buttonRect.bottom > window.innerHeight - 80) {
         // playlist list doesnt fit in screen
         setTranslate(true);
       }

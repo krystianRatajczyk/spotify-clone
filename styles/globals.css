@@ -38,6 +38,20 @@ body {
   /* Firefox */
 }
 
+.custom-range-hidden::-webkit-slider-thumb {
+  display: none;
+}
+
+.custom-range-show::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  /* Override default look */
+  appearance: none;
+  background-color: white;
+  border-radius: 50%;
+  height: 0.75rem;
+  width: 0.75rem;
+}
+
 * {
   margin: 0;
   padding: 0;

@@ -1,7 +1,9 @@
 import { Header, HorizontalSongCard, PlayPause } from "@/components";
 import { InfoContext } from "@/context/InfoContext";
+import { MusicContext } from "@/context/MusicContext";
 import { UserContext } from "@/context/User/UserContext";
 import { requireAuthentication } from "@/lib/isAuthenticated";
+import { Artist, Track } from "@prisma/client";
 import { GetServerSideProps } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import { AiFillHeart } from "react-icons/ai";
@@ -9,10 +11,53 @@ import { AiFillHeart } from "react-icons/ai";
 const likedSongs = () => {
   const { state: user } = useContext(UserContext);
   const { dispatch } = useContext(InfoContext);
+  const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
 
   useEffect(() => {
     dispatch({ type: "CHANGE_LABEL_NAME", payload: "Liked Songs" });
   }, []);
+
+  const playSongs = (index?: number) => {
+    console.log(index);
+    const convertedTracks = user.liked.songs?.map((track: Track) => {
+      return {
+        id: track.id,
+        image: track.image,
+        name: track.name,
+        duration: track.duration,
+        artists: track.artists.map((a: Artist) => ({ id: a.id, name: a.name })),
+      };
+    });
+
+    if (music.playlistId !== "likedSongs" && index != music.currentIndex) {
+      MusicDispatch({
+        type: "SET_SONGS",
+        payload: {
+          index: index!,
+          tracks: convertedTracks || [],
+          playlistId: "likedSongs",
+        },
+      });
+    } else if (index != music.currentIndex) {
+      MusicDispatch({
+        type: "SET_INDEX",
+        payload: index!,
+      });
+    } else if (music.playlistId === "likedSongs") {
+      MusicDispatch({
+        type: "PLAY_PAUSE",
+      });
+    } else {
+      MusicDispatch({
+        type: "SET_SONGS",
+        payload: {
+          index: 0,
+          tracks: convertedTracks || [],
+          playlistId: "likedSongs",
+        },
+      });
+    }
+  };
 
   return (
     <div className="min-h-full bg-[#1b1b1b] flex flex-col">
@@ -46,7 +91,8 @@ const likedSongs = () => {
           <div className="h-full">
             <div className="pl-3">
               <PlayPause
-                isPlaying
+                onClick={playSongs.bind(null, music.currentIndex)}
+                isPlaying={music.playlistId === "likedSongs" && music.isPlaying}
                 className="w-[65px] h-[65px]"
                 iconSize={35}
                 animation={false}
@@ -65,6 +111,7 @@ const likedSongs = () => {
                   withNo
                   withDate
                   index={index + 1}
+                  playSong={playSongs.bind(null, index)}
                 />
               ))}
             </div>
