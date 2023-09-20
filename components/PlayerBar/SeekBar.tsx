@@ -16,7 +16,11 @@ const SeekBar = () => {
   useEffect(() => {
     if (time == state.currentSongs[state.currentIndex]?.duration) {
       setTime(0);
-      dispatch({ type: "NEXT_SONG" });
+      if (state.currentIndex == state.currentSongs.length - 1) {
+        dispatch({ type: "SET_INDEX", payload: 0 });
+      } else {
+        dispatch({ type: "NEXT_SONG" });
+      }
     }
     if (state.isPlaying) {
       const timer = setTimeout(() => {

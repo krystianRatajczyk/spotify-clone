@@ -1,5 +1,6 @@
 import { HorizontalSongCard, PlayPause, Button } from "@/components";
 import { InfoContext } from "@/context/InfoContext";
+import { MusicContext } from "@/context/MusicContext";
 import { UserContext } from "@/context/User/UserContext";
 import { addOrRemoveLikedArtist } from "@/lib/artist";
 import { requireAuthentication } from "@/lib/isAuthenticated";
@@ -23,6 +24,7 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
 
   const { dispatch } = useContext(InfoContext);
   const { state: user, dispatch: UserDispatch } = useContext(UserContext);
+  const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
 
   const router = useRouter();
 
@@ -60,13 +62,55 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
 
   useEffect(() => {
     if (artist) {
-      const following = !!user.liked.artists?.find(
-        (a) => a.id == artist.id
-      );
+      const following = !!user.liked.artists?.find((a) => a.id == artist.id);
 
       setIsFollowing(following);
     }
   }, [user.liked.artists, artist]);
+
+  const playSongs = (index?: number) => {
+    const convertedTracks = tracks?.map((track: Track) => {
+      return {
+        id: track.id,
+        image: track.image,
+        name: track.name,
+        duration: track.duration,
+        artists: track.artists.map((a) => ({ id: a.id, name: a.name })),
+      };
+    });
+
+    if (
+      music.playlistId !== router.query.artistId &&
+      index != music.currentIndex
+    ) {
+      MusicDispatch({
+        type: "SET_SONGS",
+        payload: {
+          index: index!,
+          tracks: convertedTracks || [],
+          playlistId: router.query.artistId,
+        },
+      });
+    } else if (index != music.currentIndex) {
+      MusicDispatch({
+        type: "SET_INDEX",
+        payload: index!,
+      });
+    } else if (music.playlistId === router.query.artistId) {
+      MusicDispatch({
+        type: "PLAY_PAUSE",
+      });
+    } else {
+      MusicDispatch({
+        type: "SET_SONGS",
+        payload: {
+          index: 0,
+          tracks: convertedTracks || [],
+          playlistId: router.query.artistId,
+        },
+      });
+    }
+  };
 
   return (
     <Color src={artist?.image || ""} crossOrigin="anonymous" format="hex">
@@ -102,7 +146,11 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
               <div className="w-full h-full p-6">
                 <div className="w-full flex gap-6 items-center pb-4 p-6">
                   <PlayPause
-                    isPlaying={false}
+                    onClick={playSongs.bind(null, music.currentIndex)}
+                    isPlaying={
+                      music.playlistId == router.query.artistId &&
+                      music.isPlaying
+                    }
                     animation={false}
                     className="w-[60px] h-[60px]"
                   />
@@ -136,6 +184,7 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
                           key={track.id}
                           withNo
                           index={index + 1}
+                          playSong={() => playSongs(index)}
                         />
                       );
                     })}

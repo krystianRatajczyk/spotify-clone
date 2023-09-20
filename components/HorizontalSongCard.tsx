@@ -210,18 +210,30 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
                 playSong && playSong();
               }}
             >
-              {music.currentSongs[music.currentIndex]?.id === id ? (
+              {music.currentSongs[music.currentIndex]?.id === id &&
+              music.isPlaying ? (
                 <BiPause size={19} />
               ) : (
                 <BsFillPlayFill size={19} />
               )}
             </div>
           )}
-          <div className="relative flex items-center justify-center">
+          <div
+            className="relative flex items-center justify-center"
+            onClick={(e) => {
+              e.preventDefault();
+              playSong && playSong();
+            }}
+          >
             <img src={image} alt="" className="w-[40px] h-[40px]" />
-            {isHover && !withNo && (
-              <BsFillPlayFill size={25} className="absolute" />
-            )}
+            {isHover &&
+              !withNo &&
+              (music.currentSongs[music.currentIndex]?.id === id &&
+              music.isPlaying ? (
+                <BiPause size={25} className="absolute"/>
+              ) : (
+                <BsFillPlayFill size={25} className="absolute"/>
+              ))}
           </div>
 
           <div className="flex flex-col justify-between">

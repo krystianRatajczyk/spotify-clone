@@ -130,7 +130,6 @@ const PlaylistDetail = () => {
   ];
 
   const playSongs = (index?: number) => {
-    console.log(index);
     const convertedTracks = playlist?.tracks?.map((track: Track) => {
       return {
         id: track.id,

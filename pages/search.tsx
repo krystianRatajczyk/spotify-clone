@@ -21,6 +21,7 @@ import { requireAuthentication } from "@/lib/isAuthenticated";
 import { GetServerSideProps } from "next";
 import { GoPerson } from "react-icons/go";
 import { AnimatePresence } from "framer-motion";
+import { MusicContext } from "@/context/MusicContext";
 
 const types = ["track", "artist", "user", "playlist"];
 
@@ -40,8 +41,9 @@ const Search = () => {
   >(null);
 
   const [loading, setLoading] = useState<boolean>(true);
-
   const [isHover, setIsHover] = useState<boolean>(false);
+
+  const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
 
   const setStates = (
     loading: boolean,
@@ -78,7 +80,28 @@ const Search = () => {
                   type == "track"
                     ? { artists: true }
                     : type == "playlist"
-                    ? { user: { select: { name: true } } }
+                    ? {
+                        user: { select: { name: true } },
+                        tracks: {
+                          select: {
+                            name: true,
+                            image: true,
+                            id: true,
+                            artists: { select: { id: true, name: true } },
+                          },
+                        },
+                      }
+                    : type == "artist"
+                    ? {
+                        tracks: {
+                          select: {
+                            name: true,
+                            image: true,
+                            id: true,
+                            artists: { select: { id: true, name: true } },
+                          },
+                        },
+                      }
                     : null,
               },
               key,
@@ -127,6 +150,33 @@ const Search = () => {
     song: "Song",
     users: "Profile",
     playlist: "Playlist",
+  };
+
+  const playSongs = (index: number) => {
+    const convertedTracks = tracks?.map((track: Track) => {
+      return {
+        id: track.id,
+        image: track.image,
+        name: track.name,
+        duration: track.duration,
+        artists: track.artists.map((a) => ({ id: a.id, name: a.name })),
+      };
+    });
+
+    if (music.playlistId !== topResult?.id || index !== music.currentIndex) {
+      MusicDispatch({
+        type: "SET_SONGS",
+        payload: {
+          index: index,
+          tracks: convertedTracks || [],
+          playlistId: topResult?.id!,
+        },
+      });
+    } else {
+      MusicDispatch({
+        type: "PLAY_PAUSE",
+      });
+    }
   };
 
   return (
@@ -195,7 +245,15 @@ const Search = () => {
                         </Picture>
                       )}
 
-                      <h2 className="font-bold text-3xl">{topResult.name}</h2>
+                      <h2
+                        className={`font-bold text-3xl ${
+                          topResult.id ===
+                            music.currentSongs[music.currentIndex]?.id &&
+                          "text-primary"
+                        }`}
+                      >
+                        {topResult.name}
+                      </h2>
                       <p className="font-semibold px-4 py-1 bg-[#0f0f0f] w-fit rounded-full">
                         {links[topResult.type]}
                       </p>
@@ -205,7 +263,16 @@ const Search = () => {
                             <PlayPause
                               className="absolute right-5 bottom-5 drop-shadow-2xl"
                               hoverClassName="scale-[1.1]"
-                              isPlaying={false}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                playSongs(0);
+                              }}
+                              isPlaying={
+                                topResult.id ===
+                                  music.currentSongs[music.currentIndex]?.id &&
+                                music.isPlaying
+                              }
                             />
                           )}
                       </AnimatePresence>
@@ -228,7 +295,6 @@ const Search = () => {
                       if (index > 3 && sortTab != "Songs") {
                         return;
                       }
-
                       return (
                         <HorizontalSongCard
                           {...track}
@@ -238,6 +304,7 @@ const Search = () => {
                           withNo={sortTab == "Songs"}
                           index={index + 1}
                           isSearchCard
+                          playSong={() => playSongs(index)}
                         />
                       );
                     })}
@@ -251,23 +318,25 @@ const Search = () => {
                     <h2 className="font-bold text-2xl">Artists</h2>
                   )}
                   <div className="flex flex-wrap mt-4 w-full flex-row gap-5">
-                    {artists.map((artist: Artist, index: number) => {
-                      if (index > 5 && sortTab != "Artists") {
-                        return;
-                      }
+                    {artists.map(
+                      (artist: Artist & { tracks: Track[] }, index: number) => {
+                        if (index > 5 && sortTab != "Artists") {
+                          return;
+                        }
 
-                      return (
-                        <VerticalCard
-                          isRecentSearch={false}
-                          typeId={artist.id}
-                          type="artist"
-                          {...artist}
-                          modal="playpause"
-                          key={index}
-                          imageClassName="w-[90%] aspect-[1/1]"
-                        />
-                      );
-                    })}
+                        return (
+                          <VerticalCard
+                            isRecentSearch={false}
+                            typeId={artist.id}
+                            type="artist"
+                            {...artist}
+                            modal="playpause"
+                            key={index}
+                            imageClassName="w-[90%] aspect-[1/1]"
+                          />
+                        );
+                      }
+                    )}
                   </div>
                 </div>
               )}
@@ -311,12 +380,14 @@ const Search = () => {
                       if (index > 5 && sortTab != "Playlists") {
                         return;
                       }
+
                       return (
                         <VerticalCard
                           isRecentSearch={false}
                           typeId={playlist.author ? playlist.name : playlist.id}
                           type="playlist"
                           id={playlist.name}
+                          tracks={playlist.tracks}
                           username={playlist.author || playlist.user.name}
                           authorId={playlist.userId || playlist.name}
                           name={playlist.name}

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useContext, useRef } from "react";
 import CircularButton from "./Layout/CircularButton";
 import { RxCross2 } from "react-icons/rx";
 import { twMerge } from "tailwind-merge";
@@ -12,6 +12,8 @@ import useAddRecentSearch from "@/hooks/useAddRecentSearch";
 import useRemoveRecentSearch from "@/hooks/useRemoveRecentSearch";
 import { AnimatePresence } from "framer-motion";
 import { BsMusicNoteBeamed } from "react-icons/bs";
+import { Track } from "@prisma/client";
+import { MusicContext } from "@/context/MusicContext";
 
 interface VerticalCardProps {
   id: string;
@@ -25,6 +27,7 @@ interface VerticalCardProps {
   isRecentSearch?: boolean;
   authorId?: string;
   username?: string;
+  tracks?: Track[];
 }
 
 const VerticalCard: React.FC<VerticalCardProps> = ({
@@ -39,11 +42,14 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
   isRecentSearch,
   authorId,
   username,
+  tracks,
 }) => {
   const divRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(divRef);
   const [addRecentSearch] = useAddRecentSearch();
   const [removeRecentSearch] = useRemoveRecentSearch();
+
+  const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
 
   const links = {
     artist: "artist",
@@ -51,6 +57,33 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
     profile: "users",
     playlist: username == "Spotify" ? "category" : "playlist",
     category: "category",
+  };
+
+  const playSongs = (index: number) => {
+    const convertedTracks = tracks?.map((track: Track) => {
+      return {
+        id: track.id,
+        image: track.image,
+        name: track.name,
+        duration: track.duration,
+        artists: track.artists.map((a) => ({ id: a.id, name: a.name })),
+      };
+    });
+
+    if (music.playlistId !== id || index !== music.currentIndex) {
+      MusicDispatch({
+        type: "SET_SONGS",
+        payload: {
+          index: index,
+          tracks: convertedTracks || [],
+          playlistId: id,
+        },
+      });
+    } else {
+      MusicDispatch({
+        type: "PLAY_PAUSE",
+      });
+    }
   };
 
   return (
@@ -116,7 +149,11 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
           <AnimatePresence>
             {isHover && (modal == "playpause" || modal == "both") && (
               <PlayPause
-                isPlaying={false}
+                isPlaying={music.playlistId === id}
+                onClick={(e: any) => {
+                  e.preventDefault();
+                  playSongs(0);
+                }}
                 className="absolute right-2 bottom-2"
               />
             )}

@@ -18,6 +18,7 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import Link from "next/link";
 import { InfoContext } from "@/context/InfoContext";
 import { UserContext } from "@/context/User/UserContext";
+import { MusicContext } from "@/context/MusicContext";
 
 interface SongDetailProps {
   trackData: Track;
@@ -30,6 +31,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
 
   const { dispatch: InfoDispatch } = useContext(InfoContext);
   const { state: user, dispatch: UserDispatch } = useContext(UserContext);
+  const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
 
   useEffect(() => {
     const getTrack = async () => {
@@ -99,6 +101,48 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
     <AiOutlineHeart size={35} color={"lightGray"} onClick={handleHeartClick} />
   );
 
+  const playSongs = (index?: number) => {
+    const convertedTrack = {
+      id: track.id,
+      image: track.image,
+      name: track.name,
+      duration: track.duration,
+      artists: track.artists.map((a) => ({ id: a.id, name: a.name })),
+    };
+
+    if (
+      music.playlistId !== router.query.songId &&
+      index != music.currentIndex
+    ) {
+      MusicDispatch({
+        type: "SET_SONGS",
+        payload: {
+          index: index!,
+          tracks: [convertedTrack] || [],
+          playlistId: router.query.songId,
+        },
+      });
+    } else if (index != music.currentIndex) {
+      MusicDispatch({
+        type: "SET_INDEX",
+        payload: index!,
+      });
+    } else if (music.playlistId === router.query.songId) {
+      MusicDispatch({
+        type: "PLAY_PAUSE",
+      });
+    } else {
+      MusicDispatch({
+        type: "SET_SONGS",
+        payload: {
+          index: 0,
+          tracks: [convertedTrack] || [],
+          playlistId: router.query.songId,
+        },
+      });
+    }
+  };
+
   return (
     <Color src={track?.image} crossOrigin="anonymous" format="hex">
       {({ data: dominantColor }) => {
@@ -159,7 +203,11 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
             <div className="w-full bg-[rgba(0,0,0,0.3)] -mt-[325px] p-5 ">
               <div className="flex gap-7 items-center">
                 <PlayPause
-                  isPlaying={false}
+                  onClick={playSongs.bind(null, music.currentIndex)}
+                  isPlaying={
+                    music.playlistId == router.query.songId &&
+                    music.isPlaying
+                  }
                   className="w-[65px] h-[65px]"
                   iconSize={35}
                   animation={false}
@@ -174,6 +222,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
                   key={track.id}
                   withNo
                   index={1}
+                  playSong={playSongs.bind(null, 0)}
                 />
               )}
               {artists &&

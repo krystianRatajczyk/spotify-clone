@@ -9,7 +9,7 @@ const RecentSearches = () => {
   if (!user.recentSearches.length) return null;
 
   const router = useRouter();
-  
+
   return (
     <div className="mt-3">
       <div className="w-full flex justify-between">
@@ -30,11 +30,7 @@ const RecentSearches = () => {
           }
           return (
             <div className="col-span-1" key={index}>
-              <VerticalCard
-                {...item}
-                modal={item.type == "profile" ? "cross" : "both"}
-                isRecentSearch
-              />
+              <VerticalCard {...item} modal={"cross"} isRecentSearch />
             </div>
           );
         })}
