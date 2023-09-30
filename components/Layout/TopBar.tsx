@@ -15,6 +15,7 @@ import SortTabs from "./SortTabs";
 import { InfoContext } from "@/context/InfoContext";
 import { UserContext } from "@/context/User/UserContext";
 import PlayPause from "../PlayPause";
+import { MusicContext } from "@/context/MusicContext";
 
 const TopBar = () => {
   const router = useRouter();
@@ -23,11 +24,12 @@ const TopBar = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const {
-    state: { labelName, scrollTop, search, absolute },
+    state: { labelName, scrollTop, search, absolute, songsToPlay, playlistId },
     dispatch,
   } = useContext(InfoContext);
 
   const { state: user, dispatch: UserDispatch } = useContext(UserContext);
+  const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
 
   const [history, setHistory] = useState<string[]>([pathname]);
   const [initialized, setInitialized] = useState<boolean>(false);
@@ -52,6 +54,17 @@ const TopBar = () => {
     }
     dispatch({ type: "CHANGE_SCROLL_TOP", payload: 0 });
   }, [pathname]);
+
+  const playSongs = () => {
+    if (music.currentSongs.length == 0 || music.playlistId !== playlistId) {
+      MusicDispatch({
+        type: "SET_SONGS",
+        payload: { index: music.currentIndex, tracks: songsToPlay, playlistId },
+      });
+    } else {
+      MusicDispatch({ type: "PLAY_PAUSE" });
+    }
+  };
 
   return (
     <div
@@ -170,7 +183,8 @@ const TopBar = () => {
             scrollTop >= 230 && (
               <div className="flex gap-2 items-center absolute left-[85px] w-[700px]">
                 <PlayPause
-                  isPlaying={false}
+                  isPlaying={music.playlistId === playlistId && music.isPlaying}
+                  onClick={playSongs}
                   className="w-[45px] h-[45px] "
                   iconSize={25}
                   animation={false}

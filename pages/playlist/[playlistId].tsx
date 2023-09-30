@@ -22,7 +22,17 @@ import { useRouter } from "next/router";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
 
-const PlaylistDetail = () => {
+const PlaylistDetail = ({
+  playSongs,
+}: {
+  playSongs: (
+    index: number,
+    tracks: Track[],
+    playlistId: string,
+    playlistName: string,
+    href: string
+  ) => void;
+}) => {
   const [playlist, setPlaylist] = useState<
     Playlist & { tracks: []; user: { name: string } }
   >();
@@ -50,7 +60,15 @@ const PlaylistDetail = () => {
       } else {
         setPlaylist(playlist);
       }
-      InfoDispatch({ type: "CHANGE_LABEL_NAME", payload: playlist?.name });
+
+      InfoDispatch({
+        type: "SET_SONGS_AND_LABEL",
+        payload: {
+          label: playlist?.name,
+          tracks: playlist?.tracks,
+          playlistId: playlist?.id,
+        },
+      });
       setNewName(playlist?.name);
     };
 
@@ -129,50 +147,6 @@ const PlaylistDetail = () => {
     },
   ];
 
-  const playSongs = (index?: number) => {
-    const convertedTracks = playlist?.tracks?.map((track: Track) => {
-      return {
-        id: track.id,
-        image: track.image,
-        name: track.name,
-        duration: track.duration,
-        artists: track.artists.map((a) => ({ id: a.id, name: a.name })),
-      };
-    });
-    
-    if (
-      music.playlistId !== router.query.playlistId &&
-      index != music.currentIndex
-    ) {
-      MusicDispatch({
-        type: "SET_SONGS",
-        payload: {
-          index: index!,
-          tracks: convertedTracks || [],
-          playlistId: router.query.playlistId,
-        },
-      });
-    } else if (index != music.currentIndex) {
-      MusicDispatch({
-        type: "SET_INDEX",
-        payload: index!,
-      });
-    } else if (music.playlistId === router.query.playlistId) {
-      MusicDispatch({
-        type: "PLAY_PAUSE",
-      });
-    } else {
-      MusicDispatch({
-        type: "SET_SONGS",
-        payload: {
-          index: 0,
-          tracks: convertedTracks || [],
-          playlistId: router.query.playlistId,
-        },
-      });
-    }
-  };
-
   return (
     <Color src={src} crossOrigin="anonymous" format="hex">
       {({ data: dominantColor }) => {
@@ -249,7 +223,15 @@ const PlaylistDetail = () => {
                 <div className="h-full">
                   <div className="pl-3 flex items-center gap-4">
                     <PlayPause
-                      onClick={playSongs.bind(null, music.currentIndex)}
+                      onClick={() => {
+                        playSongs(
+                          music.currentIndex,
+                          playlist?.tracks,
+                          playlist?.id,
+                          playlist?.name,
+                          `/playlist/${playlist?.id}`
+                        );
+                      }}
                       isPlaying={
                         music.playlistId == router.query.playlistId &&
                         music.isPlaying
@@ -298,7 +280,15 @@ const PlaylistDetail = () => {
                         withNo
                         withDate
                         index={index + 1}
-                        playSong={() => playSongs(index)}
+                        playSong={() =>
+                          playSongs(
+                            index,
+                            playlist?.tracks,
+                            playlist?.id,
+                            playlist?.name,
+                            `/playlist/${playlist?.id}`
+                          )
+                        }
                       />
                     ))}
                   </div>

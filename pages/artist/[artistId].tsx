@@ -9,14 +9,21 @@ import axios from "axios";
 import Color from "color-thief-react";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { MdVerified } from "react-icons/md";
 
 interface ArtistDetailProps {
   artistData: Artist;
+  playSongs: (
+    index: number,
+    tracks: Track[],
+    playlistId: string,
+    playlistName: string,
+    href: string
+  ) => void;
 }
 
-const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
+const ArtistDetail = ({ artistData, playSongs }: ArtistDetailProps) => {
   const [artist, setArtist] = useState<Artist>();
   const [tracks, setTracks] = useState<Track[]>();
   const [showMore, setShowMore] = useState<boolean>(false);
@@ -24,7 +31,7 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
 
   const { dispatch } = useContext(InfoContext);
   const { state: user, dispatch: UserDispatch } = useContext(UserContext);
-  const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
+  const { state: music } = useContext(MusicContext);
 
   const router = useRouter();
 
@@ -38,8 +45,6 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
             options: { tracks: false },
           }
         );
-        dispatch({ type: "CHANGE_LABEL_NAME", payload: artist.data[0]?.name });
-
         const { tracksIds, ...rest } = artist.data[0];
         setArtist(rest);
 
@@ -51,6 +56,14 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
           }
         );
 
+        dispatch({
+          type: "SET_SONGS_AND_LABEL",
+          payload: {
+            label: artist.data[0]?.name,
+            tracks: tracksWithArtists.data,
+            playlistId: artist.data[0]?.id,
+          },
+        });
         setTracks(tracksWithArtists.data);
       } catch (error) {
         console.log(error);
@@ -67,50 +80,6 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
       setIsFollowing(following);
     }
   }, [user.liked.artists, artist]);
-
-  const playSongs = (index?: number) => {
-    const convertedTracks = tracks?.map((track: Track) => {
-      return {
-        id: track.id,
-        image: track.image,
-        name: track.name,
-        duration: track.duration,
-        artists: track.artists.map((a) => ({ id: a.id, name: a.name })),
-      };
-    });
-
-    if (
-      music.playlistId !== router.query.artistId &&
-      index != music.currentIndex
-    ) {
-      MusicDispatch({
-        type: "SET_SONGS",
-        payload: {
-          index: index!,
-          tracks: convertedTracks || [],
-          playlistId: router.query.artistId,
-        },
-      });
-    } else if (index != music.currentIndex) {
-      MusicDispatch({
-        type: "SET_INDEX",
-        payload: index!,
-      });
-    } else if (music.playlistId === router.query.artistId) {
-      MusicDispatch({
-        type: "PLAY_PAUSE",
-      });
-    } else {
-      MusicDispatch({
-        type: "SET_SONGS",
-        payload: {
-          index: 0,
-          tracks: convertedTracks || [],
-          playlistId: router.query.artistId,
-        },
-      });
-    }
-  };
 
   return (
     <Color src={artist?.image || ""} crossOrigin="anonymous" format="hex">
@@ -146,7 +115,15 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
               <div className="w-full h-full p-6">
                 <div className="w-full flex gap-6 items-center pb-4 p-6">
                   <PlayPause
-                    onClick={playSongs.bind(null, music.currentIndex)}
+                    onClick={() =>
+                      playSongs(
+                        music.currentIndex,
+                        tracks,
+                        artist?.id,
+                        artist?.name,
+                        `/artist/${artist?.id}`
+                      )
+                    }
                     isPlaying={
                       music.playlistId == router.query.artistId &&
                       music.isPlaying
@@ -184,7 +161,15 @@ const ArtistDetail = ({ artistData }: ArtistDetailProps) => {
                           key={track.id}
                           withNo
                           index={index + 1}
-                          playSong={() => playSongs(index)}
+                          playSong={() =>
+                            playSongs(
+                              index,
+                              tracks,
+                              artist?.id,
+                              artist?.name,
+                              `/artist/${artist?.id}`
+                            )
+                          }
                         />
                       );
                     })}

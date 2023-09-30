@@ -111,6 +111,10 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
             display: true,
           },
         });
+        MusicDispatch({
+          type: "ADD_TO_QUEUE",
+          payload: { id, image, name, artists, duration },
+        });
       },
       display: true,
     },
@@ -230,9 +234,9 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
               !withNo &&
               (music.currentSongs[music.currentIndex]?.id === id &&
               music.isPlaying ? (
-                <BiPause size={25} className="absolute"/>
+                <BiPause size={25} className="absolute" />
               ) : (
-                <BsFillPlayFill size={25} className="absolute"/>
+                <BsFillPlayFill size={25} className="absolute" />
               ))}
           </div>
 

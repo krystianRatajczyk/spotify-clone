@@ -9,9 +9,28 @@ import { InfoContextProvider } from "@/context/InfoContext";
 import { Layout } from "@/components";
 import { SessionProvider } from "next-auth/react";
 import { MusicContextProvider } from "@/context/MusicContext";
+import { Track } from "@prisma/client";
+import { useRef } from "react";
 
 export default function App({ Component, pageProps }: AppProps) {
   const pathname = usePathname();
+  const layoutRef = useRef(null);
+
+  const playSongs = (
+    index: number,
+    tracks: Track[],
+    playlistId: string,
+    playlistName: string,
+    href: string
+  ) => {
+    layoutRef?.current?.playSongs(
+      index,
+      tracks,
+      playlistId,
+      playlistName,
+      href
+    );
+  };
 
   if (pathname == "/auth") {
     return (
@@ -28,8 +47,8 @@ export default function App({ Component, pageProps }: AppProps) {
       <MusicContextProvider>
         <UserContextProvider>
           <InfoContextProvider>
-            <Layout>
-              <Component {...pageProps} />
+            <Layout ref={layoutRef}>
+              <Component {...pageProps} playSongs={playSongs} />
             </Layout>
           </InfoContextProvider>
         </UserContextProvider>

@@ -1,3 +1,4 @@
+import { Track } from "@prisma/client";
 import { usePathname } from "next/navigation";
 import React, { Dispatch, useEffect, useReducer } from "react";
 
@@ -10,6 +11,8 @@ type InfoState = {
   absolute: boolean;
   scroll: boolean;
   notification: { message: string; color: string; display: boolean };
+  songsToPlay: Track[];
+  playlistId: string;
 };
 
 //Action Type
@@ -19,8 +22,11 @@ type ActionType =
   | { type: "CHANGE_SORT_TAB"; payload: string }
   | { type: "CHANGE_SCROLL_TOP"; payload: number }
   | { type: "CHANGE_ABSOLUTE"; payload: boolean }
-  | { type: "CHANGE_LABEL_NAME"; payload: string }
   | { type: "SET_SCROLL"; payload: boolean }
+  | {
+      type: "SET_SONGS_AND_LABEL";
+      payload: { tracks: Track[]; playlistId: string; label: string };
+    }
   | {
       type: "SET_NOTIFICATION";
       payload: { message?: string; color?: string; display?: boolean };
@@ -37,10 +43,15 @@ const reducer = (state: InfoState, action: ActionType): InfoState => {
       return { ...state, scrollTop: action.payload };
     case "CHANGE_ABSOLUTE":
       return { ...state, absolute: action.payload };
-    case "CHANGE_LABEL_NAME":
-      return { ...state, labelName: action.payload };
     case "SET_SCROLL":
       return { ...state, scroll: action.payload };
+    case "SET_SONGS_AND_LABEL":
+      return {
+        ...state,
+        songsToPlay: action.payload.tracks,
+        playlistId: action.payload.playlistId,
+        labelName: action.payload.label,
+      };
     case "SET_NOTIFICATION":
       return {
         ...state,
@@ -67,6 +78,8 @@ export const InfoContext = React.createContext<ContextType>({
     scrollTop: 0,
     scroll: true,
     notification: { message: "", color: "", display: false },
+    songsToPlay: [],
+    playlistId: "",
   },
   dispatch: () => {},
 });
@@ -84,6 +97,8 @@ export const InfoContextProvider = ({
     absolute: false,
     scroll: true,
     notification: { message: "", color: "", display: false },
+    songsToPlay: [],
+    playlistId: "",
   });
 
   const pathname = usePathname();

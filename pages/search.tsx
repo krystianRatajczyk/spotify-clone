@@ -170,6 +170,8 @@ const Search = () => {
           index: index,
           tracks: convertedTracks || [],
           playlistId: topResult?.id!,
+          playlistName: "",
+          href: "",
         },
       });
     } else {

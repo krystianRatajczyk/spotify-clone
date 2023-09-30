@@ -14,7 +14,17 @@ import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
-const CategoryDetail = () => {
+interface CategoryProps {
+  playSongs: (
+    index: number,
+    tracks: Track[],
+    playlistId: string,
+    playlistName: string,
+    href: string
+  ) => void;
+}
+
+const CategoryDetail: React.FC<CategoryProps> = ({ playSongs }) => {
   const [tracks, setTracks] = useState<Track[] | []>([]);
   const [playlist, setPlaylist] = useState<Playlist | undefined>(undefined);
   const { dispatch } = useContext(InfoContext);
@@ -36,15 +46,17 @@ const CategoryDetail = () => {
 
       setPlaylist(res?.data);
       setTracks(res?.data.tracks);
+
+      dispatch({
+        type: "SET_SONGS_AND_LABEL",
+        payload: {
+          label: router.query.categoryName,
+          tracks: res?.data.tracks,
+          playlistId: router.query.categoryName,
+        },
+      });
     };
     loadTracks();
-
-    router.query.categoryName &&
-      dispatch({
-        type: "CHANGE_LABEL_NAME",
-        //@ts-ignore
-        payload: router.query.categoryName,
-      });
   }, [router.query.categoryName]);
 
   const getTime = (): string => {
@@ -74,56 +86,11 @@ const CategoryDetail = () => {
     <AiOutlineHeart size={40} color={"lightGray"} onClick={handleHeartClick} />
   );
 
-  const playSongs = (index?: number) => {
-    console.log(index);
-    const convertedTracks = playlist?.tracks?.map((track: Track) => {
-      return {
-        id: track.id,
-        image: track.image,
-        name: track.name,
-        duration: track.duration,
-        artists: track.artists.map((a) => ({ id: a.id, name: a.name })),
-      };
-    });
-    
-    if (
-      music.playlistId !== router.query.categoryName &&
-      index != music.currentIndex
-    ) {
-      MusicDispatch({
-        type: "SET_SONGS",
-        payload: {
-          index: index!,
-          tracks: convertedTracks || [],
-          playlistId: router.query.categoryName,
-        },
-      });
-    } else if (index != music.currentIndex) {
-      MusicDispatch({
-        type: "SET_INDEX",
-        payload: index!,
-      });
-    } else if (music.playlistId === router.query.categoryName) {
-      MusicDispatch({
-        type: "PLAY_PAUSE",
-      });
-    } else {
-      MusicDispatch({
-        type: "SET_SONGS",
-        payload: {
-          index: 0,
-          tracks: convertedTracks || [],
-          playlistId: router.query.categoryName,
-        },
-      });
-    }
-  };
-
   return (
     <Color src={playlist?.image || ""} crossOrigin="anonymous" format="hex">
       {({ data: dominantColor }) => {
         return (
-          <div className="bg-darkGray w-full ">
+          <div className="bg-darkGray w-full min-h-full">
             <div
               className={`p-5 h-[450px] bg-no-repeat flex items-end relative`}
               style={{
@@ -155,7 +122,15 @@ const CategoryDetail = () => {
             >
               <div className="w-full flex gap-6 items-center pb-7">
                 <PlayPause
-                  onClick={playSongs.bind(null, music.currentIndex)}
+                  onClick={() => {
+                    playSongs(
+                      music.currentIndex,
+                      tracks,
+                      router.query.categoryName,
+                      router.query.categoryName,
+                      `/category/${router.query.categoryName}`
+                    );
+                  }}
                   isPlaying={
                     music.playlistId == router.query.categoryName &&
                     music.isPlaying
@@ -176,7 +151,15 @@ const CategoryDetail = () => {
                     withNo
                     withDate
                     index={index + 1}
-                    playSong={playSongs.bind(null, index)}
+                    playSong={() => {
+                      playSongs(
+                        index,
+                        tracks,
+                        router.query.categoryName,
+                        router.query.categoryName,
+                        `/category/${router.query.categoryName}`
+                      );
+                    }}
                   />
                 ))}
               </div>

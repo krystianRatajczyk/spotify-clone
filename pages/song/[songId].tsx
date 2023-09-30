@@ -22,16 +22,23 @@ import { MusicContext } from "@/context/MusicContext";
 
 interface SongDetailProps {
   trackData: Track;
+  playSongs: (
+    index: number,
+    tracks: Track[],
+    playlistId: string,
+    playlistName: string,
+    href: string
+  ) => void;
 }
 
-const SongDetail = ({ trackData }: SongDetailProps) => {
+const SongDetail = ({ trackData, playSongs }: SongDetailProps) => {
   const [track, setTrack] = useState(emptyTrackState);
   const [artists, setArtists] = useState([]);
   const router = useRouter();
 
   const { dispatch: InfoDispatch } = useContext(InfoContext);
   const { state: user, dispatch: UserDispatch } = useContext(UserContext);
-  const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
+  const { state: music } = useContext(MusicContext);
 
   useEffect(() => {
     const getTrack = async () => {
@@ -50,6 +57,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
               ids,
               options: {
                 tracks: {
+                  include: { artists: { select: { id: true, name: true } } },
                   take: 6,
                 },
               },
@@ -63,6 +71,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
               ids: trackData.artistsIds,
               options: {
                 tracks: {
+                  include: { artists: { select: { id: true, name: true } } },
                   take: 6,
                 },
               },
@@ -86,7 +95,14 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
   }, [router.query.songId]);
 
   useEffect(() => {
-    InfoDispatch({ type: "CHANGE_LABEL_NAME", payload: track.name });
+    InfoDispatch({
+      type: "SET_SONGS_AND_LABEL",
+      payload: {
+        tracks: [track],
+        playlistId: track?.id,
+        label: track?.name,
+      },
+    });
   }, [track]);
 
   if (!track?.id) return null;
@@ -101,53 +117,11 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
     <AiOutlineHeart size={35} color={"lightGray"} onClick={handleHeartClick} />
   );
 
-  const playSongs = (index?: number) => {
-    const convertedTrack = {
-      id: track.id,
-      image: track.image,
-      name: track.name,
-      duration: track.duration,
-      artists: track.artists.map((a) => ({ id: a.id, name: a.name })),
-    };
-
-    if (
-      music.playlistId !== router.query.songId &&
-      index != music.currentIndex
-    ) {
-      MusicDispatch({
-        type: "SET_SONGS",
-        payload: {
-          index: index!,
-          tracks: [convertedTrack] || [],
-          playlistId: router.query.songId,
-        },
-      });
-    } else if (index != music.currentIndex) {
-      MusicDispatch({
-        type: "SET_INDEX",
-        payload: index!,
-      });
-    } else if (music.playlistId === router.query.songId) {
-      MusicDispatch({
-        type: "PLAY_PAUSE",
-      });
-    } else {
-      MusicDispatch({
-        type: "SET_SONGS",
-        payload: {
-          index: 0,
-          tracks: [convertedTrack] || [],
-          playlistId: router.query.songId,
-        },
-      });
-    }
-  };
-
   return (
     <Color src={track?.image} crossOrigin="anonymous" format="hex">
       {({ data: dominantColor }) => {
         return (
-          <div className="w-full bg-[#1b1b1b]">
+          <div className="w-full bg-[#1b1b1b] min-h-full">
             <div
               className={`p-5 pt-[70px] pb-[350px]`}
               style={{
@@ -203,10 +177,17 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
             <div className="w-full bg-[rgba(0,0,0,0.3)] -mt-[325px] p-5 ">
               <div className="flex gap-7 items-center">
                 <PlayPause
-                  onClick={playSongs.bind(null, music.currentIndex)}
+                  onClick={() =>
+                    playSongs(
+                      0,
+                      [track],
+                      track?.id,
+                      track?.name,
+                      `/song/${track?.id}`
+                    )
+                  }
                   isPlaying={
-                    music.playlistId == router.query.songId &&
-                    music.isPlaying
+                    music.playlistId == router.query.songId && music.isPlaying
                   }
                   className="w-[65px] h-[65px]"
                   iconSize={35}
@@ -222,7 +203,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
                   key={track.id}
                   withNo
                   index={1}
-                  playSong={playSongs.bind(null, 0)}
+                  playSong={() => playSongs(0, [track], track?.id, "", "")}
                 />
               )}
               {artists &&
@@ -244,6 +225,7 @@ const SongDetail = ({ trackData }: SongDetailProps) => {
                                 modal="playpause"
                                 imageClassName="w-[180px] h-[180px]"
                                 isRecentSearch
+                                tracks={[track]}
                               />
                             );
                           })

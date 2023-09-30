@@ -12,7 +12,7 @@ import useAddRecentSearch from "@/hooks/useAddRecentSearch";
 import useRemoveRecentSearch from "@/hooks/useRemoveRecentSearch";
 import { AnimatePresence } from "framer-motion";
 import { BsMusicNoteBeamed } from "react-icons/bs";
-import { Track } from "@prisma/client";
+import { Artist, Track } from "@prisma/client";
 import { MusicContext } from "@/context/MusicContext";
 
 interface VerticalCardProps {
@@ -66,10 +66,9 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
         image: track.image,
         name: track.name,
         duration: track.duration,
-        artists: track.artists.map((a) => ({ id: a.id, name: a.name })),
+        artists: track.artists.map((a: Artist) => ({ id: a.id, name: a.name })),
       };
     });
-
     if (music.playlistId !== id || index !== music.currentIndex) {
       MusicDispatch({
         type: "SET_SONGS",
@@ -77,6 +76,8 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
           index: index,
           tracks: convertedTracks || [],
           playlistId: id,
+          playlistName: name,
+          href: `/${links[type]}/${typeId}`,
         },
       });
     } else {
@@ -101,7 +102,7 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
               image,
               username,
               authorId,
-              type: username == "Spotify" ? "category" : "playlist",
+              type: links[type],
               typeId,
             });
           }
@@ -114,6 +115,7 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
             hoverClassName="scale-[1.1]"
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               removeRecentSearch(id);
             }}
           >

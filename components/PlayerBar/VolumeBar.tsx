@@ -1,6 +1,7 @@
 import useHover from "@/hooks/useHover";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-import { IconType } from "react-icons";
 import {
   BsFillVolumeMuteFill,
   BsFillVolumeOffFill,
@@ -15,6 +16,7 @@ const VolumeBar = () => {
 
   const ref = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(ref);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (volume === 0) {
@@ -30,9 +32,12 @@ const VolumeBar = () => {
 
   return (
     <div className="flex gap-4 items-center flex-[0.3] justify-end">
-      <div>
-        <HiOutlineQueueList size={20} color="lightGray" />
-      </div>
+      <Link href={{ pathname: "/queue" }}>
+        <HiOutlineQueueList
+          size={20}
+          color={pathname == "/queue" ? "#1ed860" : "lightGray"}
+        />
+      </Link>
       <div className="flex gap-3 items-center ">
         {Icon}
         <div className="relative flex items-center flex-row" ref={ref}>
