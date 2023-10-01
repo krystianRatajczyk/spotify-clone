@@ -8,18 +8,31 @@ import useHover from "@/hooks/useHover";
 
 const SeekBar = () => {
   const [time, setTime] = useState<number>(0);
+  const [shuffle, setShuffle] = useState<boolean>(false);
+  const [loop, setLoop] = useState<boolean>(false);
+
   const { state, dispatch } = useContext(MusicContext);
 
   const inputRef = useRef<HTMLDivElement>(null);
   const [isHover] = useHover(inputRef);
 
   useEffect(() => {
+    if (shuffle) {
+      dispatch({ type: "SHUFFLE" });
+    } else {
+      dispatch({ type: "UNSHUFFLE" });
+    }
+  }, [shuffle]);
+
+  useEffect(() => {
     if (time == state.currentSongs[state.currentIndex]?.duration) {
       setTime(0);
-      if (state.currentIndex == state.currentSongs.length - 1) {
-        dispatch({ type: "SET_INDEX", payload: 0 });
-      } else {
-        dispatch({ type: "NEXT_SONG" });
+      if (!loop) {
+        if (state.currentIndex == state.currentSongs.length - 1) {
+          dispatch({ type: "SET_INDEX", payload: 0 });
+        } else {
+          dispatch({ type: "NEXT_SONG" });
+        }
       }
     }
     if (state.isPlaying) {
@@ -53,7 +66,19 @@ const SeekBar = () => {
   return (
     <div className="flex items-center flex-col flex-[0.3]">
       <div className="flex items-center gap-6">
-        <BiShuffle size={20} color="lightGray" />
+        <BiShuffle
+          size={20}
+          color={
+            shuffle
+              ? "#1ed860"
+              : state.currentSongs.length > 0
+              ? "white"
+              : "gray"
+          }
+          onClick={() => {
+            state.currentSongs.length > 0 && setShuffle((prev) => !prev);
+          }}
+        />
         <BiSkipPrevious
           size={29}
           onClick={prevSong}
@@ -79,7 +104,15 @@ const SeekBar = () => {
               : "#9ca3af"
           }
         />
-        <TfiLoop size={20} color="lightGray" />
+        <TfiLoop
+          size={20}
+          color={
+            loop ? "#1ed860" : state.currentSongs.length > 0 ? "white" : "gray"
+          }
+          onClick={() => {
+            state.currentSongs.length > 0 && setLoop((prev) => !prev);
+          }}
+        />
       </div>
       <div className="flex flex-row items-center mt-1 gap-3">
         <p className="text-gray-400 text-[13px]">

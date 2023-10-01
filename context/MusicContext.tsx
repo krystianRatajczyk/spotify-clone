@@ -1,3 +1,4 @@
+import { shuffle } from "@/lib/music";
 import React, { Dispatch, useReducer } from "react";
 
 type convertedTrack = {
@@ -11,6 +12,7 @@ type convertedTrack = {
 //State
 type State = {
   currentSongs: convertedTrack[];
+  originSongs: convertedTrack[];
   currentIndex: number;
   isPlaying: boolean;
   playlistId?: string;
@@ -39,7 +41,9 @@ type ActionType =
   | { type: "SHUFFLE_SONG"; payload: string }
   | { type: "ADD_TO_QUEUE"; payload: convertedTrack }
   | { type: "CLEAR_QUEUE" }
-  | { type: "PLAY_PAUSE" };
+  | { type: "PLAY_PAUSE" }
+  | { type: "SHUFFLE" }
+  | { type: "UNSHUFFLE" };
 
 //reducer func
 const reducer = (state: State, action: ActionType): State => {
@@ -49,6 +53,7 @@ const reducer = (state: State, action: ActionType): State => {
         ...state,
         currentIndex: action.payload.index,
         currentSongs: [...action.payload.tracks],
+        originSongs: [...action.payload.tracks],
         playlistId: action.payload.playlistId,
         isPlaying: true,
         playlistName: action.payload.playlistName,
@@ -230,6 +235,57 @@ const reducer = (state: State, action: ActionType): State => {
       };
     case "CLEAR_QUEUE":
       return { ...state, queue: [], listenedQueue: [] };
+    case "SHUFFLE":
+      const arrayToShuffle = [
+        ...state.currentSongs.slice(0, state.currentIndex),
+        ...state.currentSongs.slice(
+          state.currentIndex + state.queue.length + 1
+        ),
+      ];
+      const shuffledArray = shuffle(arrayToShuffle);
+      const newSongs = [
+        ...shuffledArray.slice(0, state.currentIndex),
+        state.currentSongs[state.currentIndex],
+        ...state.queue,
+        ...shuffledArray.slice(state.currentIndex),
+      ];
+
+      return { ...state, currentSongs: newSongs };
+    case "UNSHUFFLE":
+      let index = state.currentIndex;
+      let songs = state.currentSongs;
+      if (
+        !state.listenedQueue.includes(
+          state.currentSongs[state.currentIndex]?.id
+        )
+      ) {
+        state.originSongs.forEach((track, i) => {
+          if (track.id === state.currentSongs[state.currentIndex]?.id) {
+            songs = [
+              ...state.originSongs.slice(0, i + 1),
+              ...state.queue,
+              ...state.originSongs.slice(i + 1),
+            ];
+          }
+        });
+      } else {
+        state.originSongs.forEach((track, i) => {
+          if (
+            track.id ===
+            state.currentSongs[state.currentIndex + state.queue.length + 1]?.id
+          ) {
+            index = i;
+            songs = [
+              ...state.originSongs.slice(0, i),
+              state.currentSongs[state.currentIndex],
+              ...state.queue,
+              ...state.originSongs.slice(i),
+            ];
+          }
+        });
+      }
+      
+      return { ...state, currentSongs: songs, currentIndex: index };
     default:
       throw new Error(`Unhandled action type: ${action.type}`);
   }
@@ -244,6 +300,7 @@ type ContextType = {
 export const MusicContext = React.createContext<ContextType>({
   state: {
     currentSongs: [],
+    originSongs: [],
     currentIndex: 0,
     isPlaying: false,
     playlistName: "",
@@ -261,6 +318,7 @@ export const MusicContextProvider = ({
 }) => {
   const [state, dispatch] = useReducer(reducer, {
     currentSongs: [],
+    originSongs: [],
     currentIndex: 0,
     isPlaying: false,
     playlistName: "",
