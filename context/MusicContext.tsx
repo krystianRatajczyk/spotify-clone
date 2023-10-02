@@ -284,7 +284,6 @@ const reducer = (state: State, action: ActionType): State => {
           }
         });
       }
-      
       return { ...state, currentSongs: songs, currentIndex: index };
     default:
       throw new Error(`Unhandled action type: ${action.type}`);

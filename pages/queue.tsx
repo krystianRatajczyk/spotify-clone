@@ -1,5 +1,7 @@
 import { Button, HorizontalSongCard } from "@/components";
 import { MusicContext } from "@/context/MusicContext";
+import { requireAuthentication } from "@/lib/isAuthenticated";
+import { GetServerSideProps } from "next";
 import Link from "next/link";
 import React, { useContext, useEffect } from "react";
 
@@ -115,3 +117,11 @@ const Queue = () => {
 };
 
 export default Queue;
+
+export const getServerSideProps: GetServerSideProps = requireAuthentication(
+  async (_ctx) => {
+    return {
+      props: {},
+    };
+  }
+);
