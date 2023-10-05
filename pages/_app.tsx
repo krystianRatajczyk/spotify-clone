@@ -31,7 +31,7 @@ export default function App({ Component, pageProps }: AppProps) {
       href
     );
   };
-
+  
   if (pathname == "/auth") {
     return (
       <SessionProvider>

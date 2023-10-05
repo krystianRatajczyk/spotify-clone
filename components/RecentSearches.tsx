@@ -12,7 +12,7 @@ const RecentSearches = () => {
   const router = useRouter();
   const parent = useRef<HTMLDivElement>(null);
 
-  const amount = useGrid(6, 200, parent);
+  const amount = useGrid(200, parent);
 
   return (
     <div className="mt-3" ref={parent}>
@@ -36,13 +36,14 @@ const RecentSearches = () => {
           marginTop: "1rem",
         }}
       >
-        {user.recentSearches
-          .slice(0, amount)
-          .map((item: any, index: number) => (
-            <div className="col-span-1" key={index}>
-              <VerticalCard {...item} modal={"cross"} isRecentSearch />
-            </div>
-          ))}
+        {amount > 0 &&
+          user.recentSearches
+            .slice(0, amount)
+            .map((item: any, index: number) => (
+              <div className="col-span-1" key={index}>
+                <VerticalCard {...item} modal={"cross"} isRecentSearch />
+              </div>
+            ))}
       </div>
     </div>
   );

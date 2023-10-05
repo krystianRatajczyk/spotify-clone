@@ -33,3 +33,9 @@ export const fadeOut = (duration?: number, delay?: number) => {
     },
   };
 };
+
+export const loading = () =>{
+  return {
+    
+  }
+}

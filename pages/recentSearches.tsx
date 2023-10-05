@@ -18,7 +18,7 @@ const recentSearches = () => {
   const [clearRecentSearch] = useClearRecentSearch();
   const parent = useRef<HTMLDivElement>(null);
 
-  const amount = useGrid(6, 200, parent);
+  const amount = useGrid(200, parent);
 
   return (
     <div
@@ -45,13 +45,14 @@ const recentSearches = () => {
           marginTop: "1rem",
         }}
       >
-        {user.recentSearches.map((item: any, index: number) => {
-          return (
-            <div className="col-span-1" key={index}>
-              <VerticalCard {...item} modal={"cross"} isRecentSearch />
-            </div>
-          );
-        })}
+        {amount > 0 &&
+          user.recentSearches.map((item: any, index: number) => {
+            return (
+              <div className="col-span-1" key={index}>
+                <VerticalCard {...item} modal={"cross"} isRecentSearch />
+              </div>
+            );
+          })}
       </div>
     </div>
   );

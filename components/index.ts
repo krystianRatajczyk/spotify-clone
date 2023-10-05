@@ -14,6 +14,7 @@ import VerticalCard from "./VerticalCard";
 import PlaylistImage from "./PlaylistImage";
 import ContextMenu from "./ContextMenu";
 import Player from "./Player";
+import Discover from "./Discover";
 
 //Layout
 import Button from "./Layout/Button";
@@ -60,4 +61,5 @@ export {
   Controls,
   Track,
   VolumeBar,
+  Discover,
 };

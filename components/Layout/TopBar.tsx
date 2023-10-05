@@ -180,7 +180,8 @@ const TopBar = () => {
               )}
             </div>
           ) : (
-            scrollTop >= 230 && (
+            scrollTop >= 230 &&
+            labelName != "" && (
               <div className="flex gap-2 items-center absolute left-[85px] w-[700px]">
                 <PlayPause
                   isPlaying={music.playlistId === playlistId && music.isPlaying}

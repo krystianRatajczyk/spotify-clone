@@ -5,7 +5,7 @@ import useGrid from "@/hooks/useGrid";
 
 const Categories = () => {
   const parent = useRef<HTMLDivElement>(null);
-  const amount = useGrid(5, 230, parent);
+  const amount = useGrid(230, parent);
 
   return (
     <div className="mb-[70px]" ref={parent}>
@@ -17,9 +17,10 @@ const Categories = () => {
           gridTemplateColumns: `repeat(${amount}, minmax(0, 1fr))`,
         }}
       >
-        {musicTypes.map((music: any, index: number) => {
-          return <SquareCard {...music} key={index} />;
-        })}
+        {amount > 0 &&
+          musicTypes.map((music: any, index: number) => {
+            return <SquareCard {...music} key={index} />;
+          })}
       </div>
     </div>
   );

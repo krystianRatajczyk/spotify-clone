@@ -50,13 +50,21 @@ const Sidebar: React.FC = () => {
   };
 
   const createPlaylist = async () => {
-    dispatch({ type: "CREATE_PLAYLIST" });
-    const res = await axios.post("/api/actions/playlist/createPlaylist", {
-      user,
+    let wait = false;
+    user.playlists.map((playlist) => {
+      if (typeof playlist.id === "number") {
+        wait = true;
+      }
     });
-
-    dispatch({ type: "CHANGE_PLAYLIST_ID", payload: { newId: res.data.id } });
     
+    if (!wait) {
+      dispatch({ type: "CREATE_PLAYLIST" });
+      const res = await axios.post("/api/actions/playlist/createPlaylist", {
+        user,
+      });
+
+      dispatch({ type: "CHANGE_PLAYLIST_ID", payload: { newId: res.data.id } });
+    }
   };
 
   return (

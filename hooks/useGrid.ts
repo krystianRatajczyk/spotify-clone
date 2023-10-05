@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-const useGrid = (def: number, cardWidth: number, ref: React.RefObject<any>) => {
-  const [amount, setAmount] = useState<number>(def);
+const useGrid = (cardWidth: number, ref: React.RefObject<any>) => {
+  const [amount, setAmount] = useState<number>(0);
 
   useEffect(() => {
     const calculateGrid = () => {

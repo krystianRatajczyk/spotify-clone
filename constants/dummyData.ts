@@ -152,4 +152,22 @@ export const musicTypes = [
   },
 ];
 
+export const madeForUser = [
+  { title: "Daily Mix 1", color: "#a1dcce" },
+  { title: "Daily Mix 2", color: "#e5cad3" },
+  { title: "Daily Mix 3", color: "#afd7b3" },
+  { title: "Daily Mix 4", color: "#f47fa4" },
+  { title: "Daily Mix 5", color: "#ecba63" },
+  { title: "Daily Mix 6", color: "#95b5c3" },
+  { title: "Daily Mix 7", color: "#625f94" },
+];
 
+export const popularForUser = [
+  { title: "Popular #1" },
+  { title: "Popular #2" },
+  { title: "Popular #3" },
+  { title: "Popular #4" },
+  { title: "Popular #5" },
+  { title: "Popular #6" },
+  { title: "Popular #7" },
+];

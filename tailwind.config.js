@@ -27,7 +27,7 @@ module.exports = {
         },
       },
       height: {
-        calc: "calc(100% - 80px)"
+        calc: "calc(100% - 80px)",
       },
       colors: {
         black: "#191624",
