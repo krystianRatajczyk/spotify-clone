@@ -196,12 +196,16 @@ const PopularCard: React.FC<PopularCardProps> = ({
   );
 };
 
-export default function Home({ playSongs }: { playSongs: PlaySongs }) {
-  const [discover, setDiscover] = useState<Track[]>();
-  const [tracks, setTracks] = useState<Track[]>();
-
+export default function Home({
+  playSongs,
+  discover,
+  tracks,
+}: {
+  playSongs: PlaySongs;
+  discover: Track[];
+  tracks: Track[];
+}) {
   const hours = new Date().getHours();
-  const day = new Date().getDay();
 
   let greeting;
 
@@ -232,44 +236,10 @@ export default function Home({ playSongs }: { playSongs: PlaySongs }) {
   }
 
   useEffect(() => {
-    const getDiscover = async () => {
-      const disc = await axios.post("/api/actions/getObjectsWithQuery", {
-        query: {
-          skip: day * 20,
-          take: 20,
-          select: {
-            id: true,
-            image: true,
-            name: true,
-            duration: true,
-            artists: { select: { id: true, name: true } },
-          },
-        },
-        key: "track",
-      });
-      setDiscover(disc.data);
-
-      const tracks = await axios.post("/api/actions/getObjectsWithQuery", {
-        query: {
-          take: 140,
-          select: {
-            id: true,
-            image: true,
-            name: true,
-            duration: true,
-            artists: { select: { id: true, name: true, image: true } },
-          },
-        },
-        key: "track",
-      });
-
-      setTracks(tracks.data);
-    };
     dispatch({
       type: "SET_SONGS_AND_LABEL",
       payload: { label: "", playlistId: "", tracks: [] },
     });
-    getDiscover();
   }, []);
 
   return (
@@ -367,8 +337,8 @@ export default function Home({ playSongs }: { playSongs: PlaySongs }) {
                 key={mix.title}
                 color={null}
                 tracks={tracks?.slice(
-                  140 - (index * 20 + 20),
-                  140 - (index * 20 + 20) + 20
+                  tracks.length - (index * 20 + 20),
+                  tracks.length - (index * 20 + 20) + 20
                 )}
                 playSongs={playSongs}
               />

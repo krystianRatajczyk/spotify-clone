@@ -10,11 +10,16 @@ import { Layout } from "@/components";
 import { SessionProvider } from "next-auth/react";
 import { MusicContextProvider } from "@/context/MusicContext";
 import { Track } from "@prisma/client";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 
 export default function App({ Component, pageProps }: AppProps) {
   const pathname = usePathname();
   const layoutRef = useRef(null);
+  const [discover, setDiscover] = useState<Track[]>();
+  const [tracks, setTracks] = useState<Track[]>();
+
+  const day = new Date().getDay();
 
   const playSongs = (
     index: number,
@@ -31,7 +36,44 @@ export default function App({ Component, pageProps }: AppProps) {
       href
     );
   };
-  
+
+  useEffect(() => {
+    const getDiscover = async () => {
+      const disc = await axios.post("/api/actions/getObjectsWithQuery", {
+        query: {
+          skip: day * 20,
+          take: 20,
+          select: {
+            id: true,
+            image: true,
+            name: true,
+            duration: true,
+            artists: { select: { id: true, name: true } },
+          },
+        },
+        key: "track",
+      });
+      setDiscover(disc.data);
+
+      const tracks = await axios.post("/api/actions/getObjectsWithQuery", {
+        query: {
+          take: 140,
+          select: {
+            id: true,
+            image: true,
+            name: true,
+            duration: true,
+            artists: { select: { id: true, name: true, image: true } },
+          },
+        },
+        key: "track",
+      });
+
+      setTracks(tracks.data);
+    };
+    getDiscover();
+  }, []);
+
   if (pathname == "/auth") {
     return (
       <SessionProvider>
@@ -48,7 +90,12 @@ export default function App({ Component, pageProps }: AppProps) {
         <UserContextProvider>
           <InfoContextProvider>
             <Layout ref={layoutRef}>
-              <Component {...pageProps} playSongs={playSongs} />
+              <Component
+                {...pageProps}
+                playSongs={playSongs}
+                discover={discover}
+                tracks={tracks}
+              />
             </Layout>
           </InfoContextProvider>
         </UserContextProvider>

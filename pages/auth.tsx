@@ -1,10 +1,14 @@
-import React, { useCallback, useState, useEffect, useContext } from "react";
-import { getSession, signIn } from "next-auth/react";
+import React, { useCallback, useState,  useContext } from "react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import axios from "axios";
-import { AiOutlineUser, AiFillLock, AiOutlineMail } from "react-icons/ai";
-import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
+import {
+  AiOutlineUser,
+  AiFillLock,
+  AiOutlineMail,
+  AiFillEye,
+  AiFillEyeInvisible,
+} from "react-icons/ai";
 
 import { SyncLoader } from "react-spinners";
 
@@ -21,6 +25,7 @@ const Auth = ({}) => {
   const [email, setEmail] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [visible, setVisible] = useState<boolean>(false);
 
   const [error, setError] = useState({
     email: { message: null },
@@ -134,7 +139,7 @@ const Auth = ({}) => {
   const errorClasses = "border-1 border-red-400";
 
   return (
-    <div className="relative h-screen w-screen bg-black bg-no-repeat bg-center bg-fixed bg-hover">
+    <div className="relative h-screen w-screen bg-gradient-to-b from-[#1a1a1a] to-[#000000] bg-no-repeat bg-center bg-fixed bg-hover">
       <div className="w-full h-full lg:bg-opacity-50">
         <nav className="px-12 py-5">
           <img src="/images/logo.png" alt="logo" className="h-12" />
@@ -142,7 +147,7 @@ const Auth = ({}) => {
         <div className="flex justify-center items-center">
           <div
             className="
-                bg-mediumGray 
+                bg-[#000000]
                 bg-opacity-70 
                 px-16 py-16 
                 self-center 
@@ -161,7 +166,7 @@ const Auth = ({}) => {
             </p>
             {type !== "login" && (
               <div
-                className={`w-full flex items-center mt-2 bg-black rounded-xl border ${
+                className={`w-full flex items-center mt-2 bg-[#121212] rounded-xl border ${
                   error.username.message ? errorClasses : "border-none"
                 }`}
               >
@@ -180,7 +185,7 @@ const Auth = ({}) => {
               </h3>
             )}
             <div
-              className={`w-full flex items-center mt-2 bg-black rounded-xl border ${
+              className={`w-full flex items-center mt-2 bg-[#121212] rounded-xl border ${
                 error.email.message ? errorClasses : "border-none"
               }`}
             >
@@ -202,17 +207,27 @@ const Auth = ({}) => {
               </h3>
             )}
             <div
-              className={`w-full flex items-center mt-2 bg-black rounded-xl border ${
+              className={`w-full flex relative items-center mt-2 bg-[#121212] rounded-xl border ${
                 error.password.message ? errorClasses : "border-none"
               }`}
             >
               <AiFillLock size={30} className="ml-3" />
               <Input
-                type="password"
+                type={visible ? "text" : "password"}
                 placeholder="Password"
                 state={password}
                 setstate={setPassword}
               />
+              <div
+                className="absolute right-4"
+                onClick={() => setVisible((prev) => !prev)}
+              >
+                {!visible ? (
+                  <AiFillEyeInvisible size={30} />
+                ) : (
+                  <AiFillEye size={30} />
+                )}
+              </div>
             </div>
             {error.password.message && (
               <h3 className="font-semibold text-red-400">
@@ -242,49 +257,7 @@ const Auth = ({}) => {
                 "Register"
               )}
             </button>
-            {type == "login" && (
-              <div>
-                <h2 className="text-center mt-5 text-gray-500">OR</h2>
-                <button
-                  className="
-                    w-full 
-                    h-[60px]  
-                    mt-5 
-                    rounded-xl 
-                    border-red-300
-                    border
-                    flex
-                    items-center
-                    justify-center
-                    gap-2
-                    transition
-                    hover:shadow-md 
-                    hover:shadow-gray-700"
-                >
-                  <FcGoogle size={30} />
-                  <h3 className="font-semibold text-xl">Google</h3>
-                </button>
-                <button
-                  className="
-                    w-full 
-                    h-[60px] 
-                    mt-5 
-                    rounded-xl
-                    border-white
-                    border
-                    flex
-                    items-center
-                    justify-center
-                    gap-2
-                    transition
-                    hover:shadow-md 
-                    hover:shadow-gray-700"
-                >
-                  <FaGithub size={30} />
-                  <h3 className="font-semibold text-xl">Github</h3>
-                </button>
-              </div>
-            )}
+            
             <p
               className="text-right mt-10  text-gray-500 cursor-pointer"
               onClick={() => {

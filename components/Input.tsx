@@ -46,7 +46,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
         }}
         value={props.context ? state.search : props.state}
         className={twMerge(
-          "color-black bg-black rounded-xl px-5 py-3 text-lg outline-none",
+          "color-black bg-transparent rounded-xl px-5 py-3 text-lg outline-none",
           props.className
         )}
       />

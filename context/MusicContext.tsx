@@ -261,6 +261,7 @@ const reducer = (state: State, action: ActionType): State => {
       ) {
         state.originSongs.forEach((track, i) => {
           if (track.id === state.currentSongs[state.currentIndex]?.id) {
+            index = i;
             songs = [
               ...state.originSongs.slice(0, i + 1),
               ...state.queue,
