@@ -32,7 +32,7 @@ const serverAuth = async (
           author: true,
           image: true,
           tracks: true,
-          createdUser: true
+          createdUser: true,
         },
       },
       likedSongs: { include: { artists: true } },
