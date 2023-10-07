@@ -18,9 +18,14 @@ export interface User {
   updatedAt: Date;
   playlists: Playlist[];
   recentSearches: Search[];
-  liked: {
-    songs: Track[];
-    artists: { name: string; image: string; id: string }[];
-    playlists: { id: string; name: string; author: string; image: string }[];
-  };
+  likedSongs: Track[];
+  likedArtists: { name: string; image: string; id: string }[];
+  likedPlaylists: {
+    id: string;
+    name: string;
+    author?: string;
+    image: string;
+  user: { id: string; name: string; tracks: Track[] };
+    userId: string;
+  }[];
 }

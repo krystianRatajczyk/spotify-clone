@@ -107,7 +107,7 @@ const SongDetail = ({ trackData, playSongs }: SongDetailProps) => {
 
   if (!track?.id) return null;
 
-  const isSongLiked = user.liked.songs.find((song) => song.id == track.id);
+  const isSongLiked = user.likedSongs.find((song) => song.id == track.id);
   const handleHeartClick = () =>
     addOrRemoveLikedSong(UserDispatch, !!isSongLiked, track);
 

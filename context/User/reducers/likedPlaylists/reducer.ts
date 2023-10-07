@@ -11,22 +11,16 @@ export const likedPlaylistsReducer = (
     case "ADD_LIKED_PLAYLIST": {
       return {
         ...state,
-        liked: {
-          ...state.liked,
-          playlists: [action.payload.playlist, ...state.liked?.playlists],
-        },
+        likedPlaylists: [action.payload.playlist, ...state.likedPlaylists],
       };
     }
 
     case "REMOVE_LIKED_PLAYLIST": {
       return {
         ...state,
-        liked: {
-          ...state.liked,
-          playlists: state.liked?.playlists?.filter(
-            (likedPlaylist) => likedPlaylist.id !== action.payload.id
-          ),
-        },
+        likedPlaylists: state.likedPlaylists?.filter(
+          (likedPlaylist) => likedPlaylist.id !== action.payload.id
+        ),
       };
     }
     default:

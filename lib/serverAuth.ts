@@ -19,10 +19,24 @@ const serverAuth = async (
     include: {
       playlists: {
         include: {
-          user: { select: { name: true } },
-          tracks: { include: { artists: { select: { name: true, id: true } } } },
+          createdUser: { select: { name: true } },
+          tracks: {
+            include: { artists: { select: { name: true, id: true } } },
+          },
         },
       },
+      likedPlaylists: {
+        select: {
+          id: true,
+          name: true,
+          author: true,
+          image: true,
+          tracks: true,
+          createdUser: true
+        },
+      },
+      likedSongs: { include: { artists: true } },
+      likedArtists: { select: { id: true, name: true, image: true } },
     },
   });
 

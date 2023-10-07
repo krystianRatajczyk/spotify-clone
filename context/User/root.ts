@@ -1,4 +1,4 @@
-import { User as UserType } from "@/constants/formattedTypesPrisma";
+import { User, User as UserType } from "@/constants/formattedTypesPrisma";
 import { Track } from "@prisma/client";
 import { likedSongsReducer } from "./reducers/likedSongs/reducer";
 import { likedArtistsReducer } from "./reducers/likedArtists/reducer";
@@ -44,7 +44,14 @@ type LikedPlaylistsActions =
   | {
       type: "ADD_LIKED_PLAYLIST";
       payload: {
-        playlist: { id: string; name: string; author: string; image: string };
+        playlist: {
+          id: string;
+          name: string;
+          author?: string;
+          image: string;
+          createdUser?: User;
+          createUserId?: string;
+        };
       };
     }
   | { type: "REMOVE_LIKED_PLAYLIST"; payload: { id: string } };

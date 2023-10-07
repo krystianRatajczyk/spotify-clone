@@ -68,7 +68,7 @@ const CategoryDetail: React.FC<CategoryProps> = ({ playSongs }) => {
     return time.minutes + " min";
   };
 
-  const isPlaylistLiked = !!user.liked?.playlists?.find(
+  const isPlaylistLiked = !!user.likedPlaylists?.find(
     (p) => p.id == playlist?.id
   );
   const handleHeartClick = () =>

@@ -39,7 +39,7 @@ const Library: React.FC<LibraryProps> = ({ isLibraryOpened }) => {
             />
           </Link>
         ))}
-        {user.liked.playlists.map((playlist) => (
+        {user.likedPlaylists.map((playlist) => (
           <Link
             href={
               playlist.author === "Spotify" ? `/category/${playlist.name}` : ""
@@ -53,7 +53,7 @@ const Library: React.FC<LibraryProps> = ({ isLibraryOpened }) => {
             />
           </Link>
         ))}
-        {user.liked.artists?.map((artist) => (
+        {user.likedArtists?.map((artist) => (
           <Link href={`/artist/${artist.id}`}>
             <img
               src={artist.image}
@@ -87,7 +87,7 @@ const Library: React.FC<LibraryProps> = ({ isLibraryOpened }) => {
       items-center"
           >
             <AiFillPushpin color="#1ed760" /> Playlist <span> • </span>{" "}
-            {user.liked.songs?.length} songs
+            {user.likedSongs?.length} songs
           </p>
         </div>
       </Link>
@@ -98,10 +98,10 @@ const Library: React.FC<LibraryProps> = ({ isLibraryOpened }) => {
           image={playlist.image!}
           name={playlist.name}
           tracks={playlist.tracks!}
-          label={`Playlist • ${playlist.author || playlist.user.name!}`}
+          label={`Playlist • ${playlist.author || playlist.createdUser?.name}`}
         />
       ))}
-      {user.liked.playlists?.map((playlist) => (
+      {user.likedPlaylists?.map((playlist) => (
         <LibraryItem
           key={playlist.id}
           href={
@@ -109,12 +109,14 @@ const Library: React.FC<LibraryProps> = ({ isLibraryOpened }) => {
               ? `/category/${playlist.name}`
               : `/playlist/${playlist.id}`
           }
+          tracks={playlist.tracks || playlist.createdUser?.tracks}
           image={playlist.image}
           name={playlist.name}
-          label={`Playlist • ${playlist.author}`}
+          authorId={playlist.createdUser?.id}
+          label={`Playlist • ${playlist.author || playlist.createdUser?.name}`}
         />
       ))}
-      {user.liked.artists?.map((artist) => (
+      {user.likedArtists?.map((artist) => (
         <LibraryItem
           key={artist.id}
           href={`/artist/${artist.id}`}

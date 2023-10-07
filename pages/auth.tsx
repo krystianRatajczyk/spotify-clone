@@ -1,4 +1,4 @@
-import React, { useCallback, useState,  useContext } from "react";
+import React, { useCallback, useState, useContext } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import axios from "axios";
@@ -257,7 +257,7 @@ const Auth = ({}) => {
                 "Register"
               )}
             </button>
-            
+
             <p
               className="text-right mt-10  text-gray-500 cursor-pointer"
               onClick={() => {

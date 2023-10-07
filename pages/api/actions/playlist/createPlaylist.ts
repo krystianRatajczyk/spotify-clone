@@ -15,12 +15,13 @@ export default async function handler(
     const createdPlaylist = await prismadb.playlist.create({
       data: {
         name: playlistName,
-        user: { connect: { id: user.id } },
+        createdUser: { connect: { id: user.id } },
         image: "",
         tracks: { create: [] },
       },
+      include: { createdUser: true },
     });
-
+    
     if (user) {
       const result = await prismadb.user.update({
         where: { id: user.id },

@@ -19,7 +19,7 @@ export const userPlaylistsReducer = (
             name: `My Playlist #${index}`,
             image: "",
             tracks: [],
-            user: { name: state.name },
+            createdUser: { name: state.name },
           },
           ...state.playlists,
         ],

@@ -11,22 +11,28 @@ export default async function handler(
     return res.status(405).end();
   }
   try {
-    const { songsIds, artistsIds, playlistsIds } = req.body;
+    const { songs, artists, playlists } = req.body;
     const { currentUser } = await serverAuth(req, res);
     
-    if (songsIds && artistsIds) {
+    if (songs || artists || playlists) {
       const result = await prisma.user.update({
         where: { email: currentUser.email },
         data: {
-          liked: {
-            artists: artistsIds,
-            songs: songsIds,
-            playlists: playlistsIds,
+          likedSongs: songs && {
+            [songs.action]: songs.ids.map((id: string) => ({ id: id })),
+          },
+          likedArtists: artists && {
+            [artists.action]: artists.ids.map((id: string) => ({ id: id })),
+          },
+          likedPlaylists: playlists && {
+            [playlists.action]: playlists.ids.map((id: string) => ({ id: id })),
           },
         },
       });
 
       return res.status(200).json(result);
+    } else {
+      return res.status(200).json("");
     }
   } catch (error) {
     console.log(error);

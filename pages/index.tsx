@@ -282,10 +282,10 @@ export default function Home({
               <div className="absolute right-2">
                 <PlayPause
                   onClick={() => {
-                    user?.liked.songs.length > 0 &&
+                    user?.likedSongs.length > 0 &&
                       playSongs(
                         music.currentIndex,
-                        user?.liked.songs,
+                        user?.likedSongs,
                         "likedSongs",
                         "Liked Songs",
                         `/likedSongs`

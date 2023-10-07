@@ -10,6 +10,7 @@ interface LibraryItemProps {
   name: string;
   label: string;
   tracks?: Track[];
+  authorId?: string;
 }
 
 const LibraryItem: React.FC<LibraryItemProps> = ({
@@ -18,6 +19,7 @@ const LibraryItem: React.FC<LibraryItemProps> = ({
   name,
   label,
   tracks,
+  authorId,
 }) => {
   return (
     <Link
@@ -39,7 +41,16 @@ const LibraryItem: React.FC<LibraryItemProps> = ({
 
       <div>
         <h2 className="font-semibold text-[17px]">{name}</h2>
-        <p className="text-[#929292] font-semibold text-[15px] ">{label}</p>
+        {!authorId ? (
+          <p className="text-[#929292] font-semibold text-[15px] ">{label}</p>
+        ) : (
+          <Link
+            href={`/users/${authorId}`}
+            className="text-[#929292] font-semibold text-[15px] "
+          >
+            {label}
+          </Link>
+        )}
       </div>
     </Link>
   );

@@ -29,7 +29,6 @@ export default async function handler(
         image: "",
         emailVerified: new Date(),
         recentSearches: [],
-        liked: { songs: [], artists: [], playlists: [] },
       },
     });
 

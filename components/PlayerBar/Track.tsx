@@ -10,7 +10,7 @@ const Track = () => {
   const { state: user, dispatch } = useContext(UserContext);
   const currentSong = state.currentSongs[state.currentIndex];
 
-  const isLikedSong = user.liked.songs?.find(
+  const isLikedSong = user.likedSongs?.find(
     (s) => s.id === state.currentSongs[state.currentIndex]?.id
   );
 

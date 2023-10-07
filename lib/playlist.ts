@@ -1,8 +1,17 @@
+import { Track } from "@prisma/client";
+
 export const addOrRemoveLikedPlaylist = (
   //@ts-ignore
   UserDispatch: ({ type: string, payload: Payload }) => void,
   isLiked: boolean,
-  playlist: { id: string; name: string; image: string; author: string }
+  playlist: {
+    id: string;
+    name: string;
+    image: string;
+    author?: string;
+    createdUser?: { id: string; name: string; tracks: Track[] };
+    createdUserId?: string;
+  }
 ) => {
   if (!isLiked) {
     UserDispatch({

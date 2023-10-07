@@ -14,7 +14,8 @@ import { InfoContext } from "@/context/InfoContext";
 import { UserContext } from "@/context/User/UserContext";
 import { arrayEquals, findMissingElements } from "@/lib/track";
 import axios from "axios";
-import { Artist, Playlist, Track, User } from "@prisma/client";
+import { Artist, Playlist, Track } from "@prisma/client";
+import { User } from "@/constants/formattedTypesPrisma";
 import { AnimatePresence } from "framer-motion";
 import { Notification, Player } from "@/components";
 import { MusicContext } from "@/context/MusicContext";
@@ -40,11 +41,9 @@ const Layout: React.FC<LayoutProps> = forwardRef(({ children }, ref) => {
   };
   const [currentUser, setCurrentUser] = useState<User>();
 
-  const likedSongsIds = user.liked.songs?.map((song) => song.id);
-  const likedArtistsIds = user.liked.artists?.map((artist) => artist.id);
-  const likedPlaylistsIds = user.liked.playlists?.map(
-    (playlist) => playlist.id
-  );
+  const likedSongsIds = user.likedSongs?.map((song) => song.id);
+  const likedArtistsIds = user.likedArtists?.map((artist) => artist.id);
+  const likedPlaylistsIds = user.likedPlaylists?.map((playlist) => playlist.id);
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -115,19 +114,85 @@ const Layout: React.FC<LayoutProps> = forwardRef(({ children }, ref) => {
   useEffect(() => {
     if (initialized) {
       const timeout = setTimeout(async () => {
-        // update array of ids in db only if 2 seconds past and something changed
-        if (
-          (!arrayEquals(currentUser?.liked.songs, likedSongsIds) ||
-            !arrayEquals(currentUser?.liked.artists, likedArtistsIds) ||
-            !arrayEquals(currentUser?.liked.playlists, likedPlaylistsIds)) &&
-          user.id // get rid of instant uploading empty arrays because of delay in deliver data
-        ) {
-          const res = await axios.post("/api/actions/liked/updateLiked", {
-            songsIds: likedSongsIds || [],
-            artistsIds: likedArtistsIds || [],
-            playlistsIds: likedPlaylistsIds || [],
-          });
+        const currentUserSongsIds =
+          currentUser?.likedSongs.map((song) => song.id) || [];
+        const currentUserArtistsIds =
+          currentUser?.likedArtists.map((artist) => artist.id) || [];
+        const currentUserPlaylistsIds =
+          currentUser?.likedPlaylists.map((playlist) => playlist.id) || [];
+
+        let options = {};
+        // update document in db only if 2 seconds past and something changed
+        if (!arrayEquals(currentUserSongsIds, likedSongsIds) && user.id) {
+          if (likedSongsIds.length > currentUserSongsIds.length) {
+            const missingSongs = findMissingElements(
+              likedSongsIds,
+              currentUserSongsIds
+            );
+            options = {
+              ...options,
+              songs: { ids: missingSongs, action: "connect" },
+            };
+          } else {
+            const missingSongs = findMissingElements(
+              currentUserSongsIds,
+              likedSongsIds
+            );
+            options = {
+              ...options,
+              songs: { ids: missingSongs, action: "disconnect" },
+            };
+          }
         }
+        if (!arrayEquals(currentUserArtistsIds, likedArtistsIds) && user.id) {
+          if (likedArtistsIds.length > currentUserArtistsIds.length) {
+            const missingSongs = findMissingElements(
+              likedArtistsIds,
+              currentUserArtistsIds
+            );
+            options = {
+              ...options,
+              artists: { ids: missingSongs, action: "connect" },
+            };
+          } else {
+            const missingSongs = findMissingElements(
+              currentUserArtistsIds,
+              likedArtistsIds
+            );
+            options = {
+              ...options,
+              artists: { ids: missingSongs, action: "disconnect" },
+            };
+          }
+        }
+        if (
+          !arrayEquals(currentUserPlaylistsIds, likedPlaylistsIds) &&
+          user.id
+        ) {
+          if (likedPlaylistsIds.length > currentUserPlaylistsIds.length) {
+            const missingSongs = findMissingElements(
+              likedPlaylistsIds,
+              currentUserPlaylistsIds
+            );
+            options = {
+              ...options,
+              playlists: { ids: missingSongs, action: "connect" },
+            };
+          } else {
+            const missingSongs = findMissingElements(
+              currentUserPlaylistsIds,
+              likedPlaylistsIds
+            );
+            options = {
+              ...options,
+              playlists: { ids: missingSongs, action: "disconnect" },
+            };
+          }
+        }
+        const res = await axios.post("/api/actions/liked/updateLiked", {
+          ...options,
+        });
+
       }, 1000);
 
       return () => clearTimeout(timeout);

@@ -8,10 +8,6 @@ import React, { useContext, useEffect } from "react";
 const Queue = () => {
   const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
 
-  useEffect(() => {
-    console.log(music.currentSongs, music.queue);
-  }, [music.queue, music.currentSongs]);
-
   return (
     <div className="min-h-full  bg-darkGray px-6">
       <div>

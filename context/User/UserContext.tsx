@@ -4,8 +4,7 @@ import { User as UserType } from "@/constants/formattedTypesPrisma";
 import axios from "axios";
 import React, { Dispatch, useEffect, useReducer } from "react";
 import rootReducer, { ActionType } from "./root";
-import { getFormattedObjects } from "@/lib/artist";
-import {  useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 //State
 type UserState = UserType;
@@ -36,50 +35,21 @@ export const UserContextProvider = ({
         if (state.id == "" || session?.user) {
           // do it if user wasnt registered, usually on refresh and login
           const currentUser = await axios.get("/api/current");
-
-          const likedArtists = await getFormattedObjects(
-            "/api/actions/artists/getArtistsByIdsWithSelect",
-            {
-              select: {
-                image: true,
-                id: true,
-                name: true,
-              },
-            },
-            "artists"
-          );
-
-          const likedPlaylists = await getFormattedObjects(
-            "/api/actions/playlist/getPlaylistsByIdsWithSelect",
-            {
-              select: {
-                image: true,
-                id: true,
-                name: true,
-                author: true,
-              },
-            },
-            "playlists"
-          );
-
-          const likedTracks = await getFormattedObjects(
-            "/api/actions/tracks/getTracksByIds",
-            {
-              options: { artists: true },
-            },
-            "songs"
-          );
-          
           const userObject = {
             ...currentUser.data,
             playlists: currentUser.data.playlists.reverse(),
-            liked: {
-              songs: likedTracks,
-              artists: likedArtists,
-              playlists: likedPlaylists,
-            },
+            likedPlaylists: currentUser.data.likedPlaylists.map((playlist) => {
+              return {
+                ...playlist,
+                createdUser: playlist.createdUser && {
+                  id: playlist.createdUser.id,
+                  name: playlist.createdUser.name,
+                },
+              };
+            }),
           };
-        dispatch({ type: "CHANGE_PROFILE", payload: userObject });
+          
+          dispatch({ type: "CHANGE_PROFILE", payload: userObject });
         }
       } catch (error) {
         console.error("Error fetching current user:", error);

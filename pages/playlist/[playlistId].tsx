@@ -12,6 +12,7 @@ import { InfoContext } from "@/context/InfoContext";
 import { MusicContext } from "@/context/MusicContext";
 import { UserContext } from "@/context/User/UserContext";
 import { requireAuthentication } from "@/lib/isAuthenticated";
+import { addOrRemoveLikedPlaylist } from "@/lib/playlist";
 import { timeReducer } from "@/lib/track";
 import { Playlist, Track } from "@prisma/client";
 import axios from "axios";
@@ -20,6 +21,7 @@ import { GetServerSideProps } from "next";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useRef, useState } from "react";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
 
 const PlaylistDetail = ({
@@ -34,13 +36,13 @@ const PlaylistDetail = ({
   ) => void;
 }) => {
   const [playlist, setPlaylist] = useState<
-    Playlist & { tracks: []; user: { name: string } }
+    Playlist & { tracks: []; createdUser: { id: string; name: string } }
   >();
   const [newName, setNewName] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { state: user, dispatch } = useContext(UserContext);
   const { dispatch: InfoDispatch } = useContext(InfoContext);
-  const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
+  const { state: music } = useContext(MusicContext);
   const [optionsOpen, setOptionsOpen] = useState<boolean>(false);
 
   const router = useRouter();
@@ -147,6 +149,27 @@ const PlaylistDetail = ({
     },
   ];
 
+  const isPlaylistLiked = !!user.likedPlaylists?.find(
+    (p) => p.id == playlist?.id
+  );
+
+  const handleHeartClick = () => {
+    playlist &&
+      addOrRemoveLikedPlaylist(dispatch, isPlaylistLiked, {
+        id: playlist.id,
+        createdUser: { ...playlist.createdUser, tracks: playlist.tracks },
+        createdUserId: playlist.createdUser.id,
+        name: playlist.name,
+        image: playlist.image!, // we are sure there will be image because here is the only place where image will appear
+      });
+  };
+
+  const HeartIcon = isPlaylistLiked ? (
+    <AiFillHeart size={40} color="#1ed860" onClick={handleHeartClick} />
+  ) : (
+    <AiOutlineHeart size={40} color={"lightGray"} onClick={handleHeartClick} />
+  );
+
   return (
     <Color src={src} crossOrigin="anonymous" format="hex">
       {({ data: dominantColor }) => {
@@ -206,7 +229,9 @@ const PlaylistDetail = ({
                     {playlist?.name}
                   </h2>
                   <p className="font-semibold">
-                    <span className="font-bold">{playlist?.user.name}</span>
+                    <span className="font-bold">
+                      {playlist?.createdUser?.name}
+                    </span>
                     <span> • </span> {playlist?.tracks.length} songs{", "}
                     <span className="font-bold text-[rgba(201,198,198,0.75)]">
                       {playlist?.tracks && getTime()}
@@ -240,6 +265,7 @@ const PlaylistDetail = ({
                       iconSize={35}
                       animation={false}
                     />
+                    {!isInPlaylist && HeartIcon}
                     {isInPlaylist && (
                       <div className="relative">
                         {optionsOpen && (

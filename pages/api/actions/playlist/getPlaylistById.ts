@@ -16,13 +16,15 @@ export default async function handler(
         id,
       },
       include: {
-        user: { select: { name: true } },
+        createdUser: { select: { id: true, name: true } },
         tracks: { include: { artists: true } },
       },
     });
 
     if (playlist) {
       return res.status(200).json(playlist);
+    } else {
+      return res.status(200).json("");
     }
   } catch (error) {
     console.log(error);

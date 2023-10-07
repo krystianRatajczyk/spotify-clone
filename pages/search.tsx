@@ -81,7 +81,7 @@ const Search = () => {
                     ? { artists: true }
                     : type == "playlist"
                     ? {
-                        user: { select: { name: true } },
+                        createdUser: { select: { name: true } },
                         tracks: {
                           select: {
                             name: true,
@@ -106,7 +106,6 @@ const Search = () => {
               },
               key,
             });
-
             if (type == "track") {
               tracks = res.data;
             } else if (type == "artist") {
@@ -390,8 +389,10 @@ const Search = () => {
                           type="playlist"
                           id={playlist.name}
                           tracks={playlist.tracks}
-                          username={playlist.author || playlist.user.name}
-                          authorId={playlist.userId || playlist.name}
+                          username={
+                            playlist.author || playlist?.createdUser?.name
+                          }
+                          authorId={playlist.createdUserId || playlist.name}
                           name={playlist.name}
                           image={playlist.image ? playlist.image : ""}
                           modal="playpause"

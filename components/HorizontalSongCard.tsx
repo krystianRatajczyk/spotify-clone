@@ -68,7 +68,7 @@ const HorizontalSongCard: React.FC<HorizontalSongCardProps> = ({
   const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
 
   const [addRecentSearch] = useAddRecentSearch();
-  const isLikedSong = user.liked.songs?.find((s) => s.id === id);
+  const isLikedSong = user.likedSongs?.find((s) => s.id === id);
 
   const buttonRef = useRef<HTMLDivElement>(null);
 

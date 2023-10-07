@@ -27,7 +27,7 @@ const likedSongs: React.FC<LikedSongsProps> = ({ playSongs }) => {
     dispatch({
       type: "SET_SONGS_AND_LABEL",
       payload: {
-        tracks: user.liked.songs,
+        tracks: user.likedSongs,
         label: "Liked Songs",
         playlistId: "likedSongs",
       },
@@ -53,7 +53,7 @@ const likedSongs: React.FC<LikedSongsProps> = ({ playSongs }) => {
             <h2 className="text-[90px] font-bold">Liked Songs</h2>
             <p className="font-semibold">
               <span className="font-bold">{user.name}</span>
-              <span> • </span> {user.liked.songs.length} songs
+              <span> • </span> {user.likedSongs?.length || 0} songs
             </p>
           </div>
         </div>
@@ -62,14 +62,14 @@ const likedSongs: React.FC<LikedSongsProps> = ({ playSongs }) => {
         className="w-full min-h-full flex-1 -mt-[325px] bg-[rgba(0,0,0,0.3)] p-5
          "
       >
-        {user.liked.songs?.length > 0 && (
+        {user.likedSongs?.length > 0 && (
           <div className="h-full">
             <div className="pl-3">
               <PlayPause
                 onClick={() =>
                   playSongs(
                     music.currentIndex,
-                    user.liked.songs,
+                    user.likedSongs,
                     "likedSongs",
                     "Liked Songs",
                     "/likedSongs"
@@ -85,7 +85,7 @@ const likedSongs: React.FC<LikedSongsProps> = ({ playSongs }) => {
               <Header withDate />
             </div>
             <div className="h-full">
-              {user.liked.songs?.map((track, index) => (
+              {user.likedSongs?.map((track, index) => (
                 <HorizontalSongCard
                   key={index}
                   {...track}
@@ -97,7 +97,7 @@ const likedSongs: React.FC<LikedSongsProps> = ({ playSongs }) => {
                   playSong={() =>
                     playSongs(
                       index,
-                      user.liked.songs,
+                      user.likedSongs,
                       "likedSongs",
                       "Liked Songs",
                       "/likedSongs"

@@ -75,11 +75,11 @@ const ArtistDetail = ({ artistData, playSongs }: ArtistDetailProps) => {
 
   useEffect(() => {
     if (artist) {
-      const following = !!user.liked.artists?.find((a) => a.id == artist.id);
+      const following = !!user.likedArtists?.find((a) => a.id == artist.id);
 
       setIsFollowing(following);
     }
-  }, [user.liked.artists, artist]);
+  }, [user.likedArtists, artist]);
 
   return (
     <Color src={artist?.image || ""} crossOrigin="anonymous" format="hex">

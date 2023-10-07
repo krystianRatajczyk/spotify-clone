@@ -20,8 +20,10 @@ model User {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   recentSearches Json[]     @default([])
-  liked          Json
-  playlists      Playlist[]
+  playlists      Playlist[] @relation("playlists")
+  likedPlaylists Playlist[] @relation("likedPlaylists")
+  likedSongs     Track[]
+  likedArtists   Artist[]
 }
 
 model Track {
@@ -37,6 +39,8 @@ model Track {
   genre        String
   playlists    Playlist[] @relation(fields: [playlistsIds], references: [id])
   playlistsIds String[]   @db.ObjectId
+  User         User?      @relation(fields: [userId], references: [id])
+  userId       String?    @db.ObjectId
 }
 
 model Artist {
@@ -47,16 +51,20 @@ model Artist {
   image        String
   currentRank  Int
   previousRank Int
+  User         User?    @relation(fields: [userId], references: [id])
+  userId       String?  @db.ObjectId
 }
 
 model Playlist {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  tracks    Track[]  @relation(fields: [tracksIds], references: [id])
-  tracksIds String[] @db.ObjectId
-  image     String?
-  isPublic  Boolean  @default(true)
-  author    String?
-  user      User?    @relation(fields: [userId], references: [id])
-  userId    String?  @db.ObjectId
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  tracks        Track[]  @relation(fields: [tracksIds], references: [id])
+  tracksIds     String[] @db.ObjectId
+  image         String?
+  isPublic      Boolean  @default(true)
+  author        String?
+  likedUserId   String?  @db.ObjectId
+  likedUser     User?    @relation("likedPlaylists", fields: [likedUserId], references: [id])
+  createdUserId String?  @db.ObjectId
+  createdUser   User?    @relation("playlists", fields: [createdUserId], references: [id])
 }

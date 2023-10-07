@@ -32,7 +32,7 @@ export const authOptions: NextAuthOptions = {
           include: {
             playlists: {
               include: {
-                user: { select: { name: true } },
+                createdUser: { select: { name: true } },
               },
             },
           },
