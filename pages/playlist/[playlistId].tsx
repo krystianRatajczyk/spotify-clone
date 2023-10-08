@@ -51,16 +51,21 @@ const PlaylistDetail = ({
 
   useEffect(() => {
     const getPlaylist = async () => {
-      const playlist: Playlist & { user: { name: string }; tracks: [] } =
-        user.playlists.find((p) => p.id === router.query.playlistId);
-      if (!playlist) {
+      const createdPlaylist = user.playlists.find(
+        (p) => p.id === router.query.playlistId
+      );
+      const likedPlaylist = user.likedPlaylists.find(
+        (p) => p.id === router.query.playlistId
+      );
+
+      if (!createdPlaylist && !likedPlaylist) {
         const res = await axios.post("/api/actions/playlist/getPlaylistById", {
           id: router.query.playlistId,
         });
-
+        
         setPlaylist(res?.data);
       } else {
-        setPlaylist(playlist);
+        setPlaylist(createdPlaylist || likedPlaylist);
       }
 
       InfoDispatch({

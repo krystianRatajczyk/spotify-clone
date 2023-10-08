@@ -1,4 +1,4 @@
-import { Playlist, Track } from "@prisma/client";
+import { Track } from "@prisma/client";
 import React from "react";
 import { BsMusicNoteBeamed } from "react-icons/bs";
 
@@ -19,10 +19,14 @@ const PlaylistImage: React.FC<PlaylistImageProps> = ({
     <div>
       {tracks?.length === 0 ? (
         <div
-          style={{
-            width: width.toString() + "px",
-            height: width.toString() + "px",
-          }}
+          style={
+            width > -1
+              ? {
+                  width: width.toString() + "px",
+                  height: width.toString() + "px",
+                }
+              : { width: "100%", aspectRatio: "1/1" }
+          }
           className={`
             bg-[#282828]
             flex items-center justify-center shadow-[rgba(0,_0,_0,_0.4)_0px_30px_90px]

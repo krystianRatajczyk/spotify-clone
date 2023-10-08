@@ -25,7 +25,9 @@ export interface User {
     name: string;
     author?: string;
     image: string;
-  user: { id: string; name: string; tracks: Track[] };
+    user: { id: string; name: string; tracks: Track[] };
     userId: string;
   }[];
+  following: { id: string; name: string; image: string }[];
+  followers: { id: string; name: string; image: string }[];
 }

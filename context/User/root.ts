@@ -1,3 +1,4 @@
+import { followingReducer } from "./reducers/follow/reducer";
 import { User, User as UserType } from "@/constants/formattedTypesPrisma";
 import { Track } from "@prisma/client";
 import { likedSongsReducer } from "./reducers/likedSongs/reducer";
@@ -15,9 +16,21 @@ export type ActionType =
   | LikedSongsActions
   | LikedArtistsActions
   | LikedPlaylistsActions
-  | PlaylistActions;
+  | PlaylistActions
+  | FollowActions;
 
 type ProfileActions = { type: "CHANGE_PROFILE"; payload: UserType | {} };
+
+type FollowActions =
+  | {
+      type: "ADD_FOLLOWING";
+      payload: {
+        id: string;
+        name: string;
+        image: string;
+      };
+    }
+  | { type: "REMOVE_FOLLOWING"; payload: { id: string } };
 
 type RecentSearchesActions =
   | {
@@ -76,6 +89,7 @@ const rootReducer = (state: UserState, action: ActionType): UserState => {
     ...likedSongsReducer(state, action),
     ...likedPlaylistsReducer(state, action),
     ...userPlaylistsReducer(state, action),
+    ...followingReducer(state, action),
   };
 };
 

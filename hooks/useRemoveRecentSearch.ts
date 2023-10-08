@@ -17,24 +17,6 @@ const useRemoveRecentSearch = () => {
     });
   };
 
-  // useEffect(() => {
-  //   console.log("run");
-  //   const timeout = setTimeout(async () => {
-  //     const user = await axios.get("/api/current");
-
-  //     const databaseRecentSearchIds = user.data.recentSearches.map(
-  //       (r: any) => r.id
-  //     );
-  //     console.log(userRecentSearchIds, databaseRecentSearchIds);
-  //     if (!arrayEquals(userRecentSearchIds, databaseRecentSearchIds)) {
-  //       console.log("udaptin]g");
-  //
-  //     }
-  //   }, 1000);
-
-  //   return () => clearTimeout(timeout);
-  // }, [userRecentSearchIds]);
-
   return [removeRecentSearch];
 };
 

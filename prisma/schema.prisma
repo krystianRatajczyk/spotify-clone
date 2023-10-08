@@ -11,19 +11,25 @@ datasource db {
 }
 
 model User {
-  id             String     @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
-  email          String     @unique
-  emailVerified  DateTime
-  image          String?
-  hashedPassword String
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  recentSearches Json[]     @default([])
-  playlists      Playlist[] @relation("playlists")
-  likedPlaylists Playlist[] @relation("likedPlaylists")
-  likedSongs     Track[]
-  likedArtists   Artist[]
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  email           String     @unique
+  emailVerified   DateTime
+  image           String?
+  hashedPassword  String
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  recentSearches  Json[]     @default([])
+  followers       User[]     @relation("followers")
+  following       User[]     @relation("following")
+  playlists       Playlist[] @relation("playlists")
+  likedPlaylists  Playlist[] @relation("likedPlaylists")
+  likedSongs      Track[]
+  likedArtists    Artist[]
+  followersUserId String?    @db.ObjectId
+  followersUser   User?      @relation("followers", fields: [followersUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  followingUserId String?    @db.ObjectId
+  followingsUser  User?      @relation("following", fields: [followingUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model Track {

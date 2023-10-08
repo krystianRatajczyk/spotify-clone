@@ -14,6 +14,7 @@ import { AnimatePresence } from "framer-motion";
 import { BsMusicNoteBeamed } from "react-icons/bs";
 import { Artist, Track } from "@prisma/client";
 import { MusicContext } from "@/context/MusicContext";
+import PlaylistImage from "./PlaylistImage";
 
 interface VerticalCardProps {
   id: string;
@@ -128,12 +129,18 @@ const VerticalCard: React.FC<VerticalCardProps> = ({
               <GoPerson size={60} color="#B3B3B3" />
             </Picture>
           ) : type === "playlist" && image === "" ? (
-            <div
-              className="w-full aspect-[1/1] rounded-lg flex items-center
-          justify-center bg-[#282828] shadow-[rgba(0,_0,_0,_0.4)_0px_30px_90px]"
-            >
-              <BsMusicNoteBeamed size={60} color="#b3b3b3" />
-            </div>
+            tracks ? (
+              <div>
+                <PlaylistImage tracks={tracks} width={-1} rounded />
+              </div>
+            ) : (
+              <div
+                className="w-full aspect-[1/1] rounded-lg flex items-center
+        justify-center bg-[#282828] shadow-[rgba(0,_0,_0,_0.4)_0px_30px_90px]"
+              >
+                <BsMusicNoteBeamed size={60} color="#b3b3b3" />
+              </div>
+            )
           ) : (
             <img
               src={image}

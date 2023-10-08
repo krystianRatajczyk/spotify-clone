@@ -44,6 +44,7 @@ const Layout: React.FC<LayoutProps> = forwardRef(({ children }, ref) => {
   const likedSongsIds = user.likedSongs?.map((song) => song.id);
   const likedArtistsIds = user.likedArtists?.map((artist) => artist.id);
   const likedPlaylistsIds = user.likedPlaylists?.map((playlist) => playlist.id);
+  const followingIds = user.following.map((f) => f.id);
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -120,6 +121,28 @@ const Layout: React.FC<LayoutProps> = forwardRef(({ children }, ref) => {
           currentUser?.likedArtists.map((artist) => artist.id) || [];
         const currentUserPlaylistsIds =
           currentUser?.likedPlaylists.map((playlist) => playlist.id) || [];
+        const currentUserFollowingIds =
+          currentUser?.following.map((f) => f.id) || [];
+
+        if (!arrayEquals(currentUserFollowingIds, followingIds)) {
+          let options;
+          if (followingIds.length > currentUserFollowingIds.length) {
+            const missingSongs = findMissingElements(
+              followingIds,
+              currentUserFollowingIds
+            );
+            options = { ids: missingSongs, action: "connect" };
+          } else {
+            const missingSongs = findMissingElements(
+              currentUserFollowingIds,
+              followingIds
+            );
+            options = { ids: missingSongs, action: "disconnect" };
+          }
+          const res = await axios.post("/api/actions/follow/updateFollowing", {
+            ...options,
+          });
+        }
 
         let options = {};
         // update document in db only if 2 seconds past and something changed
@@ -192,7 +215,6 @@ const Layout: React.FC<LayoutProps> = forwardRef(({ children }, ref) => {
         const res = await axios.post("/api/actions/liked/updateLiked", {
           ...options,
         });
-
       }, 1000);
 
       return () => clearTimeout(timeout);

@@ -48,7 +48,6 @@ export const UserContextProvider = ({
               };
             }),
           };
-          
           dispatch({ type: "CHANGE_PROFILE", payload: userObject });
         }
       } catch (error) {
@@ -57,7 +56,7 @@ export const UserContextProvider = ({
     };
 
     fetchCurrentUser();
-  }, [session]); // Empty dependency array to ensure the effect runs only once on app load
+  }, [session]);
 
   return (
     <UserContext.Provider value={{ state, dispatch }}>

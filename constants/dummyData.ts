@@ -12,6 +12,8 @@ export const User = {
   likedSongs: [],
   likedArtists: [],
   likedPlaylists: [],
+  followers: [],
+  following: [],
 };
 
 export const darkerAmount = 50;

@@ -10,10 +10,10 @@ export default async function handler(
     return res.status(405).end();
   }
   try {
-    const { id, select } = req.body;
+    const { id, options } = req.body;
     const user = await prisma.user.findUnique({
       where: { id },
-      select: { ...select },
+      ...options,
     });
 
     if (user) {

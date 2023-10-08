@@ -7,6 +7,8 @@ interface ProfileHeaderProps {
   id: string;
   name: string;
   image: string;
+  followers: { id: string; name: string; image: true }[];
+  following: { id: string; name: string; image: true }[];
   dominantColor: string | undefined;
   darkerAmount: number;
 }
@@ -15,6 +17,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   image,
   name,
   dominantColor,
+  followers,
+  following,
 }) => {
   return (
     <div
@@ -36,7 +40,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <h4 className="font-bold">Profile</h4>
         <h2 className="text-bold text-white text-[100px] font-bold ">{name}</h2>
         <p className="font-semibold">
-          1 followers <span>•</span> 11 following
+          {followers.length} followers <span>•</span> {following.length} following
         </p>
       </div>
     </div>

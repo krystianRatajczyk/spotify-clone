@@ -1,5 +1,4 @@
 import { Header, PlayPause, HorizontalSongCard } from "@/components";
-import { musicTypes } from "@/constants/dummyData";
 import { InfoContext } from "@/context/InfoContext";
 import { MusicContext } from "@/context/MusicContext";
 import { UserContext } from "@/context/User/UserContext";
@@ -29,29 +28,35 @@ const CategoryDetail: React.FC<CategoryProps> = ({ playSongs }) => {
   const [playlist, setPlaylist] = useState<Playlist | undefined>(undefined);
   const { dispatch } = useContext(InfoContext);
   const { state: user, dispatch: UserDispatch } = useContext(UserContext);
-  const { state: music, dispatch: MusicDispatch } = useContext(MusicContext);
+  const { state: music } = useContext(MusicContext);
 
   const router = useRouter();
 
   useEffect(() => {
     const loadTracks = async () => {
-      const category = musicTypes.find(
-        (category) => category.name === router.query.categoryName
+      let playlist = user.likedPlaylists.find(
+        (p) => p.name === router.query.categoryName
       );
 
-      const res = await axios.post("/api/actions/playlist/getPlaylistByName", {
-        name: category?.name,
-        author: "Spotify",
-      });
+      if (!playlist) {
+        const res = await axios.post(
+          "/api/actions/playlist/getPlaylistByName",
+          {
+            name: router.query.categoryName,
+            author: "Spotify",
+          }
+        );
+        playlist = res.data;
+      }
 
-      setPlaylist(res?.data);
-      setTracks(res?.data.tracks);
+      setPlaylist(playlist);
+      setTracks(playlist?.tracks);
 
       dispatch({
         type: "SET_SONGS_AND_LABEL",
         payload: {
           label: router.query.categoryName,
-          tracks: res?.data.tracks,
+          tracks: playlist?.tracks,
           playlistId: router.query.categoryName,
         },
       });

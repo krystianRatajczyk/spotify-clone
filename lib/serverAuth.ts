@@ -31,12 +31,14 @@ const serverAuth = async (
           name: true,
           author: true,
           image: true,
-          tracks: true,
-          createdUser: true,
+          tracks: { include: { artists: true } },
+          createdUser: { select: { id: true, name: true } },
         },
       },
       likedSongs: { include: { artists: true } },
       likedArtists: { select: { id: true, name: true, image: true } },
+      followers: { select: { id: true, image: true, name: true } },
+      following: { select: { id: true, image: true, name: true } },
     },
   });
 

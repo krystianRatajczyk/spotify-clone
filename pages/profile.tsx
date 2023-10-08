@@ -5,7 +5,14 @@ import { GoPerson } from "react-icons/go";
 import { HiOutlinePencil } from "react-icons/hi";
 import { BeatLoader } from "react-spinners";
 import useHover from "@/hooks/useHover";
-import { Modal, Input, Button, Notification, Picture } from "@/components";
+import {
+  Modal,
+  Input,
+  Button,
+  Notification,
+  Picture,
+  VerticalCard,
+} from "@/components";
 import { checkImageExists } from "@/lib/checkImageExists";
 import axios from "axios";
 import {
@@ -15,7 +22,7 @@ import {
 } from "@/constants/initialStates";
 import { UserContext } from "@/context/User/UserContext";
 import Color from "color-thief-react";
-import { getDownGradient, getUpGradient } from "@/constants/styles";
+import {  getUpGradient } from "@/constants/styles";
 import { AnimatePresence } from "framer-motion";
 
 const Profile = () => {
@@ -121,6 +128,10 @@ const Profile = () => {
         });
     }
   };
+
+  useEffect(() => {
+    console.log(user.following);
+  }, [user.following]);
 
   return (
     <Color src={user?.image || ""} crossOrigin="anonymous" format="hex">
@@ -259,14 +270,55 @@ const Profile = () => {
                 )}
 
                 <p className="font-semibold">
-                  1 followers <span>•</span> 11 following
+                  {user.followers.length} followers <span>•</span>{" "}
+                  {user.following.length} following
                 </p>
               </div>
             </div>
             <div
-              style={getDownGradient(dominantColor)}
-              className="flex-1 drop-shadow-md"
-            ></div>
+              style={{
+                background:
+                  "linear-gradient(to bottom, #242424, #121212 150px)",
+              }}
+              className="flex-1 drop-shadow-md p-4"
+            >
+              {user.followers.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <h2 className="text-[20px] font-bold">Followers</h2>
+                  <div className="flex gap-2 items-center flex-wrap">
+                    {user.followers.map((f) => {
+                      return (
+                        <VerticalCard
+                          {...f}
+                          type="profile"
+                          typeId={f.id}
+                          imageClassName=""
+                          modal="none"
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              {user.following.length > 0 && (
+                <div className="flex flex-col gap-2 mt-4">
+                  <h2 className="text-[20px] font-bold">Following</h2>
+                  <div className="flex gap-2 items-center flex-wrap">
+                    {user.following.map((f) => {
+                      return (
+                        <VerticalCard
+                          {...f}
+                          type="profile"
+                          typeId={f.id}
+                          imageClassName=""
+                          modal="none"
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         );
       }}

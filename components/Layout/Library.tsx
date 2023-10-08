@@ -3,7 +3,6 @@ import { AiFillHeart, AiFillPushpin } from "react-icons/ai";
 import { UserContext } from "@/context/User/UserContext";
 import Link from "next/link";
 import LibraryItem from "./LibraryItem";
-import { BsMusicNoteBeamed } from "react-icons/bs";
 import PlaylistImage from "../PlaylistImage";
 
 interface LibraryProps {
